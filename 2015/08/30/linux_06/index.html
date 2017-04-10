@@ -19,7 +19,7 @@
 <meta property="og:url" content="http://magnetoeric.github.io/2015/08/30/linux_06/index.html">
 <meta property="og:site_name" content="艾瑞克">
 <meta property="og:description" content="通常在服务器执行某些shell的时候，都是挂起执行的。但是有时候忘记了挂起执行，不小心直接执行了，ctrl＋c 停止，然后再加nohup。但是这种方式带来的问题也很突出，前面执行的命令是无法回滚的。所以去网上寻找了一些方法，这篇文章虽然比较久远，但是很实用，转过来学习了解决方法就是使用disown  我们经常会碰到这样的问题，用 telnet/ssh 登录了远程的 Linux 服务器，运行了一些耗">
-<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta property="og:updated_time" content="2017-04-10T10:24:43.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux 技巧：让进程在后台可靠运行的几种方法">
 <meta name="twitter:description" content="通常在服务器执行某些shell的时候，都是挂起执行的。但是有时候忘记了挂起执行，不小心直接执行了，ctrl＋c 停止，然后再加nohup。但是这种方式带来的问题也很突出，前面执行的命令是无法回滚的。所以去网上寻找了一些方法，这篇文章虽然比较久远，但是很实用，转过来学习了解决方法就是使用disown  我们经常会碰到这样的问题，用 telnet/ssh 登录了远程的 Linux 服务器，运行了一些耗">
@@ -48,7 +48,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -64,7 +64,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -87,14 +87,14 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-29T16:26:00.000Z" itemprop="datePublished"> 发表于 2015-08-30</time>
+    <time datetime="2015-08-29T16:26:00.000Z" itemprop="datePublished"> Published 2015-08-30</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目录</strong>
+			<strong class="toc-title">Contents</strong>
 		
 			
 		
@@ -149,7 +149,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/linux-shell/">linux,shell</a>
+  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/shell/">shell</a>
   </div>
 
 </div>
@@ -193,31 +193,31 @@
 	
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目录</strong>
+  <strong class="toc-title">Contents</strong>
  
  
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">标签云</p>
+    <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -269,7 +269,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
 		  
 		
 		  
@@ -507,7 +507,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

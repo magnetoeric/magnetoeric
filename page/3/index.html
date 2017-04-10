@@ -46,7 +46,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -62,7 +62,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -80,6 +80,335 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/04/20/git-hook/" title="git hook" itemprop="url">git hook</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-20T08:13:00.000Z" itemprop="datePublished"> Published 2016-04-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="hook"><a href="#hook" class="headerlink" title="hook"></a>hook</h2><p>使用了很久git了，但是hook用的很少，今天研究一下<br>git的hook放在GIT_DIR/.git/hooks目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  hooks git:(master) ls -al</div><div class="line">总用量 48</div><div class="line">drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .</div><div class="line">drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..</div><div class="line">-rwxrwxr-x 1 eric eric  452  4月 20 16:18 applypatch-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  896  4月 20 16:18 commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  189  4月 20 16:18 post-update.sample</div><div class="line">-rwxrwxr-x 1 eric eric  398  4月 20 16:18 pre-applypatch.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1642  4月 20 16:18 pre-commit.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1239  4月 20 16:18 prepare-commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1352  4月 20 16:18 pre-push.sample</div><div class="line">-rwxrwxr-x 1 eric eric 4898  4月 20 16:18 pre-rebase.sample</div><div class="line">-rwxrwxr-x 1 eric eric 3611  4月 20 16:18 update.sample</div></pre></td></tr></table></figure></p>
+<p>可以看到该目录下有很多以sample结尾的文件<br>这里尝试几个简单的吧</p>
+<h2 id="客户端钩子"><a href="#客户端钩子" class="headerlink" title="客户端钩子"></a>客户端钩子</h2><h3 id="commit-msg"><a href="#commit-msg" class="headerlink" title="commit-msg"></a>commit-msg</h3><p>将commit-msg.sample 重命名commit-msg<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">mv commit-msg.sample commit-msg</div><div class="line">➜  hooks git:(master) cat commit-msg </div><div class="line">#!/bin/sh</div><div class="line">#</div><div class="line"># An example hook script to check the commit log message.</div><div class="line"># Called by &quot;git commit&quot; with one argument, the name of the file</div><div class="line"># that has the commit message.  The hook should exit with non-zero</div><div class="line"># status after issuing an appropriate message if it wants to stop the</div><div class="line"># commit.  The hook is allowed to edit the commit message file.</div><div class="line">#</div><div class="line"># To enable this hook, rename this file to &quot;commit-msg&quot;.</div><div class="line"></div><div class="line"># Uncomment the below to add a Signed-off-by line to the message.</div><div class="line"># Doing this in a hook is a bad idea in general, but the prepare-commit-msg</div><div class="line"># hook is more suited to it.</div><div class="line">#</div><div class="line"># SOB=$(git var GIT_AUTHOR_IDENT | sed -n &apos;s/^\(.*&gt;\).*$/Signed-off-by: \1/p&apos;)</div><div class="line"># grep -qs &quot;^$SOB&quot; &quot;$1&quot; || echo &quot;$SOB&quot; &gt;&gt; &quot;$1&quot;</div><div class="line"></div><div class="line"># This example catches duplicate Signed-off-by lines.</div><div class="line"></div><div class="line">test &quot;&quot; = &quot;$(grep &apos;^Signed-off-by: &apos; &quot;$1&quot; |</div><div class="line">	 sort | uniq -c | sed -e &apos;/^[ 	]*1[ 	]/d&apos;)&quot; || &#123;</div><div class="line">	echo &gt;&amp;2 Duplicate Signed-off-by lines.</div><div class="line">	exit 1</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看介绍，应该是在git commit 命令时检查log message的脚本，有一个参数，存放commit message的文件名<br>在最后加上判断log message低于3个时不得提交的脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">words=$(cat $1 |wc -w)</div><div class="line">if test $words -lt 3</div><div class="line"> then  echo &quot;commit message should larger than 3 words&quot;</div><div class="line">       exit 1</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p>然后添加一个文件,提交。无法提交，原因是message单词数没有超过3个，过于简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  git-hooks git:(master) ✗ echo 1111&gt;aaa</div><div class="line">➜  git-hooks git:(master) ✗ git add .</div><div class="line">➜  git-hooks git:(master) ✗ git commit -m &apos;add aaa&apos;</div><div class="line">commit message should larger than 3 words</div></pre></td></tr></table></figure></p>
+<h3 id="pre-commit"><a href="#pre-commit" class="headerlink" title="pre-commit"></a>pre-commit</h3><p>git commit 触发  先于commit-msg，不接收参数</p>
+<h3 id="prepare-commit-msg"><a href="#prepare-commit-msg" class="headerlink" title="prepare-commit-msg"></a>prepare-commit-msg</h3><p>效果与pre-commit类似，先于pre-commit执行</p>
+<h2 id="服务器钩子"><a href="#服务器钩子" class="headerlink" title="服务器钩子"></a>服务器钩子</h2><h3 id="pre-receive"><a href="#pre-receive" class="headerlink" title="pre-receive"></a>pre-receive</h3><p>在客户端推送时最先执行，可以用它来拒绝客户端的推送。<br>我能想到的，可以做语法检查，拼写等等</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>与 pre-receive 类似，但会在每个分支都执行一次。</p>
+<h3 id="post-receive"><a href="#post-receive" class="headerlink" title="post-receive"></a>post-receive</h3><p>在客户端推送完成后执行</p>
+<h2 id="使用gitlab的webhook"><a href="#使用gitlab的webhook" class="headerlink" title="使用gitlab的webhook"></a>使用gitlab的webhook</h2><p>现在很多版本控制都是使用git，gitlab来管理git项目仓库，其提供了方便的web管理，用户访问及权限，是搭建私人git仓库的推荐选择。<br>具体安装可以参考官方的wiki，因为gitlab比较吃内存，，所以我不想把它安装到机器上，所以就用docker来操作吧。<br>创建一个名为gitlab的容器，并将其80端口映射到苏主机的8088端口<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -itd -p 8088:80 --name gitlab gitlab/gitlab-ce</div></pre></td></tr></table></figure></p>
+<p>等待一段时间，就可以访问本机的8088端口，进入到gitlab的web管理界面了，初次使用要设置root的密码，然后就可以登录了，默认管理员帐号是root，密码是初次进入时设置的。<br>登录后点击 new project创建一个git项目,就叫做testHook把<br>接下来再启动一个docker 容器来作为git的客户端<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -it --link=gitlab ubuntu:14.04 /bin/bash</div></pre></td></tr></table></figure></p>
+<p>启动后安装git<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~# apt-get update &amp;&amp; apt-get install git</div></pre></td></tr></table></figure></p>
+<p>生成sshkey<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen</div></pre></td></tr></table></figure></p>
+<p>一直回车就可以了，在~/.ssh/下就生成了2个文件，私钥和公钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
+<p>把公钥设置到gitlab里，搜索框里搜索sshkey，把公钥复制到key中，title可以随意设置，gitlab也会自动生成<br>接下来把git项目clone到客户端中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~#git clone git@b9a4402e85aa:root/testhook.git</div></pre></td></tr></table></figure></p>
+<p>home目录下就会有一个空的git项目testHook，</p>
+<p>接下来设置webhook,可以为每个项目设置webhook，比如我创建的这个git项目，在<a href="http://localhost:8088/root/testhook/hooks" target="_blank" rel="external">http://localhost:8088/root/testhook/hooks</a> 中设置<br>这里我只添加push event，这个钩子作用应该类似post-receive，url是钩子触发时，需要向“谁”报告,这里我只在本机上启动了一个swoole-server,url请求swoole来看看gitlab钩子触发时具体发了些什么信息<br>swoole的代码就直接粘贴到这里了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">// Server</div><div class="line">class Server</div><div class="line">&#123;</div><div class="line">    private $serv;</div><div class="line"></div><div class="line">    public function __construct() &#123;</div><div class="line">        $this-&gt;serv = new swoole_server(&quot;0.0.0.0&quot;, 9501);</div><div class="line">        $this-&gt;serv-&gt;set(array(</div><div class="line">            &apos;worker_num&apos; =&gt; 8,</div><div class="line">            &apos;daemonize&apos; =&gt; false,</div><div class="line">            &apos;max_request&apos; =&gt; 10000,</div><div class="line">            &apos;dispatch_mode&apos; =&gt; 2,</div><div class="line">            &apos;debug_mode&apos;=&gt; 1</div><div class="line">        ));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;on(&apos;Start&apos;, array($this, &apos;onStart&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Connect&apos;, array($this, &apos;onConnect&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Receive&apos;, array($this, &apos;onReceive&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Close&apos;, array($this, &apos;onClose&apos;));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onStart( $serv ) &#123;</div><div class="line">        echo &quot;Start\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onConnect( $serv, $fd, $from_id ) &#123;</div><div class="line">        $serv-&gt;send( $fd, &quot;Hello &#123;$fd&#125;!,this is swoole server &quot; );</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onReceive( swoole_server $serv, $fd, $from_id, $data ) &#123;</div><div class="line">        echo &quot;Get Message From Client &#123;$fd&#125;:&#123;$data&#125;\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onClose( $serv, $fd, $from_id ) &#123;</div><div class="line">        echo &quot;Client &#123;$fd&#125; close connection\n&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">// 启动服务器</div><div class="line">$server = new Server();</div></pre></td></tr></table></figure></p>
+<p>启动swooleserver</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php swoole-server.php</div></pre></td></tr></table></figure>
+<p>然后来操作下客户端，需要设置git的user.name 和user.email不然不能commit<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# echo 1&gt;test</div><div class="line">root@ed6dd236d56b:~/testhook# git add test</div><div class="line">root@ed6dd236d56b:~/testhook# git commit -m &apos;add test&apos;</div><div class="line">[master 7923a94] add test</div><div class="line">1 file changed, 1 insertion(+)</div><div class="line">create mode 100644 test</div></pre></td></tr></table></figure></p>
+<p>接下来push，让gitlab产生一个触发<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# git push origin master</div><div class="line">Counting objects: 4, done.</div><div class="line">Delta compression using up to 4 threads.</div><div class="line">Compressing objects: 100% (2/2), done.</div><div class="line">Writing objects: 100% (3/3), 256 bytes | 0 bytes/s, done.</div><div class="line">Total 3 (delta 0), reused 0 (delta 0)</div><div class="line">To git@b9a4402e85aa:root/testhook.git</div><div class="line">79a7567..7923a94  master -&gt; master</div></pre></td></tr></table></figure></p>
+<p>可以看到swoole产生的日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  php swoole-server.php</div><div class="line">Start</div><div class="line">Get Message From Client 1:POST /swoole/swoole-client.php HTTP/1.1</div><div class="line">Content-Type: application/json</div><div class="line">X-Gitlab-Event: Push Hook</div><div class="line">Connection: close</div><div class="line">Host: 10.207.26.234:9501</div><div class="line">Content-Length: 1532</div><div class="line"></div><div class="line"></div><div class="line">Get Message From Client 1:&#123;&quot;object_kind&quot;:&quot;push&quot;,&quot;before&quot;:&quot;79a7567c469738a689d38510f9cfc6b5132eda02&quot;,&quot;after&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;ref&quot;:&quot;refs/heads/master&quot;,&quot;checkout_sha&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:null,&quot;user_id&quot;:1,&quot;user_name&quot;:&quot;Administrator&quot;,&quot;user_email&quot;:&quot;admin@example.com&quot;,&quot;user_avatar&quot;:&quot;http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon&quot;,&quot;project_id&quot;:1,&quot;project&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;description&quot;:&quot;&quot;,&quot;web_url&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;avatar_url&quot;:null,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;namespace&quot;:&quot;root&quot;,&quot;visibility_level&quot;:20,&quot;path_with_namespace&quot;:&quot;root/testhook&quot;,&quot;default_branch&quot;:&quot;master&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;&#125;,&quot;commits&quot;:[&#123;&quot;id&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:&quot;add test\n&quot;,&quot;timestamp&quot;:&quot;2016-05-12T03:36:03+00:00&quot;,&quot;url&quot;:&quot;http://b9a4402e85aa/root/testhook/commit/7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;author&quot;:&#123;&quot;name&quot;:&quot;ericwang&quot;,&quot;email&quot;:&quot;ericwang@leju.com&quot;&#125;,&quot;added&quot;:[&quot;test&quot;],&quot;modified&quot;:[],&quot;removed&quot;:[]&#125;],&quot;total_commits_count&quot;:1,&quot;repository&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;description&quot;:&quot;&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;visibility_level&quot;:20&#125;&#125;</div></pre></td></tr></table></figure></p>
+<p>关于webhook具体的细节，在gitlab搜索框中搜索webhook也可以查阅</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>   [1] <a href="https://www.kernel.org/pub/software/scm/git/docs/githooks.html" target="_blank" rel="external">https://www.kernel.org/pub/software/scm/git/docs/githooks.html</a><br>   [2] <a href="https://www.atlassian.com/git/tutorials/git-hooks/local-hooks" target="_blank" rel="external">https://www.atlassian.com/git/tutorials/git-hooks/local-hooks</a><br>   [3] <a href="http://www.ituring.com.cn/article/206985" target="_blank" rel="external">http://www.ituring.com.cn/article/206985</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/git/">git</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/git/">git</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/20/rabbitmq-搭建/" title="rabbitmq 环境搭建" itemprop="url">rabbitmq 环境搭建</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-20T06:44:36.000Z" itemprop="datePublished"> Published 2016-04-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="erlang-安装"><a href="#erlang-安装" class="headerlink" title="erlang 安装"></a>erlang 安装</h2><p>关于erlang 的下载，可以到官网找最新版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">wget http://erlang.org/download/otp_src_18.3.tar.gz</div><div class="line">tar zxvf otp_src_18.3.tar.gz</div><div class="line">cd otp_src_18.3</div><div class="line">./configure</div><div class="line">sudo make</div><div class="line">sudo make install</div></pre></td></tr></table></figure></p>
+<p>erlang编译会依赖一些环境，这里就不一一列举了<br>缺省情况下需要libncurses5-dev  libssl-dev 以及java环境<br>因为本人用的zsh,在编译的时候提示/bin/sh javac not found，原因大概是javac并没有在/bin/sh的path的环境变量中，暴力了一点,直接在/usr/local/bin下做了javac,jar的软连接,解决了</p>
+<h2 id="rabbitmq"><a href="#rabbitmq" class="headerlink" title="rabbitmq"></a>rabbitmq</h2><p>下载地址:<a href="http://www.rabbitmq.com/download.html" target="_blank" rel="external">http://www.rabbitmq.com/download.html</a><br>选择binary安装包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget www.rabbitmq.com/releases/rabbitmq-server/v3.6.1/rabbitmq-server-generic-unix-3.6.1.tar.xz</div><div class="line">xz -d rabbitmq-server-generic-unix-3.6.1.tar.xz</div><div class="line">tar xvf rabbitmq-server-generic-unix-3.6.1.tar</div><div class="line">mv rabbitmq_server-3.6.1 /usr</div><div class="line">mv rabbitmq_server-3.6.1 /usr/local/rabbitmq</div></pre></td></tr></table></figure></p>
+<p>下载的是二进制包，所以可以直接使用<br>启动rabbitmq </p>
+<pre><code>/usr/local/rabbitmq/sbin/rabbitmq-server
+</code></pre>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/15/linux_11/" title="探索linux系统下proc文件系统内容" itemprop="url">探索linux系统下proc文件系统内容</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-15T06:46:00.000Z" itemprop="datePublished"> Published 2016-02-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>以下部分参考自<a href="http://www.cnblogs.com/cute/archive/2011/04/20/2022280.html" target="_blank" rel="external">深入理解linux系统下proc文件系统内容</a><br>Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。 </p>
+<p>基于/proc文件系统如上所述的特殊性，其内的文件也常被称作虚拟文件，并具有一些独特的特点。例如，其中有些文件虽然使用查看命令查看时会返回大量信息，但文件本身的大小却会显示为0字节。此外，这些特殊文件中大多数文件的时间及日期属性通常为当前系统时间和日期，这跟它们随时会被刷新（存储于RAM中）有关。 </p>
+<p>为了查看及使用上的方便，这些文件通常会按照相关性进行分类存储于不同的目录甚至子目录中，如/proc/scsi目录中存储的就是当前系统上所有SCSI设备的相关信息，/proc/N中存储的则是系统当前正在运行的进程的相关信息，其中N为正在运行的进程（可以想象得到，在某进程结束后其相关目录则会消失）。 </p>
+<p>大多数虚拟文件可以使用文件查看命令如cat、more或者less进行查看，有些文件信息表述的内容可以一目了然，但也有文件的信息却不怎么具有可读性。不过，这些可读性较差的文件在使用一些命令如apm、free、lspci或top查看时却可以有着不错的表现。 </p>
+<h3 id="进程目录中的常见文件介绍"><a href="#进程目录中的常见文件介绍" class="headerlink" title="进程目录中的常见文件介绍"></a>进程目录中的常见文件介绍</h3><p>/proc目录中包含许多以数字命名的子目录，这些数字表示系统当前正在运行进程的进程号，里面包含对应进程相关的多个信息文件。<br>以下实验都是在基于docker的nginx容器里进行的，部分内容可能会与真实系统有些区别（用docker的原因是进程比较少，可以直接使用<code>docker run -it nginx:1.7 /bin/bash</code>创建一个nginx的容器并进入容器内部)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@cdb3d33f6cb4:/# ls /bin/</div><div class="line">bash   cp    dir	    egrep    gunzip    ln     mknod	  mv		 pwd	   run-parts   ss     tar	uname	      zcat    zforce</div><div class="line">cat    dash  dmesg	    false    gzexe     login  mktemp	  nisdomainname  rbash	   sed	       stty   tempfile	uncompress    zcmp    zgrep</div><div class="line">chgrp  date  dnsdomainname  fgrep    gzip      ls     more	  pidof		 readlink  sh	       su     touch	vdir	      zdiff   zless</div><div class="line">chmod  dd    domainname     findmnt  hostname  lsblk  mount	  ping		 rm	   sh.distrib  sync   true	which	      zegrep  zmore</div><div class="line">chown  df    echo	    grep     ip        mkdir  mountpoint  ping6		 rmdir	   sleep       tailf  umount	ypdomainname  fgrep  znew</div></pre></td></tr></table></figure>
+<p>容器中可用的命令少之又少，都是些基本的命令，但是有这些命令，可以做很多事情了，虽然很多命令我也不懂。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/# cd proc/</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1	   bus	      consoles	diskstats    fb		  iomem     kcore      kpagecount  meminfo  mtrr	  scsi	    stat	   sysvipc	tty	     vmstat</div><div class="line">15	   cgroups    cpuinfo	dma	     filesystems  ioports   key-users  kpageflags  misc     net		  self	    swaps	   thread-self	uptime	     zoneinfo</div><div class="line">acpi	   cmdline    crypto	driver	     fs		  irq	    keys       loadavg	   modules  pagetypeinfo  slabinfo  sys		   timer_list	version</div><div class="line">buddyinfo  config.gz  devices	execdomains  interrupts   kallsyms  kmsg       locks	   mounts   partitions	  softirqs  sysrq-trigger  timer_stats	vmallocinfo</div></pre></td></tr></table></figure>
+<p>上面列出的是/proc目录中一些进程相关的目录，每个目录中是当程本身相关信息的文件。<br>下面我们来启动一个nginx，看看会发生什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# nginx</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1   acpi       cmdline	  crypto     driver	  fs	      irq	 keys	     loadavg  modules  pagetypeinfo  slabinfo  sys	      timer_list   version</div><div class="line">17  buddyinfo  config.gz  devices    execdomains  interrupts  kallsyms	 kmsg	     locks    mounts   partitions    softirqs  sysrq-trigger  timer_stats  vmallocinfo</div><div class="line">18  bus        consoles   diskstats  fb		  iomem       kcore	 kpagecount  meminfo  mtrr     scsi	     stat      sysvipc	      tty	   vmstat</div><div class="line">19  cgroups    cpuinfo	  dma	     filesystems  ioports     key-users  kpageflags  misc     net      self	     swaps     thread-self    uptime	   zoneinfo</div></pre></td></tr></table></figure>
+<p>嗯？ 多出来3个数字命名的目录，对就是pid 为17，18，19的进程。再次ls，发现19小时，没错19应该是运行ls产生的进程，运行完成就消失了，猜测17，18一个是nginx master，另一个应该是worker<br>查看以下pid为18的进程，属组和用户都是nginx，更加确定它就是nginx的worker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 18</div><div class="line">ls: cannot read symbolic link 18/cwd: Permission denied</div><div class="line">ls: cannot read symbolic link 18/root: Permission denied</div><div class="line">ls: cannot read symbolic link 18/exe: Permission denied</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 nginx nginx 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root  root  0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 nginx nginx 0 Feb 15 02:17 attr</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 autogroup</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 auxv</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cgroup</div><div class="line">--w-------   1 nginx nginx 0 Feb 15 02:17 clear_refs</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cmdline</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 comm</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 coredump_filter</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cpuset</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 cwd</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 environ</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 exe</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fd</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fdinfo</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 gid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 limits</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 map_files</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 maps</div><div class="line">-rw-------   1 nginx nginx 0 Feb 15 02:17 mem</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mountinfo</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mounts</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 mountstats</div><div class="line">dr-xr-xr-x   7 nginx nginx 0 Feb 15 02:17 net</div><div class="line">dr-x--x--x   2 nginx nginx 0 Feb 15 02:17 ns</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_adj</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score_adj</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 pagemap</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 personality</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 projid_map</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 root</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 setgroups</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 smaps</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 stack</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 stat</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 statm</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 status</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 syscall</div><div class="line">dr-xr-xr-x   3 nginx nginx 0 Feb 15 02:17 task</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 timers</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 uid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 wchar</div></pre></td></tr></table></figure>
+<p>有些文件没有权限，还是看nginx的master吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 17/</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 root root 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root root 0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 root root 0 Feb 15 02:19 attr</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 autogroup</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 auxv</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cgroup</div><div class="line">--w-------   1 root root 0 Feb 15 02:19 clear_refs</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cmdline</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 comm</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 coredump_filter</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cpuset</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 cwd -&gt; /proc</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 environ</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fd</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fdinfo</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 gid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 limits</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 map_files</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 maps</div><div class="line">-rw-------   1 root root 0 Feb 15 02:19 mem</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mountinfo</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mounts</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 mountstats</div><div class="line">dr-xr-xr-x   7 root root 0 Feb 15 02:19 net</div><div class="line">dr-x--x--x   2 root root 0 Feb 15 02:19 ns</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_adj</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 oom_score</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_score_adj</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 pagemap</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 personality</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 projid_map</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 root -&gt; /</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 setgroups</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 smaps</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 stack</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 stat</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 statm</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 status</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 syscall</div><div class="line">dr-xr-xr-x   3 root root 0 Feb 15 02:19 task</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 timers</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 uid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 wchan</div></pre></td></tr></table></figure>
+<p>接下来看看各个文件都是干吗用的吧</p>
+<ul>
+<li>cmdline — 启动当前进程的完整命令，但僵尸进程目录中的此文件不包含任何信息;</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cd 17</div><div class="line">root@c27f523688ea:/proc/17# more cmdline</div><div class="line">nginx: master process nginx</div></pre></td></tr></table></figure>
+<ul>
+<li><p>cwd 指向当前进程运行目录的一个符号链接； </p>
+</li>
+<li><p>environ 当前进程的环境变量列表，彼此间用空字符（NULL）隔开；变量用大写字母表示，其值用小写字母表示；</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# more environ</div><div class="line"> master process nginx</div></pre></td></tr></table></figure>
+<ul>
+<li>exe 指向启动当前进程的可执行文件（完整路径）的符号链接，通过/proc/N/exe可以启动当前进程的一个拷贝； </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ls -al exe</div><div class="line">lrwxrwxrwx 1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div></pre></td></tr></table></figure>
+<p>实际的可执行文件就是/usr/sbin/nginx</p>
+<ul>
+<li><p>fd 这是个目录，包含当前进程打开的每一个文件的文件描述符（file descriptor），这些文件描述符是指向实际文件的一个符号链接;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# ls -al fd</div><div class="line">total 0</div><div class="line">dr-x------ 2 root root  0 Feb 15 02:19 .</div><div class="line">dr-xr-xr-x 9 root root  0 Feb 15 02:13 ..</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 0 -&gt; /dev/null</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 1 -&gt; /dev/null</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 2 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 3 -&gt; socket:[63800]</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 4 -&gt; /1</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 5 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 6 -&gt; socket:[63798]</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 7 -&gt; socket:[63801]</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>limits 当前进程所使用的每一个受限资源的软限制、硬限制和管理单元；此文件仅可由实际启动当前进程的UID用户读取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat limits</div><div class="line">Limit                     Soft Limit           Hard Limit           Units</div><div class="line">Max cpu time              unlimited            unlimited            seconds</div><div class="line">Max file size             unlimited            unlimited            bytes</div><div class="line">Max data size             unlimited            unlimited            bytes</div><div class="line">Max stack size            8388608              unlimited            bytes</div><div class="line">Max core file size        0                    unlimited            bytes</div><div class="line">Max resident set          unlimited            unlimited            bytes</div><div class="line">Max processes             1048576              1048576              processes</div><div class="line">Max open files            1048576              1048576              files</div><div class="line">Max locked memory         65536                65536                bytes</div><div class="line">Max address space         unlimited            unlimited            bytes</div><div class="line">Max file locks            unlimited            unlimited            locks</div><div class="line">Max pending signals       3867                 3867                 signals</div><div class="line">Max msgqueue size         819200               819200               bytes</div><div class="line">Max nice priority         0                    0</div><div class="line">Max realtime priority     0                    0</div><div class="line">Max realtime timeout      unlimited            unlimited            us</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>再运行 ulimit ，因为用户都是root，所以 ulimit应该和这个limits表示的内容是相同的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ulimit -a</div><div class="line">core file size          (blocks, -c) 0</div><div class="line">data seg size           (kbytes, -d) unlimited</div><div class="line">scheduling priority             (-e) 0</div><div class="line">file size               (blocks, -f) unlimited</div><div class="line">pending signals                 (-i) 3867</div><div class="line">max locked memory       (kbytes, -l) 64</div><div class="line">max memory size         (kbytes, -m) unlimited</div><div class="line">open files                      (-n) 1048576</div><div class="line">pipe size            (512 bytes, -p) 8</div><div class="line">POSIX message queues     (bytes, -q) 819200</div><div class="line">real-time priority              (-r) 0</div><div class="line">stack size              (kbytes, -s) 8192</div><div class="line">cpu time               (seconds, -t) unlimited</div><div class="line">max user processes              (-u) 1048576</div><div class="line">virtual memory          (kbytes, -v) unlimited</div><div class="line">file locks                      (-x) unlimited</div></pre></td></tr></table></figure>
+<ul>
+<li>maps — 当前进程关联到的每个可执行文件和库文件在内存中的映射区域及其访问权限所组成的列表;<br>看不懂 先过了</li>
+</ul>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat maps</div><div class="line">00400000-004c1000 r-xp 00000000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c0000-006c1000 r--p 000c0000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c1000-006d7000 rw-p 000c1000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006d7000-006e6000 rw-p 00000000 00:00 0</div><div class="line">01c28000-01c85000 rw-p 00000000 00:00 0                                  [heap]</div><div class="line">7fb1c3d4f000-7fb1c3d5a000 r-xp 00000000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3d5a000-7fb1c3f59000 ---p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f59000-7fb1c3f5a000 r--p 0000a000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5a000-7fb1c3f5b000 rw-p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5b000-7fb1c3f65000 r-xp 00000000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c3f65000-7fb1c4164000 ---p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4164000-7fb1c4165000 r--p 00009000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4165000-7fb1c4166000 rw-p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4166000-7fb1c417b000 r-xp 00000000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c417b000-7fb1c437a000 ---p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437a000-7fb1c437b000 r--p 00014000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437b000-7fb1c437c000 rw-p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437c000-7fb1c437e000 rw-p 00000000 00:00 0</div><div class="line">7fb1c437e000-7fb1c4385000 r-xp 00000000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4385000-7fb1c4584000 ---p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4584000-7fb1c4585000 r--p 00006000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4585000-7fb1c4586000 rw-p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4586000-7fb1c4588000 r-xp 00000000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4588000-7fb1c4788000 ---p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4788000-7fb1c4789000 r--p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4789000-7fb1c478a000 rw-p 00003000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c478a000-7fb1c490b000 r-xp 00000000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c490b000-7fb1c4b0b000 ---p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0b000-7fb1c4b0f000 r--p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0f000-7fb1c4b10000 rw-p 00185000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b10000-7fb1c4b15000 rw-p 00000000 00:00 0</div><div class="line">7fb1c4b15000-7fb1c4b2b000 r-xp 00000000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4b2b000-7fb1c4d2a000 ---p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2a000-7fb1c4d2b000 r--p 00015000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2b000-7fb1c4d2c000 rw-p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2c000-7fb1c4ef6000 r-xp 00000000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c4ef6000-7fb1c50f6000 ---p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c50f6000-7fb1c5111000 r--p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5111000-7fb1c5120000 rw-p 001e5000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5120000-7fb1c5124000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5124000-7fb1c517a000 r-xp 00000000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c517a000-7fb1c537a000 ---p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537a000-7fb1c537d000 r--p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537d000-7fb1c5384000 rw-p 00059000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c5384000-7fb1c53c0000 r-xp 00000000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c53c0000-7fb1c55c0000 ---p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c0000-7fb1c55c1000 rw-p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c1000-7fb1c55c9000 r-xp 00000000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c55c9000-7fb1c57c8000 ---p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c8000-7fb1c57c9000 r--p 00007000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c9000-7fb1c57ca000 rw-p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57ca000-7fb1c57f8000 rw-p 00000000 00:00 0</div><div class="line">7fb1c57f8000-7fb1c580f000 r-xp 00000000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c580f000-7fb1c5a0e000 ---p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0e000-7fb1c5a0f000 r--p 00016000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0f000-7fb1c5a10000 rw-p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a10000-7fb1c5a14000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5a14000-7fb1c5a34000 r-xp 00000000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c2a000-7fb1c5c2f000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c30000-7fb1c5c31000 rw-s 00000000 00:01 63799                      /dev/zero (deleted)</div><div class="line">7fb1c5c31000-7fb1c5c33000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c33000-7fb1c5c34000 r--p 0001f000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c34000-7fb1c5c35000 rw-p 00020000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c35000-7fb1c5c36000 rw-p 00000000 00:00 0</div><div class="line">7ffe5a572000-7ffe5a593000 rw-p 00000000 00:00 0                          [stack]</div><div class="line">7ffe5a5e3000-7ffe5a5e5000 r--p 00000000 00:00 0                          [vvar]</div><div class="line">7ffe5a5e5000-7ffe5a5e7000 r-xp 00000000 00:00 0                          [vdso]</div><div class="line">ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]</div></pre></td></tr></table></figure>
+<ul>
+<li>mem 当前进程所占用的内存空间，由open、read和lseek等系统调用使用，不能被用户读取；</li>
+<li>root 指向当前进程运行根目录的符号链接；在Unix和Linux系统上，通常采用chroot命令使每个进程运行于独立的根目录；</li>
+<li><p>stat 当前进程的状态信息，包含一系统格式化后的数据列，可读性差，通常由ps命令使用； </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more stat</div><div class="line">17 (nginx) S 1 17 17 0 -1 4218944 49 0 0 0 0 0 0 0 20 0 1 0 5428469 31825920 195 18446744073709551615 4194304 4982492 140730414209264 140730414208128 140401482384618 0 0 1073745920</div><div class="line">402745863 0 0 0 17 0 0 0 0 0 0 7081352 7168288 29523968 140730414214953 140730414214959 140730414214959 140730414215144 0</div></pre></td></tr></table></figure>
+</li>
+<li><p>status 与stat所提供信息类似，但可读性较好，如下所示，每行表示一个属性信息；其详细介绍请参见 proc的man手册页;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more status</div><div class="line">Name:	nginx</div><div class="line">State:	S (sleeping)</div><div class="line">Tgid:	17</div><div class="line">Ngid:	0</div><div class="line">Pid:	17</div><div class="line">PPid:	1</div><div class="line">TracerPid:	0</div><div class="line">Uid:	0	0	0	0</div><div class="line">Gid:	0	0	0	0</div><div class="line">FDSize:	64</div><div class="line">Groups:</div><div class="line">NStgid:	17</div><div class="line">NSpid:	17</div><div class="line">NSpgid:	17</div><div class="line">NSsid:	17</div><div class="line">VmPeak:	   31080 kB</div><div class="line">VmSize:	   31080 kB</div><div class="line">VmLck:	       0 kB</div><div class="line">VmPin:	       0 kB</div><div class="line">VmHWM:	     780 kB</div><div class="line">VmRSS:	     780 kB</div><div class="line">VmData:	     724 kB</div><div class="line">VmStk:	     136 kB</div><div class="line">VmExe:	     772 kB</div><div class="line">VmLib:	    4500 kB</div><div class="line">VmPTE:	      76 kB</div><div class="line">VmPMD:	      12 kB</div><div class="line">VmSwap:	       0 kB</div><div class="line">Threads:	1</div><div class="line">SigQ:	0/3867</div><div class="line">SigPnd:	0000000000000000</div><div class="line">ShdPnd:	0000000000000000</div><div class="line">SigBlk:	0000000000000000</div><div class="line">SigIgn:	0000000040001000</div><div class="line">SigCgt:	0000000198016a07</div><div class="line">CapInh:	00000000a80425fb</div><div class="line">CapPrm:	00000000a80425fb</div><div class="line">CapEff:	00000000a80425fb</div><div class="line">CapBnd:	00000000a80425fb</div><div class="line">Seccomp:	0</div><div class="line">Cpus_allowed:	1</div><div class="line">Cpus_allowed_list:	0</div><div class="line">Mems_allowed:	1</div><div class="line">Mems_allowed_list:	0</div><div class="line">voluntary_ctxt_switches:	1</div><div class="line">--More--(0%)</div></pre></td></tr></table></figure>
+</li>
+<li><p>task 目录文件，包含由当前进程所运行的每一个线程的相关信息，每个线程的相关信息文件均保存在一个由线程号（tid）命名的目录中，这类似于其内容类似于每个进程目录中的内容</p>
+</li>
+</ul>
+<h3 id="proc目录下常见的文件介绍"><a href="#proc目录下常见的文件介绍" class="headerlink" title="/proc目录下常见的文件介绍"></a>/proc目录下常见的文件介绍</h3><ul>
+<li>/proc/apm 高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用(容器中没有)</li>
+<li>/proc/buddyinfo 用于诊断内存碎片问题的相关信息文件(容器中没有)</li>
+<li>/proc/cmdline 在启动时传递至内核的相关参数信息，这些信息通常由lilo或grub等启动管理工具进行传递</li>
+<li>/proc/cpuinfo 处理器的相关信息的文件</li>
+<li>/proc/crypto 系统上已安装的内核使用的密码算法及每个算法的详细信息列表</li>
+<li>/proc/devices 系统已经加载的所有块设备和字符设备的信息，包含主设备号和设备组（与主设备号对应的设备类型）名</li>
+<li>/proc/diskstats 每块磁盘设备的磁盘I/O统计信息列表</li>
+<li>/proc/dma 每个正在使用且注册的ISA DMA通道的信息列表</li>
+<li>/proc/execdomains 内核当前支持的执行域（每种操作系统独特“个性”）信息列表</li>
+<li>/proc/fb 帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息；</li>
+<li>/proc/filesystems 当前被内核支持的文件系统类型列表文件，被标示为nodev的文件系统表示不需要块设备的支持；通常mount一个设备时，如果没有指定文件系统类型将通过此文件来决定其所需文件系统的类型</li>
+<li>/proc/interrupts X86或X86_64体系架构系统上每个IRQ相关的中断号列表；多路处理器平台上每个CPU对于每个I/O设备均有自己的中断号</li>
+<li>/proc/iomem 每个物理设备上的记忆体（RAM或者ROM）在系统内存中的映射信息</li>
+<li>/proc/ioports 当前正在使用且已经注册过的与物理设备进行通讯的输入-输出端口范围信息列表；如下面所示，第一列表示注册的I/O端口范围，其后表示相关的设备</li>
+<li>/proc/kallsyms 模块管理工具用来动态链接或绑定可装载模块的符号定义，由内核输出;通常这个文件中的信息量相当大；</li>
+<li>/proc/kcore 系统使用的物理内存，以ELF核心文件（core file）格式存储，其文件大小为已使用的物理内存（RAM）加上4KB；这个文件用来检查内核数据结构的当前状态，因此，通常由GDB通常调试工具使用，但不能使用文件查看命令打开此文件</li>
+<li>/proc/kmsg 此文件用来保存由内核输出的信息，通常由/sbin/klogd或/bin/dmsg等程序使用，不要试图使用查看命令打开此文件</li>
+<li>/proc/locks 保存当前由内核锁定的文件的相关信息，包含内核内部的调试数据；每个锁定占据一行，且具有一个惟一的编号；如下输出信息中每行的第二列表示当前锁定使用的锁定类别，POSIX表示目前较新类型的文件锁，由lockf系统调用产生，FLOCK是传统的UNIX文件锁，由flock系统调用产生；第三列也通常由两种类型，ADVISORY表示不允许其他用户锁定此文件，但允许读取，MANDATORY表示此文件锁定期间不允许其他用户任何形式的访问；  </li>
+<li><p>/proc/meminfo 系统中关于当前内存的利用状况等的信息，常由free命令使用；可以使用文件查看命令直接读取此文件，其内容显示为两列，前者为统计属性，后者为对应的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat meminfo</div><div class="line">MemTotal:        1020096 kB</div><div class="line">MemFree:          746572 kB</div><div class="line">MemAvailable:     802920 kB</div><div class="line">Buffers:           41512 kB</div><div class="line">Cached:           139888 kB</div><div class="line">SwapCached:            0 kB</div><div class="line">Active:           135888 kB</div><div class="line">Inactive:          92792 kB</div><div class="line">Active(anon):      83496 kB</div><div class="line">Inactive(anon):    90648 kB</div><div class="line">Active(file):      52392 kB</div><div class="line">Inactive(file):     2144 kB</div><div class="line">Unevictable:           0 kB</div><div class="line">Mlocked:               0 kB</div><div class="line">SwapTotal:       1182172 kB</div><div class="line">SwapFree:        1182172 kB</div><div class="line">Dirty:                 8 kB</div><div class="line">Writeback:             0 kB</div><div class="line">AnonPages:         47276 kB</div><div class="line">Mapped:            29256 kB</div><div class="line">Shmem:            126868 kB</div><div class="line">Slab:              28464 kB</div><div class="line">SReclaimable:      16392 kB</div><div class="line">SUnreclaim:        12072 kB</div><div class="line">KernelStack:        2432 kB</div><div class="line">PageTables:         1616 kB</div><div class="line">NFS_Unstable:          0 kB</div><div class="line">Bounce:                0 kB</div><div class="line">WritebackTmp:          0 kB</div><div class="line">CommitLimit:     1692220 kB</div><div class="line">Committed_AS:     371556 kB</div><div class="line">VmallocTotal:   34359738367 kB</div><div class="line">VmallocUsed:        8908 kB</div><div class="line">VmallocChunk:   34359699820 kB</div><div class="line">AnonHugePages:     32768 kB</div><div class="line">HugePages_Total:       0</div><div class="line">HugePages_Free:        0</div><div class="line">HugePages_Rsvd:        0</div><div class="line">HugePages_Surp:        0</div><div class="line">Hugepagesize:       2048 kB</div><div class="line">DirectMap4k:       47040 kB</div><div class="line">DirectMap2M:     1001472 kB</div></pre></td></tr></table></figure>
+</li>
+<li><p>/proc/mounts 在内核2.4.29版本以前，此文件的内容为系统当前挂载的所有文件系统，在2.4.19以后的内核中引进了每个进程使用独立挂载名称空间的方式，此文件则随之变成了指向/proc/self/mounts（每个进程自身挂载名称空间中的所有挂载点列表）文件的符号链接；/proc/self是一个独特的目录，后文中会对此目录进行介绍</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al mounts</div><div class="line">lrwxrwxrwx 1 root root 11 Feb 15 06:18 mounts -&gt; self/mounts</div></pre></td></tr></table></figure>
+<p>其中第一列表示挂载的设备，第二列表示在当前目录树中的挂载点，第三点表示当前文件系统的类型，第四列表示挂载属性（ro或者rw），第五列和第六列用来匹配/etc/mtab文件中的转储（dump）属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# more mounts</div><div class="line">none / aufs rw,relatime,si=6bfa28fca2bd64f1,dio,dirperm1 0 0</div><div class="line">proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /dev tmpfs rw,nosuid,mode=755 0 0</div><div class="line">devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0</div><div class="line">sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /sys/fs/cgroup tmpfs ro,nosuid,nodev,noexec,relatime,mode=755 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuset cgroup ro,nosuid,nodev,noexec,relatime,cpuset 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpu cgroup ro,nosuid,nodev,noexec,relatime,cpu 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuacct cgroup ro,nosuid,nodev,noexec,relatime,cpuacct 0 0</div><div class="line">cgroup /sys/fs/cgroup/blkio cgroup ro,nosuid,nodev,noexec,relatime,blkio 0 0</div><div class="line">cgroup /sys/fs/cgroup/memory cgroup ro,nosuid,nodev,noexec,relatime,memory 0 0</div><div class="line">cgroup /sys/fs/cgroup/devices cgroup ro,nosuid,nodev,noexec,relatime,devices 0 0</div><div class="line">cgroup /sys/fs/cgroup/freezer cgroup ro,nosuid,nodev,noexec,relatime,freezer 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_cls cgroup ro,nosuid,nodev,noexec,relatime,net_cls 0 0</div><div class="line">cgroup /sys/fs/cgroup/perf_event cgroup ro,nosuid,nodev,noexec,relatime,perf_event 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_prio cgroup ro,nosuid,nodev,noexec,relatime,net_prio 0 0</div><div class="line">cgroup /sys/fs/cgroup/hugetlb cgroup ro,nosuid,nodev,noexec,relatime,hugetlb 0 0</div></pre></td></tr></table></figure>
+<p>可以看到/proc 使用的是proc文件系统,大多数的ubuntu镜像使用的是aufs文件系统，当然可以在启动镜像时的时候指定storage driver</p>
+<ul>
+<li><p>/proc/modules 当前装入内核的所有模块名称列表，可以由lsmod命令使用，也可以直接查看；如下所示，其中第一列表示模块名，第二列表示此模块占用内存空间大小，第三列表示此模块有多少实例被装入，第四列表示此模块依赖于其它哪些模块，第五列表示此模块的装载状态（Live：已经装入；Loading：正在装入；Unloading：正在卸载），第六列表示此模块在内核内存（kernel memory）中的偏移量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat modules</div><div class="line">veth 16384 0 - Live 0xffffffffa0173000</div><div class="line">xt_conntrack 16384 1 - Live 0xffffffffa0152000</div><div class="line">ipt_MASQUERADE 16384 1 - Live 0xffffffffa014d000</div><div class="line">nf_nat_masquerade_ipv4 16384 1 ipt_MASQUERADE, Live 0xffffffffa01a5000</div></pre></td></tr></table></figure>
+</li>
+<li><p>proc/partitions 块设备每个分区的主设备号（major）和次设备号（minor）等信息，同时包括每个分区所包含的块（block）数目（如下面输出中第三列所示)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# more partitions</div><div class="line">major minor  #blocks  name</div><div class="line"></div><div class="line">   1        0      65535 ram0</div><div class="line">   1        1      65535 ram1</div><div class="line">   1        2      65535 ram2</div><div class="line">   1        3      65535 ram3</div><div class="line">   1        4      65535 ram4</div><div class="line">   1        5      65535 ram5</div><div class="line">   1        6      65535 ram6</div><div class="line">   1        7      65535 ram7</div><div class="line"> 250        0     194216 zram0</div><div class="line">  11        0      30720 sr0</div><div class="line">   8        0   20480000 sda</div><div class="line">   8        1   19486845 sda1</div><div class="line">   8        2     987966 sda2</div></pre></td></tr></table></figure>
+</li>
+<li><p>/proc/pci<br>内核初始化时发现的所有PCI设备及其配置信息列表，其配置信息多为某PCI设备相关IRQ信息，可读性不高，可以用“/sbin/lspci –vb”命令获得较易理解的相关信息；在2.6内核以后，此文件已为/proc/bus/pci目录及其下的文件代替</p>
+<ul>
+<li>/proc/slabinfo 在内核中频繁使用的对象（如inode、dentry等）都有自己的cache，即slab pool，而/proc/slabinfo文件列出了这些对象相关slap的信息；详情可以参见内核文档中slapinfo的手册页</li>
+<li><p>/proc/stat<br>实时追踪自系统上次启动以来的多种统计信息；如下所示，其中</p>
+<p>“cpu”行后的八个值分别表示以1/100（jiffies）秒为单位的统计值（包括系统运行于用户模式、低优先级用户模式，运系统模式、空闲模式、I/O等待模式的时间等）</p>
+<p>“intr”行给出中断的信息，第一个为自系统启动以来，发生的所有的中断的次数；然后每个数对应一个特定的中断自系统启动以来所发生的次数； </p>
+<p>“ctxt”给出了自系统启动以来CPU发生的上下文交换的次数。 </p>
+<p>“btime”给出了从系统启动到现在为止的时间，单位为秒； </p>
+<p>“processes (total_forks) 自系统启动以来所创建的任务的个数目； </p>
+<p>“procs_running”：当前运行队列的任务的数目； </p>
+<p>“procs_blocked”：当前被阻塞的任务的数目； </p>
+</li>
+<li>/proc/swaps 当前系统上的交换分区及其空间利用信息，如果有多个交换分区的话，则会每个交换分区的信息分别存储于/proc/swap目录中的单独文件中，而其优先级数字越低，被使用到的可能性越大 </li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat swaps</div><div class="line">Filename				Type		Size	Used	Priority</div><div class="line">/dev/zram0                              partition	194212	0	-1</div><div class="line">/dev/sda2                               partition	987960	0	-2</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/uptime 系统上次启动以来的运行时间,如下所示，其第一个数字表示系统运行时间，第二个数字表示系统空闲时间，单位是秒；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">	root@c27f523688ea:/proc# cat uptime</div><div class="line">70344.11 70304.83</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/version<br>当前系统运行的内核版本号，还会显示系统安装的gcc版本，如下所示；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat version</div><div class="line">Linux version 4.1.13-boot2docker (root@11aafb97cfeb) (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Fri Nov 20 19:05:50 UTC 2015</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/vmstat<br>当前系统虚拟内存的多种统计数据，信息量可能会比较大，这因系统而有所不同，可读性较好</li>
+<li>/proc/zoneinfo 内存区域（zone）的详细信息列表，信息量较大</li>
+</ul>
+<h3 id="proc-sys目录详解"><a href="#proc-sys目录详解" class="headerlink" title="/proc/sys目录详解"></a>/proc/sys目录详解</h3><p>与 /proc下其它文件的“只读”属性不同的是，管理员可对/proc/sys子目录中的许多文件内容进行修改以更改内核的运行特性，事先可以使用“ls -l”命令查看某文件是否“可写入”。写入操作通常使用类似于“echo  DATA &gt; /path/to/your/filename”的格式进行。需要注意的是，即使文件可写，其一般也不可以使用编辑器进行编辑。 </p>
+<ul>
+<li><p>/proc/sys/debug 子目录<br>此目录通常是一空目录； </p>
+</li>
+<li><p>/proc/sys/dev 子目录<br>为系统上特殊设备提供参数信息文件的目录，其不同设备的信息文件分别存储于不同的子目录中，如大多数系统上都会具有的/proc/sys/dev /cdrom和/proc/sys/dev/raid（如果内核编译时开启了支持raid的功能） 目录，其内存储的通常是系统上cdrom和raid的相关参数信息文件。</p>
+</li>
+</ul>
+<p>照着搬过来很多内容，了解了一些，一些还是不懂，写博客的好处，就是可以温故而知新</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/02/07/docker/" title="docker 笔记" itemprop="url">docker 笔记</a>
   </h1>
   <p class="article-author">By
@@ -87,7 +416,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-02-07T06:33:00.000Z" itemprop="datePublished"> 发表于 2016-02-07</time>
+    <time datetime="2016-02-07T06:33:00.000Z" itemprop="datePublished"> Published 2016-02-07</time>
     
   </p>
 </header>
@@ -165,7 +494,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-02-02T03:22:00.000Z" itemprop="datePublished"> 发表于 2016-02-02</time>
+    <time datetime="2016-02-02T03:22:00.000Z" itemprop="datePublished"> Published 2016-02-02</time>
     
   </p>
 </header>
@@ -251,7 +580,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-01-23T04:56:00.000Z" itemprop="datePublished"> 发表于 2016-01-23</time>
+    <time datetime="2016-01-23T04:56:00.000Z" itemprop="datePublished"> Published 2016-01-23</time>
     
   </p>
 </header>
@@ -343,7 +672,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-01-21T16:30:00.000Z" itemprop="datePublished"> 发表于 2016-01-22</time>
+    <time datetime="2016-01-21T16:30:00.000Z" itemprop="datePublished"> Published 2016-01-22</time>
     
   </p>
 </header>
@@ -404,7 +733,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-01-21T14:40:00.000Z" itemprop="datePublished"> 发表于 2016-01-21</time>
+    <time datetime="2016-01-21T14:40:00.000Z" itemprop="datePublished"> Published 2016-01-21</time>
     
   </p>
 </header>
@@ -472,7 +801,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-01-16T06:28:00.000Z" itemprop="datePublished"> 发表于 2016-01-16</time>
+    <time datetime="2016-01-16T06:28:00.000Z" itemprop="datePublished"> Published 2016-01-16</time>
     
   </p>
 </header>
@@ -538,7 +867,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-01-13T07:17:00.000Z" itemprop="datePublished"> 发表于 2016-01-13</time>
+    <time datetime="2016-01-13T07:17:00.000Z" itemprop="datePublished"> Published 2016-01-13</time>
     
   </p>
 </header>
@@ -585,286 +914,30 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/01/12/laravel/" title="laravel 的一些吐槽" itemprop="url">laravel 的一些吐槽</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-01-12T14:02:00.000Z" itemprop="datePublished"> 发表于 2016-01-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>最近在做业务项目迁移，把ec的代码迁移到laravel中，<br>为什么选用laravel，我也不知道(也不是我做选型)。其他的框架也没太多接触过，都是跑跑hello world，看的多一点的算是yaf了，不过个人理解，yaf没有orm，完全就是个vc框架，没有model层。需要自己去扩展，但是眼前项目很紧，明显不能这么用。以前用的框架是自己公司内部使用的，虽然思想的都不错，但是随便使用。<br>因为是公司内部物流系统，所以ui直接都是后端人员开发，ui框架选用的semantic，对于我这种不熟悉css，js的人来说也还不错，毕竟有文档，复制粘贴，大体的页面也就出来了。<br>但是开发过程中，还是想吐槽一下laravel。<br>1.最想吐槽的就是它的配置，放到.env里，每行其实就是个键值对，通过config目录下的配置读取，把这些配置替换过去，<br>但是我的项目配置不可能放在项目里啊，这是最基本的需求！因为不能对代码做入侵，所以可以在app初始化的时候，去set到外围目录里。为什么要set到外围目录？很简单，因为配置本就应该和代码分离，这样开发环境就能和线上环境区分出来了。但是这样远远不够，作为配置，很多项目是重复使用同一配置的，那就公用起来，做为每个项目不同的部分，也要区分出来，所以配置就成为了一个配置中心。以前在使用java开发时，比较简单，用的是superdiamond作为配置中心，公用的部分完全可以共用，独立的部分也不会被干扰。但是php显然不行，作为以进程为模型的语言，不可能每处理一个请求的时候就去读一遍配置，而应该是读取本地的某个固定目录的php文件，将配置载入。一旦配置发生改变（比如 redis迁移，mysql迁移，域名变更等）不需要一台一台地去更新配置，而是直接更新发布机的配置文件，直接发布到各机器上，这种方式可以使用ansible去做，Jenkins也可以做。也有自己去实现的，比如在每台机器上安装一个客户端，然后定时去和中心机器上的文件做对比，有不同就更新。想到的也就推模式和拉模式两种方式。<br>2.接下来就是blade模板，关于这个模板，文档实在是太少了，在页面上做变量嵌套的时候总是出问题，也无从查起，只能换种方式去做<br>3.log 这个就不多说了，实用的log并不多,php中的exception和fatal error是俩概念，无从和java的exception比拟。需要一个日志收集系统，去收集log，做分析。elk在这方面应该很强大，zabbix应该也可以。<br>4.分页，虽然可以自己实现，但是想短时间内做一个美观的无错误逻辑的，还是要花时间的。虽然这个在文档上有，但是用下来才发现，是给bootstrap模板使用的！一万个草泥马奔腾而过，然后github上找到了一份，还挺好用，虽然是个简单的实现。代码不贴了，在<a href="https://github.com/Landish/Pagination" target="_blank" rel="external">这里</a>,感谢开源。因为想尽量保证少量的依赖包，所以直接拷贝到文件里了。<br>先吐槽这些吧，吐槽归吐槽，laravel也有很多优点，比如依赖注入，validation，orm等等，很方便，不多说了</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/php/">php</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/php/">php</a><a href="/tags/laravel/">laravel</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/01/04/do_while/" title="do{...}while(0)的意义和用法" itemprop="url">do{...}while(0)的意义和用法</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-01-04T13:23:35.000Z" itemprop="datePublished"> 发表于 2016-01-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>在尝试写扩展时，阅读到了这样类似的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#define ZVAL_BOOL(z, b) do &#123;		\</div><div class="line">		zval *__z = (z);			\</div><div class="line">		Z_LVAL_P(__z) = ((b) != 0);	\</div><div class="line">		Z_TYPE_P(__z) = IS_BOOL;	\</div><div class="line">	&#125; while (0)</div></pre></td></tr></table></figure></p>
-<p>好奇怪，明明是只做一次运算，为何要使用do{}while(0)的方式<br>google一下，涨了很多姿势<br>接下来的大部分部分参考<a href="http://www.spongeliu.com/415.html" target="_blank" rel="external">do{…}while(0)的意义和用法</a></p>
-<p>linux内核和其他一些开源的代码中，经常会遇到这样的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">do&#123;</div><div class="line"> ...</div><div class="line">&#125;while(0)</div></pre></td></tr></table></figure></p>
-<p>总结起来这样写主要有以下几点好处：</p>
-<p>1、辅助定义复杂的宏，避免引用的时候出错：</p>
-<p>举例来说，假设你需要定义这样一个宏：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING()\</div><div class="line">               foo1();\</div><div class="line">               foo2()</div></pre></td></tr></table></figure></p>
-<p>这个宏的本意是，当调用DOSOMETHING()时，函数foo1()和foo2()都会被调用。但是如果你在调用的时候这么写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">    DOSOMETHING();</div></pre></td></tr></table></figure></p>
-<p>因为宏在预处理的时候会直接被展开，你实际上写的代码是这个样子的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">    foo1();</div><div class="line">foo2();</div></pre></td></tr></table></figure></p>
-<p>这就出现了问题，因为无论a是否大于0，foo2()都会被执行，导致程序出错。</p>
-<p>那么仅仅使用{}将foo1()和foo2()包起来行么？</p>
-<p>我们在写代码的时候都习惯在语句右面加上分号，如果在宏中使用{}，代码里就相当于这样写了：“{…};”，展开后就是这个样子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">&#123;</div><div class="line">    foo1();</div><div class="line">    foo2();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
-<p>所以碰到这种调用宏:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">if (a&gt;0)</div><div class="line">     DOSOMETHING();</div><div class="line">else</div><div class="line">     DOOTHERTHING();</div></pre></td></tr></table></figure></p>
-<p>会被扩展成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">if (a&gt;0) &#123;</div><div class="line">    foo1();</div><div class="line">    foo2();</div><div class="line">&#125;;</div><div class="line">else</div><div class="line">    DOOTHERTHING(wolf);</div></pre></td></tr></table></figure></p>
-<p>这样不会编译通过。所以，很多人才采用了do{…}while(0);</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING() \</div><div class="line">        do&#123; \</div><div class="line">          foo1();\</div><div class="line">          foo2();\</div><div class="line">        &#125;while(0)\</div><div class="line">    </div><div class="line">...</div><div class="line"> </div><div class="line">if(a&gt;0)</div><div class="line">    DOSOMETHING();</div><div class="line"> </div><div class="line">...</div></pre></td></tr></table></figure>
-<p>这样，宏被展开后，才会保留初始的语义。GCC提供了Statement-Expressions用以替代do{…}while(0); 所以你也可以这样定义宏：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING() (&#123;\</div><div class="line">        foo1(); \</div><div class="line">        foo2(); \</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
-<p>2、避免使用goto对程序流进行统一的控制：</p>
-<p>有些函数中，在函数return之前我们经常会进行一些收尾的工作，比如free掉一块函数开始malloc的内存，goto一直都是一个比较简便的方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int foo()</div><div class="line">&#123;</div><div class="line">    somestruct* ptr = malloc(...);</div><div class="line"> </div><div class="line">    dosomething...;</div><div class="line">    if(error)</div><div class="line">    &#123;</div><div class="line">        goto END;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    dosomething...;</div><div class="line">    if(error)</div><div class="line">    &#123;</div><div class="line">        goto END;</div><div class="line">    &#125;</div><div class="line">    dosomething...;</div><div class="line"> </div><div class="line">END:</div><div class="line">    free(ptr);</div><div class="line">    return 0;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>由于goto不符合软件工程的结构化，而且有可能使得代码难懂，所以很多人都不倡导使用，那这个时候就可以用do{}while(0)来进行统一的管理：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">int foo()</div><div class="line">&#123;</div><div class="line"> </div><div class="line">    somestruct* ptr = malloc(...);</div><div class="line"> </div><div class="line">    do&#123;</div><div class="line">        dosomething...;</div><div class="line">        if(error)</div><div class="line">        &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line"> </div><div class="line">        dosomething...;</div><div class="line">        if(error)</div><div class="line">        &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        dosomething...;</div><div class="line">    &#125;while(0);</div><div class="line"> </div><div class="line">    free(ptr);</div><div class="line">    return 0;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这里将函数主体使用do()while(0)包含起来，使用break来代替goto，后续的处理工作在while之后，就能够达到同样的效果。</p>
-<p>3、避免空宏引起的warning</p>
-<p>内核中由于不同架构的限制，很多时候会用到空宏，在编译的时候，空宏会给出warning，为了避免这样的warning，就可以使用do{}while(0)来定义空宏：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#define EMPTYMICRO do&#123;&#125;while(0)</div></pre></td></tr></table></figure>
-<p>4、定义一个单独的函数块来实现复杂的操作：</p>
-<p>当你的功能很复杂，变量很多你又不愿意增加一个函数的时候，使用do{}while(0);，将你的代码写在里面，里面可以定义变量而不用考虑变量名会同函数之前或者之后的重复。</p>
-<p>理解了这个do{…}while(0),一切豁然开朗。<br>发现ZVAL_RESOURCE,ZVAL_STRING,ZVAL_ZVAL等宏也都是使用的do{}while(0)的形式,ZVAL_DOUBLE,ZVAL_LONG等并没有使用,个人理解ZVAL_BOOL这样定义宏属于第一种情况。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/C/">C</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/C/">C</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/01/04/c/" title="C指针" itemprop="url">C指针</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-01-04T11:59:00.000Z" itemprop="datePublished"> 发表于 2016-01-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>最近深入学习写扩展，发现C功底太弱了，也印证了那句话，出来混迟早要还的。<br>大学里因为不喜欢指针，放弃了C转战java，结果到现在，也只有自己给自己填坑了。<br>所以找了些文章充实一下吧。<br>本文转自<a href="http://www.cnblogs.com/wchhuangya/archive/2009/12/24/1631121.html" target="_blank" rel="external">C指针</a></p>
-<h2 id="第一章-指针的概念"><a href="#第一章-指针的概念" class="headerlink" title="第一章 指针的概念"></a>第一章 指针的概念</h2><p>指针是一个特殊的变量，它里面存储的数值被解释成为内存里的一个地址。 </p>
-<p>要搞清一个指针需要搞清指针的四方面的内容：指针的类型，指针所指向的类型，指针的值或者叫指针所指向的内存区，还有指针本身所占据的内存区。让我们分别说明。<br>先声明几个指针放着做例子：<br>例一：<br>(1)int <em>ptr;<br>(2)char </em>ptr;<br>(3)int <em>*ptr;<br>(4)int (</em>ptr)[3];<br>(5)int <em>(</em>ptr)[4]; </p>
-<ol>
-<li><p>指针的类型。<br>从语法的角度看，你只要把指针声明语句里的指针名字去掉，剩下的部分就是这个指针的类型。这是指针本身所具有的类型。让我们看看例一中各个指针的类型：<br>(1)int <em>ptr; //指针的类型是int </em><br>(2)char <em>ptr; //指针的类型是char </em><br>(3)int <strong>ptr; //指针的类型是 int </strong><br>(4)int (<em>ptr)[3]; //指针的类型是 int(</em>)[3]<br>(5)int <em>(</em>ptr)[4]; //指针的类型是 int <em>(</em>)[4]<br>怎么样？找出指针的类型的方法是不是很简单？ </p>
-</li>
-<li><p>指针所指向的类型。<br>当你通过指针来访问指针所指向的内存区时，指针所指向的类型决定了编译器将把那片内存区里的内容当做什么来看待。从语法上看，你只须把指针声明语句中的指针名字和名字左边的指针声明符<em>去掉，剩下的就是指针所指向的类型。例如：<br>(1)int </em>ptr; //指针所指向的类型是int<br>(2)char <em>ptr; //指针所指向的的类型是char<br>(3)int **ptr; //指针所指向的的类型是 int </em><br>(4)int (<em>ptr)[3]; //指针所指向的的类型是 int()[3]<br>(5)int </em>(<em>ptr)[4]; //指针所指向的的类型是 int </em>()[4]<br>在指针的算术运算中，指针所指向的类型有很大的作用。指针的类型(即指针本身的类型)和指针所指向的类型是两个概念。当你对C越<br>来越熟悉时，你会发现，把与指针搅和在一起的”类型”这个概念分成”指针的类型”和”指针所指向的类型”两个概念，是精通指针的关键点之一。我看了不少书，发现有些写得差的书中，就把指针的这两个概念搅在一起了，所以看起书来前后矛盾，越看越糊涂。 </p>
-</li>
-<li><p>指针的值，或者叫指针所指向的内存区或地址。<br>指针的值是指针本身存储的数值，这个值将被编译器当作一个地址，而不是一个一般的数值。在32位程序里，所有类型的指针的值都是一个32位整数，因为32位程序里内存地址全都是32位长。指针所指向的内存区就是从指针的值所代表的那个内存地址开始，长度为si<br>zeof(指针所指向的类型)的一片内存区。以后，我们说一个指针的值是XX，就相当于说该指针指向了以XX为首地址的一片内存区域；我们说一个指针指向了某块内存区域，就相当于说该指针的值是这块内存区域的首地址。指针所指向的内存区和指针所指向的类型是两个完全不同的概念。在例一中，指针所指向的类型已经有了，但由于指针还未初始化，所以它所指向的内存区是不存在的，或者说是无意义的。以后，每遇到一个指针，都应该问问：这个指针的类型是什么？指针指向的类型是什么？该指针指向了哪里？ </p>
-</li>
-<li><p>指针本身所占据的内存区。<br>指针本身占了多大的内存？你只要用函数sizeof(指针的类型)测一下就知道<br>了。在32位平台里，指针本身占据了4个字节的长度。<br>指针本身占据的内存这个概念在判断一个指针表达式是否是左值时很有用。 </p>
-</li>
-</ol>
-<h2 id="第二章-指针的算术运算"><a href="#第二章-指针的算术运算" class="headerlink" title="第二章 指针的算术运算"></a>第二章 指针的算术运算</h2><p>指针可以加上或减去一个整数。指针的这种运算的意义和通常的数值的加减运算的意义是不一样的。例如：<br>例二：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">char a[20]; </div><div class="line">int *ptr=a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr++;</div></pre></td></tr></table></figure></p>
-<p>在上例中，指针ptr的类型是int*,它指向的类型是int，它被初始化为指向整形变量a。接下来的第3句中，指针ptr被加了1，编译器是这样处理的：它把指针ptr的值加上了sizeof(int)，在32位程序中，是被加上了4。由于地址是用字节做单位的，故ptr所指向的地址由原来的变量a的地址向高地址方向增加了4个字节。由于char类型的长度是一个字节，所以，原来ptr是指向数组a的第0号单元开始的四个字节，此时指向了数组a中从第4号单元开始的四个字节。我们可以用一个指针和一个循环来遍历一个数组，看例子：<br>例三：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">int array[20]; </div><div class="line">int *ptr=array; </div><div class="line">... </div><div class="line">//此处略去为整型数组赋值的代码。 </div><div class="line">... </div><div class="line">for(i=0;i&lt;20;i++) </div><div class="line">&#123; </div><div class="line">(*ptr)++; </div><div class="line">ptr++； </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>这个例子将整型数组中各个单元的值加1。由于每次循环都将指针ptr加1，所以每次循环都能访问数组的下一个单元。<br>再看例子：<br>例四：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">char a[20]; </div><div class="line">int *ptr=a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr+=5;</div><div class="line">``` </div><div class="line">在这个例子中，ptr被加上了5，编译器是这样处理的：将指针ptr的值加上5乘sizeof(int)，在32位程序中就是加上了5乘4=20。由于地址的单位是字节，故现在的ptr所指向的地址比起加5后的ptr所指向的地址来说，向高地址方向移动了20个字节。在这个例子中，没加5前的ptr指向数组a的第0号单元开始的四个字节，加5后，ptr已经指向了数组a的合法范围之外了。虽然这种情况在应用上会出问题，但在语法上却是可以的。这也体现出了指针的灵活性。如果上例中，ptr是被减去5，那么处理过程大同小异，只不过ptr的值是被减去5乘sizeof(int)，新的ptr指向的地址将比原来的ptr所指向的地址向低地址方向移动了20个字节。 </div><div class="line"></div><div class="line">总结一下，一个指针ptrold加上一个整数n后，结果是一个新的指针ptrnew,ptrnew的类型和ptrold的类型相同，ptrnew所指向的类型和ptrold所指向的类型也相同。ptrnew的值将比ptrold的值增加了n乘sizeof(ptrold所指向的类型)个字节。就是说,ptrnew所指向的内存区将比ptrold所指向的内存区向高地址方向移动了n乘sizeof(ptrold所指向的类型)个字节。一个指针ptrold减去一个整数n后，结果是一个新的指针ptrnew，ptrnew的类型和ptrold的类型相同，ptrnew所指向的类型和ptrold所指向的类型也相同。ptrnew的值将比ptrold的值减少了n乘sizeof(ptrold所指向的类型)个字节，就是说 ，ptrnew所指向的内存区将比ptrold所指向的内存区向低地址方向移动了n乘sizeof(ptrold所指向的类型)个字节。 </div><div class="line"></div><div class="line">第三章 运算符号&amp;和*</div><div class="line">-----------</div><div class="line"></div><div class="line">这里&amp;是取地址运算符，*是...书上叫做&quot;间接运算符&quot;。&amp;a的运算结果是一个指针，指针的类型是a的类型加个*，指针所指向的类型 </div><div class="line">是a的类型，指针所指向的地址嘛，那就是a的地址。*p的运算结果就五花八门了。总之*p的结果是p所指向的东西，这个东西有这 </div><div class="line">些特点：它的类型是p指向的类型，它所占用的地址是p所指向的地址。 </div><div class="line">例五：</div></pre></td></tr></table></figure></p>
-<p>int a=12;<br>int b;<br>int <em>p;<br>int **ptr;<br>p=&a;//&amp;a的结果是一个指针，类型是int</em>，指向的类型是int，指向的地址是a的地址。<br><em>p=24;//</em>p的结果，在这里它的类型是int，它所占用的地址是p所指向的地址，显然，<em>p就是变量a。<br>ptr=&p;//&amp;p的结果是个指针，该指针的类型是p的类型加个</em>，在这里是int<strong>。该指针所指向的类型是p的类型，这里是int<em>。该指针所指向的地址就是指针p自己的地址。 
-</em>ptr=&b;//<em>ptr是个指针，&amp;b的结果也是个指针，且这两个指针的类型和所指向的类型是一样的，所以用&amp;b来给</em>ptr赋值就是毫无      问题的了。 
-</strong>ptr=34;//<em>ptr的结果是ptr所指向的东西，在这里是一个指针，对这个指针再做一次</em>运算，结果就是一个int类型的变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">第四章 指针表达式</div><div class="line">---------</div><div class="line"></div><div class="line">一个表达式的最后结果如果是一个指针，那么这个表达式就叫指针表达式。下面是一些指针表达式的例子： </div><div class="line">例六：</div></pre></td></tr></table></figure></p>
-<p>int a,b;<br>int array[10];<br>int <em>pa;<br>pa=&a;//&amp;a是一个指针表达式。<br>int **ptr=&pa;//&amp;pa也是一个指针表达式。 
-</em>ptr=&b;//*ptr和&amp;b都是指针表达式。<br>pa=array;<br>pa++;//这也是指针表达式。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">例七：</div><div class="line">``` </div><div class="line">char *arr[20]; </div><div class="line">char **parr=arr;//如果把arr看作指针的话，arr也是指针表达式 </div><div class="line">char *str; </div><div class="line">str=*parr;//*parr是指针表达式 </div><div class="line">str=*(parr+1);//*(parr+1)是指针表达式 </div><div class="line">str=*(parr+2);//*(parr+2)是指针表达式</div></pre></td></tr></table></figure></p>
-<p>由于指针表达式的结果是一个指针，所以指针表达式也具有指针所具有的四个要素：指针的类型，指针所指向的类型，指针指向的内存区，指针自身占据的内存。好了，当一个指针表达式的结果指针已经明确地具有了指针自身占据的内存的话，这个指针表达式就是一个左值，否则就不是一个左值。<br>在例六中，&amp;a不是一个左值，因为它还没有占据明确的内存。<em>ptr是一个左值，因为</em>ptr这个指针已经占据了内存，其实<em>ptr就是指针pa，既然pa已经在内存中有了自己的位置，那么</em>ptr当然也有了自己的位置。 </p>
-<h2 id="第五章-数组和指针的关系"><a href="#第五章-数组和指针的关系" class="headerlink" title="第五章 数组和指针的关系"></a>第五章 数组和指针的关系</h2><p>数组的数组名其实可以看作一个指针。看下例：<br>例八：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">int array[10]=&#123;0,1,2,3,4,5,6,7,8,9&#125;,value; </div><div class="line">... </div><div class="line">... </div><div class="line">value=array[0];//也可写成：value=*array; </div><div class="line">value=array[3];//也可写成：value=*(array+3); </div><div class="line">value=array[4];//也可写成：value=*(array+4);</div><div class="line">``` </div><div class="line">上例中，一般而言数组名array代表数组本身，类型是int [10]，但如果把array看做指针的话，它指向数组的第0个单元，类型是int *，所指向的类型是数组单元的类型即int。因此*array等于0就一点也不奇怪了。同理，array+3是一个指向数组第3个单元的指针，所以*(array+3)等于3。其它依此类推。 </div><div class="line"></div><div class="line">例九： </div><div class="line">``` </div><div class="line">char *str[3]=&#123; </div><div class="line">&quot;Hello,this is a sample!&quot;, </div><div class="line">&quot;Hi,good morning.&quot;, </div><div class="line">&quot;Hello world&quot; </div><div class="line">&#125;; </div><div class="line">char s[80]； </div><div class="line">strcpy(s,str[0]);//也可写成strcpy(s,*str); </div><div class="line">strcpy(s,str[1]);//也可写成strcpy(s,*(str+1)); </div><div class="line">strcpy(s,str[2]);//也可写成strcpy(s,*(str+2));</div></pre></td></tr></table></figure></p>
-<p>上例中，str是一个三单元的数组，该数组的每个单元都是一个指针，这些指针各指向一个字符串。把指针数组名str当作一个指针的话，它指向数组的第0号单元，它的类型是char<strong>，它指向的类型是char <em>。</em>str也是一个指针，它的类型是char*，它所指向的类型是char，它指向的地址是字符串”Hello,this is a sample!”的第一个字符的地址，即’H’的地址。str+1也是一个指针，它指向数组的第1号单元，它的类型是char</strong>，它指向的类型是char <em>。 </em>(str+1)也是一个指针，它的类型是char*，它所指向的类型是char，它指向 “Hi,good morning.”的第一个字符’H’，等等。 </p>
-<p>下面总结一下数组的数组名的问题。声明了一个数组TYPE array[n]，则数组名称array就有了两重含义：第一，它代表整个数组，它的类型是TYPE [n]；第二，它是一个指针，该指针的类型是TYPE<em>，该指针指向的类型是TYPE，也就是数组单元的类型，该指针指向的内存区就是数组第0号单元，该指针自己占有单独的内存区，注意它和数组第0号单元占据的内存区是不同的。该指针的值是不能修改的，即类似array++的表达式是错误的。<br>在不同的表达式中数组名array可以扮演不同的角色。在表达式sizeof(array)中，数组名array代表数组本身，故这时sizeof函数<br>测出的是整个数组的大小。在表达式</em>array中，array扮演的是指针，因此这个表达式的结果就是数组第 0号单元的值。sizeof(<em>array)测出的是数组单元的大小。 表达式array+n（其中n=0，1，2，….。）中，array扮演的是指针，故arr<br>ay+n的结果是一个指针，它的类型是TYPE</em>，它指向的类型是TYPE，它指向数组第<br>n号单元。故sizeof(array+n)测出的是指针类型的大小。<br>例十：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int array[10]; </div><div class="line">int (*ptr)[10]; </div><div class="line">ptr=&amp;array;</div></pre></td></tr></table></figure></p>
-<p>上例中ptr是一个指针，它的类型是int (*)[10]，他指向的类型是int [10]，我们用整个数组的首地址来初始化它。在语句ptr=&amp;array中，array代表数组本身。 </p>
-<p>本节中提到了函数sizeof()，那么我来问一问，sizeof(指针名称)测出的究竟是指针自身类型的大小呢还是指针所指向的类型的大小？答案是前者。例如： </p>
-<p>int (*ptr)[10];<br>则在32位程序中，有：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sizeof(int(*)[10])==4 </div><div class="line">sizeof(int [10])==40 </div><div class="line">sizeof(ptr)==4</div></pre></td></tr></table></figure></p>
-<p>实际上，sizeof(对象)测出的都是对象自身的类型的大小，而不是别的什么类型的大小。 </p>
-<h2 id="第六章-指针和结构类型的关系"><a href="#第六章-指针和结构类型的关系" class="headerlink" title="第六章 指针和结构类型的关系"></a>第六章 指针和结构类型的关系</h2><p>可以声明一个指向结构类型对象的指针。<br>例十一：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">struct MyStruct </div><div class="line">&#123; </div><div class="line">int a; </div><div class="line">int b; </div><div class="line">int c; </div><div class="line">&#125; </div><div class="line">MyStruct ss=&#123;20,30,40&#125;;//声明了结构对象ss，并把ss的三个成员初始化为20，30和40。 </div><div class="line">MyStruct *ptr=&amp;ss;//声明了一个指向结构对象ss的指针。它的类型是MyStruct*,它指向的类型是MyStruct。 </div><div class="line">int *pstr=(int*)&amp;ss;//声明了一个指向结构对象ss的指针。但是它的类型和它指向的类型和ptr是不同的。</div></pre></td></tr></table></figure></p>
-<p>请问怎样通过指针ptr来访问ss的三个成员变量？<br>答案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ptr-&gt;a; </div><div class="line">ptr-&gt;b; </div><div class="line">ptr-&gt;c;</div></pre></td></tr></table></figure></p>
-<p>又请问怎样通过指针pstr来访问ss的三个成员变量？<br>答案：<br><em>pstr；//访问了ss的成员a。 
-</em>(pstr+1);//访问了ss的成员b。<br><em>(pstr+2)//访问了ss的成员c。<br>呵呵，虽然我在我的MSVC++6.0上调式过上述代码，但是要知道，这样使用pstr来访问结构成员是不正规的，为了说明为什么不正规，让我们看看怎样通过指针来访问数组的各个单元：<br>例十二：<br>int array[3]={35,56,37};<br>int </em>pa=array;<br>通过指针pa访问数组array的三个单元的方法是：<br><em>pa;//访问了第0号单元 
-</em>(pa+1);//访问了第1号单元<br><em>(pa+2);//访问了第2号单元<br>从格式上看倒是与通过指针访问结构成员的不正规方法的格式一样。所有的C/C++编译器在排列数组的单元时，总是把各个数组单元存放在连续的存储区里，单元和单元之间没有空隙。但在存放结构对象的各个成员时，在某种编译环境下，可能会需要字对齐或双字对齐或者是别的什么对齐，需要在相邻两个成员之间加若干?quot;填充字节”，这就导致各个成员之间可能会有若干个字节的空隙。<br>所以，在例十二中，即使</em>pstr访问到了结构对象ss的第一个成员变量a，也不能保证<em>(pstr+1)就一定能访问到结构成员b。因为成员a和成员b之间可能会有若干填充字节，说不定</em>(pstr+1)就正好访问到了这些填充字节呢。这也证明了指针的灵活性。要是你的目的就是想看看各个结构成员之间到底有没有填充字节，嘿，这倒是个不错的方法。 通过指针访问结构成员的正确方法应该是象例十二中使用指针ptr的方法。 </p>
-<h2 id="第七章-指针和函数的关系"><a href="#第七章-指针和函数的关系" class="headerlink" title="第七章 指针和函数的关系"></a>第七章 指针和函数的关系</h2><p>可以把一个指针声明成为一个指向函数的指针。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">int fun1(char*,int); </div><div class="line">int (*pfun1)(char*,int); </div><div class="line">pfun1=fun1; </div><div class="line">.... </div><div class="line">.... </div><div class="line">int a=(*pfun1)(&quot;abcdefg&quot;,7);//通过函数指针调用函数。</div></pre></td></tr></table></figure></p>
-<p>可以把指针作为函数的形参。在函数调用语句中，可以用指针表达式来作为实参。<br>例十三：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">int fun(char*); </div><div class="line">int a; </div><div class="line">char str[]=&quot;abcdefghijklmn&quot;; </div><div class="line">a=fun(str); </div><div class="line">... </div><div class="line">... </div><div class="line">int fun(char*s) </div><div class="line">&#123; </div><div class="line">int num=0; </div><div class="line">for(int i=0;i&lt;strlen(s);i++) </div><div class="line">&#123; </div><div class="line">num+=*s;s++; </div><div class="line">&#125; </div><div class="line">return num; </div><div class="line">)</div></pre></td></tr></table></figure></p>
-<p>这个例子中的函数fun统计一个字符串中各个字符的ASCII码值之和。前面说了，数组的名字也是一个指针。在函数调用中，当把str作为实参传递给形参s后，实际是把str的值传递给了s，s所指向的地址就和str所指向的地址一致，但是str和s各自占用各自的存储空间。在函数体内对s进行自加1运算，并不意味着同时对str进行了自加1运算。 </p>
-<h2 id="第八章-指针类型转换"><a href="#第八章-指针类型转换" class="headerlink" title="第八章 指针类型转换"></a>第八章 指针类型转换</h2><p>当我们初始化一个指针或给一个指针赋值时，赋值号的左边是一个指针，赋值号的右边是一个指针表达式。在我们前面所举的例子中，绝大多数情况下，指针的类型和指针表达式的类型是一样的，指针所指向的类型和指针表达式所指向的类型是一样的。<br>例十四：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">float f=12.3; </div><div class="line">float *fptr=&amp;f; </div><div class="line">int *p;</div></pre></td></tr></table></figure></p>
-<p>在上面的例子中，假如我们想让指针p指向实数f，应该怎么搞？是用下面的语句吗？<br>p=&f;<br>不对。因为指针p的类型是int<em>，它指向的类型是int。表达式&amp;f的结果是一个指针，指针的类型是float</em>,它指向的类型是float。两者不一致，直接赋值的方法是不行的。至少在我的MSVC++6.0上，对指针的赋值语句要求赋值号两边的类型一致，所指向的类型也一致，其它的编译器上我没试过，大家可以试试。为了实现我们的目的，需要进行”强制类型转换”：<br>p=(int<em>)&f;<br>如果有一个指针p，我们需要把它的类型和所指向的类型改为TYEP</em>和TYPE,那么语法格式是：<br>(TYPE<em>)p；<br>这样强制类型转换的结果是一个新指针，该新指针的类型是TYPE</em>，它指向的类型是TYPE，它指向的地址就是原指针指向的地址。而原来的指针p的一切属性都没有被修改。 </p>
-<p>一个函数如果使用了指针作为形参，那么在函数调用语句的实参和形参的结合过程中，也会发生指针类型的转换。<br>例十五：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">void fun(char*); </div><div class="line">int a=125,b; </div><div class="line">fun((char*)&amp;a); </div><div class="line">... </div><div class="line">... </div><div class="line">void fun(char*s) </div><div class="line">&#123; </div><div class="line">char c; </div><div class="line">c=*(s+3);*(s+3)=*(s+0);*(s+0)=c; </div><div class="line">c=*(s+2);*(s+2)=*(s+1);*(s+1)=c; </div><div class="line">&#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>注意这是一个32位程序，故int类型占了四个字节，char类型占一个字节。函数fun的作用是把一个整数的四个字节的顺序来个颠倒。注意到了吗？在函数调用语句中，实参&amp;a的结果是一个指针，它的类型是int <em>，它指向的类型是int。形参这个指针的类型是char</em>，它指向的类型是char。这样，在实参和形参的结合过程中，我们必须进行一次从int<em>类型到char</em>类型的转换。结合这个例子，我们可以这样来想象编译器进行转换的过程：编译器先构造一个临时指针 char<em>temp，然后执行temp=(char</em>)&amp;a，最后再把temp的值传递给s。所以最后的结果是：s的类型是char*,它指向的类型是char，它指向的地址就是a的首地址。 </p>
-<p>我们已经知道，指针的值就是指针指向的地址，在32位程序中，指针的值其实是一个32位整数。那可不可以把一个整数当作指针的值直接赋给指针呢？就象下面的语句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">unsigned int a; </div><div class="line">TYPE *ptr;//TYPE是int，char或结构类型等等类型。 </div><div class="line">... </div><div class="line">... </div><div class="line">a=20345686; </div><div class="line">ptr=20345686;//我们的目的是要使指针ptr指向地址20345686（十进制 </div><div class="line">） </div><div class="line">ptr=a;//我们的目的是要使指针ptr指向地址20345686（十进制）</div></pre></td></tr></table></figure></p>
-<p>编译一下吧。结果发现后面两条语句全是错的。那么我们的目的就不能达到了吗？不，还有办法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">unsigned int a; </div><div class="line">TYPE *ptr;//TYPE是int，char或结构类型等等类型。 </div><div class="line">... </div><div class="line">... </div><div class="line">a=某个数，这个数必须代表一个合法的地址； </div><div class="line">ptr=(TYPE*)a；//呵呵，这就可以了。</div></pre></td></tr></table></figure></p>
-<p>严格说来这里的(TYPE<em>)和指针类型转换中的(TYPE</em>)还不一样。这里的(TYPE*)的意思是把无符号整数a的值当作一个地址来看待。<br>上面强调了a的值必须代表一个合法的地址，否则的话，在你使用ptr的时候，就会出现非法操作错误。 </p>
-<p>想想能不能反过来，把指针指向的地址即指针的值当作一个整数取出来。完全可以。下面的例子演示了把一个指针的值当作一个整数取出来，然后再把这个整数当作一个地址赋给一个指针：<br>例十六：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">int a=123,b; </div><div class="line">int *ptr=&amp;a; </div><div class="line">char *str; </div><div class="line">b=(int)ptr;//把指针ptr的值当作一个整数取出来。 </div><div class="line">str=(char*)b;//把这个整数的值当作一个地址赋给指针str。</div></pre></td></tr></table></figure></p>
-<p>好了，现在我们已经知道了，可以把指针的值当作一个整数取出来，也可以把一个整数值当作地址赋给一个指针。 </p>
-<h2 id="第九章-指针的安全问题"><a href="#第九章-指针的安全问题" class="headerlink" title="第九章 指针的安全问题"></a>第九章 指针的安全问题</h2><p>看下面的例子：<br>例十七：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">char s=’a’; </div><div class="line">int *ptr; </div><div class="line">ptr=(int*)&amp;s; </div><div class="line">*ptr=1298；</div></pre></td></tr></table></figure></p>
-<p>指针ptr是一个int*类型的指针，它指向的类型是int。它指向的地址就是s的首地址。在32位程序中，s占一个字节，int类型占四个字节。最后一条语句不但改变了s所占的一个字节，还把和s相临的高地址方向的三个字节也改变了。这三个字节是干什么的？只有编译程序知道，而写程序的人是不太可能知道的。也许这三个字节里存储了非常重要的数据，也许这三个字节里正好是程序的一条代码，而由于你对指针的马虎应用，这三个字节的值被改变了！这会造成崩溃性的错误。<br>让我们再来看一例：<br>例十八：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">char a; </div><div class="line">int *ptr=&amp;a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr++; </div><div class="line">*ptr=115;</div></pre></td></tr></table></figure></p>
-<p>该例子完全可以通过编译，并能执行。但是看到没有？第3句对指针ptr进行自加1运算后，ptr指向了和整形变量a相邻的高地址方向的一块存储区。这块存储区里是什么？我们不知道。有可能它是一个非常重要的数据，甚至可能是一条代码。而第4句竟然往这片存储区里写入一个数据！这是严重的错误。所以在使用指针时，程序员心里必须非常清楚：我的指针究竟指向了哪里。<br>在用指针访问数组的时候，也要注意不要超出数组的低端和高端界限，否则也会造成类似的错误。<br>在指针的强制类型转换：ptr1=(TYPE*)ptr2中，如果sizeof(ptr2的类型)大于sizeof(ptr1的类型)，那么在使用指针ptr1来访问ptr2所指向的存储区时是安全的。如果sizeof(ptr2的类型)小于sizeof(ptr1的类型)，那么在使用指针ptr1来访问ptr2所指向的存储区时是不安全的。至于为什么，读者结合例十七来想一想，应该会明白的。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/C/">C</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/C/">C</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">标签云</p>
+    <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -916,7 +989,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
 		  
 		
 		  
@@ -1077,7 +1150,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

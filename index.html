@@ -46,7 +46,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -62,7 +62,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -87,13 +87,13 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-05T06:17:00.000Z" itemprop="datePublished"> 发表于 2017-04-05</time>
+    <time datetime="2017-04-05T06:17:00.000Z" itemprop="datePublished"> Published 2017-04-05</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h1 id="STOMP-协议"><a href="#STOMP-协议" class="headerlink" title="STOMP 协议"></a>STOMP 协议</h1><h2 id="STOMP-概述"><a href="#STOMP-概述" class="headerlink" title="STOMP 概述"></a>STOMP 概述</h2><p>STOMP即Simple (or Streaming) Text Orientated Messaging Protocol，简单(流)文本定向消息协议，它提供了一个可互操作的连接格式，允许STOMP客户端与任意STOMP消息代理（Broker）进行交互。STOMP协议由于设计简单，易于开发客户端，因此在多种语言和多种平台上得到广泛地应用。</p>
+        <h2 id="STOMP-概述"><a href="#STOMP-概述" class="headerlink" title="STOMP 概述"></a>STOMP 概述</h2><p>STOMP即Simple (or Streaming) Text Orientated Messaging Protocol，简单(流)文本定向消息协议，它提供了一个可互操作的连接格式，允许STOMP客户端与任意STOMP消息代理（Broker）进行交互。STOMP协议由于设计简单，易于开发客户端，因此在多种语言和多种平台上得到广泛地应用。</p>
 <p>STOMP协议的前身是TTMP协议（一个简单的基于文本的协议），专为消息中间件设计。</p>
 <p>STOMP是一个非常简单和容易实现的协议，其设计灵感源自于HTTP的简单性。尽管STOMP协议在服务器端的实现可能有一定的难度，但客户端的实现却很容易。例如，可以使用Telnet登录到任何的STOMP代理，并与STOMP代理进行交互。</p>
 <h2 id="STOMP的实现"><a href="#STOMP的实现" class="headerlink" title="STOMP的实现"></a>STOMP的实现</h2><p>业界已经有很多优秀的STOMP的服务器/客户端的开源实现，下面就介绍一下这方面的情况。</p>
@@ -157,6 +157,284 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/01/10/activemq/" title="activemq 通信方式总结" itemprop="url">activemq 通信方式总结</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-10T12:59:00.000Z" itemprop="datePublished"> Published 2017-01-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>activemq是JMS消息通信规范的一个实现。总的来说，消息规范里面定义最常见的几种消息通信模式主要有发布-订阅、点对点这两种。</p>
+<h2 id="基础流程"><a href="#基础流程" class="headerlink" title="基础流程"></a>基础流程</h2><p>在讨论具体方式的时候，我们先看看使用activemq需要启动服务的主要过程。<br>按照JMS的规范，我们首先需要获得一个JMS connection factory.，通过这个connection factory来创建connection.在这个基础之上我们再创建session, destination, producer和consumer。因此主要的几个步骤如下：</p>
+<ol>
+<li>获得JMS connection factory. 通过我们提供特定环境的连接信息来构造factory。</li>
+<li>利用factory构造JMS connection</li>
+<li>启动connection</li>
+<li>通过connection创建JMS session.</li>
+<li>指定JMS destination.</li>
+<li>创建JMS producer或者创建JMS message并提供destination.</li>
+<li>创建JMS consumer或注册JMS message listener.</li>
+<li>发送和接收JMS message.</li>
+<li>关闭所有JMS资源，包括connection, session, producer, consumer等。</li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/01/04/rabbitmq/" title="rabbitmq" itemprop="url">rabbitmq</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-04T11:59:00.000Z" itemprop="datePublished"> Published 2017-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><p>从AMQP协议可以看出，MessageQueue、Exchange和Binding构成了AMQP协议的核心，下面我们就围绕这三个主要组件    从应用使用的角度全面的介绍如何利用Rabbit MQ构建消息队列以及使用过程中的注意事项。</p>
+<h3 id="MessageQueue"><a href="#MessageQueue" class="headerlink" title="MessageQueue"></a>MessageQueue</h3><p>在Rabbit MQ中，无论是生产者发送消息还是消费者接受消息，都首先需要声明一个MessageQueue。这就存在一个问题，是生产者声明还是消费者声明呢？要解决这个问题，首先需要明确：</p>
+<p>a)消费者是无法订阅或者获取不存在的MessageQueue中信息。</p>
+<p>b)消息被Exchange接受以后，如果没有匹配的Queue，则会被丢弃。<br>在明白了上述两点以后，就容易理解如果是消费者去声明Queue，就有可能会出现在声明Queue之 前，生产者已发送的消息被丢弃的隐患。如果应用能够通过消息重发的机制允许消息丢失，则使用此方案没有任何问题。但是如果不能接受该方案，这就需要无论是 生产者还是消费者，在发送或者接受消息前，都需要去尝试建立消息队列。这里有一点需要明确，如果客户端尝试建立一个已经存在的消息队列，Rabbit MQ不会做任何事情，并返回客户端建立成功的。</p>
+<p>如果一个消费者在一个信道中正在监听某一个队列的消息，Rabbit MQ是不允许该消费者在同一个channel去声明其他队列的。Rabbit MQ中，可以通过queue.declare命令声明一个队列，可以设置该队列以下属性:</p>
+<p>a) Exclusive： 排他队列，如果一个队列被声明为排他队列，该队列仅对首次声明它的连接可见，并在连接断开时自动删除。这里需要注意三点：其一，排他队列是基于连接可见 的，同一连接的不同信道是可以同时访问同一个连接创建的排他队列的。其二，“首次”，如果一个连接已经声明了一个排他队列，其他连接是不允许建立同名的排 他队列的，这个与普通队列不同。其三，即使该队列是持久化的，一旦连接关闭或者客户端退出，该排他队列都会被自动删除的。这种队列适用于只限于一个客户端 发送读取消息的应用场景。</p>
+<p>b)   Auto-delete:自动删除，如果该队列没有任何订阅的消费者的话，该队列会被自动删除。这种队列适用于临时队列。</p>
+<p>c)   Durable:持久化，这个会在后面作为专门一个章节讨论。</p>
+<p>d)  其他选项，例如如果用户仅仅想查询某一个队列是否已存在，如果不存在，不想建立该队列，仍然可以调用queue.declare，只不过需要将参数passive设为true，传给queue.declare，如果该队列已存在，则会返回true；如果不存在，则会返回Error，但是不会创建新的队列。</p>
+<h3 id="生产者发送消息"><a href="#生产者发送消息" class="headerlink" title="生产者发送消息"></a>生产者发送消息</h3><p>在AMQP模型中，Exchange是接受生产者消息并将消息路由到消息队列的关键组件。ExchangeType和Binding决定了消息的路由规 则。所以生产者想要发送消息，首先必须要声明一个Exchange和该Exchange对应的Binding。可以通过 ExchangeDeclare和BindingDeclare完成。在Rabbit MQ中，声明一个Exchange需要三个参数：ExchangeName，ExchangeType和Durable。ExchangeName是该 Exchange的名字，该属性在创建Binding和生产者通过publish推送消息时需要指定。ExchangeType，指Exchange的类 型，在RabbitMQ中，有三种类型的Exchange：direct ，fanout和topic，不同的Exchange会表现出不同路由行为。Durable是该Exchange的持久化属性，这个会在消息持久化章节讨 论。声明一个Binding需要提供一个QueueName，ExchangeName和BindingKey。下面我们就分析一下不同的 ExchangeType表现出的不同路由规则。</p>
+<p>生产者在发送消息时，都需要指定一个RoutingKey和Exchange，Exchange在接到该RoutingKey以后，会判断该ExchangeType:</p>
+<p>a) 如果是Direct类型，则会将消息中的RoutingKey与该Exchange关联的所有Binding中的BindingKey进行比较，如果相等，则发送到该Binding对应的Queue中。</p>
+<p>b) 如果是Fanout类型，则会将消息发送给所有与该Exchange定义过Binding的所有Queues中去，其实是一种广播行为。</p>
+<p>c)如果是Topic类型，则会按照正则表达式，对RoutingKey与BindingKey进行匹配，如果匹配成功，则发送到对应的Queue中。</p>
+<h3 id="消费者订阅消息"><a href="#消费者订阅消息" class="headerlink" title="消费者订阅消息"></a>消费者订阅消息</h3><p>在RabbitMQ中消费者有2种方式获取队列中的消息:</p>
+<p>a)  一种是通过basic.consume命令，订阅某一个队列中的消息,channel会自动在处理完上一条消息之后，接收下一条消息。（同一个channel消息处理是串行的）。除非关闭channel或者取消订阅，否则客户端将会一直接收队列的消息。</p>
+<p>b)  另外一种方式是通过basic.get命令主动获取队列中的消息，但是绝对不可以通过循环调用basic.get来代替basic.consume，这是因为basic.get RabbitMQ在实际执行的时候，是首先consume某一个队列，然后检索第一条消息，然后再取消订阅。如果是高吞吐率的消费者，最好还是建议使用basic.consume。</p>
+<p>如果有多个消费者同时订阅同一个队列的话，RabbitMQ是采用循环的方式分发消息的，每一条消息只能被一个订阅者接收。例如，有队列Queue，其中ClientA和ClientB都Consume了该队列，MessageA到达队列后，被分派到ClientA，ClientA回复服务器收到响应，服务器删除MessageA；再有一条消息MessageB抵达队列，服务器根据“循环推送”原则，将消息会发给ClientB，然后收到ClientB的确认后，删除MessageB；等到再下一条消息时，服务器会再将消息发送给ClientA。</p>
+<p>这里我们可以看出，消费者再接到消息以后，都需要给服务器发送一条确认命令，这个即可以在handleDelivery里显示的调用basic.ack实现，也可以在Consume某个队列的时候，设置autoACK属性为true实现。这个ACK仅仅是通知服务器可以安全的删除该消息，而不是通知生产者，与RPC不同。 如果消费者在接到消息以后还没来得及返回ACK就断开了连接，消息服务器会重传该消息给下一个订阅者，如果没有订阅者就会存储该消息。</p>
+<p>既然RabbitMQ提供了ACK某一个消息的命令，当然也提供了Reject某一个消息的命令。当客户端发生错误，调用basic.reject命令拒绝某一个消息时，可以设置一个requeue的属性，如果为true，则消息服务器会重传该消息给下一个订阅者；如果为false，则会直接删除该消息。当然，也可以通过ack，让消息服务器直接删除该消息并且不会重传。</p>
+<h2 id="持久化："><a href="#持久化：" class="headerlink" title="持久化："></a>持久化：</h2><p>Rabbit MQ默认是不持久队列、Exchange、Binding以及队列中的消息的，这意味着一旦消息服务器重启，所有已声明的队列，Exchange，Binding以及队列中的消息都会丢失。通过设置Exchange和MessageQueue的durable属性为true，可以使得队列和Exchange持久化，但是这还不能使得队列中的消息持久化，这需要生产者在发送消息的时候，将delivery mode设置为2，只有这3个全部设置完成后，才能保证服务器重启不会对现有的队列造成影响。这里需要注意的是，只有durable为true的Exchange和durable为true的Queues才能绑定，否则在绑定时，RabbitMQ都会抛错的。持久化会对RabbitMQ的性能造成比较大的影响，可能会下降10倍不止。</p>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>对事务的支持是AMQP协议的一个重要特性。假设当生产者将一个持久化消息发送给服务器时，因为consume命令本身没有任何Response返回，所以即使服务器崩溃，没有持久化该消息，生产者也无法获知该消息已经丢失。如果此时使用事务，即通过txSelect()开启一个事务，然后发送消息给服务器，然后通过txCommit()提交该事务，即可以保证，如果txCommit()提交了，则该消息一定会持久化，如果txCommit()还未提交即服务器崩溃，则该消息不会服务器就收。当然Rabbit MQ也提供了txRollback()命令用于回滚某一个事务。</p>
+<h2 id="confirm机制"><a href="#confirm机制" class="headerlink" title="confirm机制"></a>confirm机制</h2><p>使用事务固然可以保证只有提交的事务，才会被服务器执行。但是这样同时也将客户端与消息服务器同步起来，这背离了消息队列解耦的本质。Rabbit MQ提供了一个更加轻量级的机制来保证生产者可以感知服务器消息是否已被路由到正确的队列中——Confirm。如果设置channel为confirm状态，则通过该channel发送的消息都会被分配一个唯一的ID，然后一旦该消息被正确的路由到匹配的队列中后，服务器会返回给生产者一个Confirm，该Confirm包含该消息的ID，这样生产者就会知道该消息已被正确分发。对于持久化消息，只有该消息被持久化后，才会返回Confirm。Confirm机制的最大优点在于异步，生产者在发送消息以后，即可继续执行其他任务。而服务器返回Confirm后，会触发生产者的回调函数，生产者在回调函数中处理Confirm信息。如果消息服务器发生异常，导致该消息丢失，会返回给生产者一个nack，表示消息已经丢失，这样生产者就可以通过重发消息，保证消息不丢失。Confirm机制在性能上要比事务优越很多。但是Confirm机制，无法进行回滚，就是一旦服务器崩溃，生产者无法得到Confirm信息，生产者其实本身也不知道该消息吃否已经被持久化，只有继续重发来保证消息不丢失，但是如果原先已经持久化的消息，并不会被回滚，这样队列中就会存在两条相同的消息，系统需要支持去重。</p>
+<p>1.什么情况会导致 blackhole？</p>
+<p>两种情况：</p>
+<pre><code>声明 exchange 后未绑定任何 queue ，此时发送到该 exchange 上的 message 均被 blackholed ；
+声明 exchange 后绑定了 queue ，但发送到该 exchange 上的 message 所使用的 routing_key 不匹配任何 binding_key ，则 blackholed 。
+</code></pre>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/rabbitmq/">rabbitmq</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/01/04/search/" title="常见搜索引擎的分布式解决方法" itemprop="url">常见搜索引擎的分布式解决方法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-04T11:59:00.000Z" itemprop="datePublished"> Published 2017-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>本文转自<a href="http://armsword.com/2017/01/16/distributed-solutions-for-search-engines/" target="_blank" rel="external">说说常见搜索引擎的分布式解决方法</a><br>随着索引数据的增大以及请求的增多，分布式搜索是最好的一种解决方案，主要解决两个问题，其一是能让单台机器load所有索引数据到内存中，其二是请求延时大，解决请求latency问题。我之前为团队写了篇专利，内容是关于分布式搜索解决方案的，所以粗略的看了下大部分开源的搜索引擎是怎么实现分布式的，后面的文章我会简单说下常见的搜索引擎的分布式解决方案。</p>
+<p>首先我们先说下几个简单概念，分布式搜索都是M*N（横向切分数据，纵向切分流量）这个维度去解决问题的，虽然不同产品或场景概念不完全相同，读者可以简单认为一份完整的数据，被均分为M份，每一份被称为一个分配（Shard或者Partition），然后提供对每个Shard提供N份副本（Replica）。那么分布式的设计就围绕着以下问题：</p>
+<ul>
+<li>如何选择合适的分片(Shard)，副本(Replica)的数量</li>
+<li>如何做路由，即怎么在所有Shard里找到一份完整的数据（找到对应的机器列表）</li>
+<li>如何做负载均衡</li>
+<li>如果提高服务的可扩展性</li>
+<li>如何提高服务的服务能力（QPS），当索引和搜索并发量增大时，如何平滑解决</li>
+<li>如何更新索引，全量和增量索引的更新解决方法</li>
+<li>如果提高服务的稳定性，单台服务挂掉怎么不影响整体服务等等</li>
+</ul>
+<p>下面就说下常见的搜索引擎的分布式解决方案，因为开源的搜索产品基本上都没有在工作中用过，对代码细节并不是太了解，只是研究了下其原理，所以理解的会有些偏差，看官们如果发现错误直接指出即可。</p>
+<h2 id="Sphinx-Coreseek"><a href="#Sphinx-Coreseek" class="headerlink" title="Sphinx/Coreseek"></a>Sphinx/Coreseek</h2><p>Sphinx的流程还是很简单的，可以看下其流程图：<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/sphinx.png" alt="sphinx"><br>需要支持分布式的话，需要改下配置，大致是这样子的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">index dist</div><div class="line">&#123;</div><div class="line">  type = distributed</div><div class="line">  local = chunk1</div><div class="line">  agent = localhost:9312:chunk2  本地</div><div class="line">  agent = 192.168.100.2:9312:chunk3  远程</div><div class="line">  agent = 192.168.100.3:9312:chunk4  远程	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从图中也可以看出，需要在配置列表里配置好其他shard的地址。查询过程为：</p>
+<ul>
+<li>连接到远程代理</li>
+<li>执行查询</li>
+<li>对本地索引进行查询</li>
+<li>接收来自远程代理的搜索结果</li>
+<li>将所有结果合并，删除重复项</li>
+<li>将合并后的结果返回给客户端<br>索引数据复制同步的方法也是常用的两种：</li>
+</ul>
+<p>主从同步<br>增量更新索引<br>方法也是设置crontab，添加2个选项，一个是重建主索引，一个是增量索引更新。</p>
+<p>当然为了避免单点以及增加服务能力，肯定有多个Replica，解决方法应该也是配置或者haproxy相关的方法解决，从上面可以看出，Sphinx很难用，自动化能力太弱，所以很多大厂要么不再使用Sphinx要么基于其二次开发。</p>
+<h2 id="Solr"><a href="#Solr" class="headerlink" title="Solr"></a>Solr</h2><p>Solr提供了两种方案来应对访问压力，其一是Replication，另一个是SolrCloud。我们此处只说Replication原理。<br>Replication采用了Master/Slave模式，也就是说由一个主索引和多个从索引构成，从索引从主索引复制索引，主索引负责更新索引，从索引负责同步索引和查询。本质上是读写分离的思想，MySQL/Redis等数据库也多是这种方式部署的。有两种部署方式：</p>
+<ul>
+<li>第一种<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/solr.png" alt="solr-replica"></li>
+<li>第二种<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/solr_repeater.png" alt="solr-repeater"></li>
+</ul>
+<p>与第一种相比多了一层Repeater，Repeater既扮演了Master角色，又扮演了Slave功能，主要解决单个Master下Slave太多，Master压力太大的问题。</p>
+<p>Master与Slave之间的通信是无状态的http连接，Slave端发送不同的Command从Master端获得数据。原理就是Master那边有个标志位和版本号，用于获取正确的数据版本，然后数据扔到Slave临时目录下，数据完整后，再覆盖原有数据。多个副本的方法应该与Sphinx相似，一般也是通过通过上游负载均衡模块如Nginx，HaProxy来分流。</p>
+<h2 id="SolrCloud"><a href="#SolrCloud" class="headerlink" title="SolrCloud"></a>SolrCloud</h2><p>因为Solr Replication不好用，本质上还不算真正分布式的，所以Solr从4.0开始支持SolrCloud模式。特性不少，主要说两个吧：</p>
+<p>配置文件统一管理，扔到Zookeeper上<br>自动做负载均衡和故障恢复，不再需要Nginx或HaProxy的支持<br>逻辑图<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/solrcloud.png" alt="逻辑图"></p>
+<ul>
+<li>Collection：逻辑意义上一份完整的索引</li>
+<li>Shard：上文已说，就是索引的1/N分片</li>
+<li>Replica：Shard的一个拷贝<br>每个Shard，即相同的Replica下都会有一个leader，leader选举由Zookeeper完成。虽然有leader的概念，但是其实SolrCloud分布式是去中心化的，意思就是说，leader和非leader都能提供查询功能（也有修改和删除功能，搜索场景应用不多吧？），而更新索引，创建Collection/Shard/Replica（即扩容）只能由leader完成，避免产生并发修改问题，当非leader节点收到修改操作请求时，将信息存储在zookeeper中相应节点上，leader节点会一直对该节点进行watch，发现变化就实时做处理。</li>
+</ul>
+<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3><p>任意节点收到创建索引请求后，转换成json格式存储到zk的/overseer/collection-queue-work的children节点上<br>leader线程一直监控collection-queue-work节点，检查到变化后，取出json数据，根据信息计算出需要创建的shard、replica，将创建具体replica的请求转向各对应节点<br>各节点创建完具体的replica后，将该节点的状态（创建成功与否等）更新到/overseer/queue的children节点上<br>leader线程监控/overseer/queue节点，将overseer/queue的children节点的状态更新至/clusterstate.json<br>各节点同步/clusterstate.json，整个集群状态得到更新，新索引创建成功</p>
+<h3 id="更新索引"><a href="#更新索引" class="headerlink" title="更新索引"></a>更新索引</h3><p>根据路由规则计算出该doc所属shard，并找出该doc所属的shard对应的leader<br>如果当前Replica是对应Shard且是leader，首先更新本地索引，然后再将doc转向该Shard的其余Replica<br>扩容/缩容</p>
+<p>停掉某台Solr，更新集群状态到/clusterstate.json<br>增加一台Solr，从leader出复制相同的数据，然后配置写到/clusterstate.json<br>查询</p>
+<p>去中心的，leader和非leader一样功能，Replica接收搜索请求时，从Zookeeper中获取该Replica对应的Collection及所有的Shard和Replica<br>将请求发送到该Collection下对应的Shard，然后负载均衡到对应的Replica<br>SolrCloud也有其他功能，比如Optimization，就是一个运行在leader机器的进程，复杂压缩索引和归并Segment；近实时搜索等。总体看SolrCloud解决了Solr Replication遇到的一些问题，比Sphinx更好用，更自动化。</p>
+<p>一号店</p>
+<p>很多大一点的厂商如果不自研搜索引擎的话，并没有使用SolrCloud，而多基于Solr/Lucence。比如一号店的分布式搜索解决方案，如下所示：<br><a href="http://www.infoq.com/cn/articles/yhd-11-11-distributed-search-engine-architecture" target="_blank" rel="external">http://www.infoq.com/cn/articles/yhd-11-11-distributed-search-engine-architecture</a></p>
+<p>Broker就相当于Proxy，扮演了路由功能，很多厂商做的与一号店有相似之处。因为没有leader选举，所以索引的更新就由其他模块来做了。</p>
+<h2 id="ElasticSearch"><a href="#ElasticSearch" class="headerlink" title="ElasticSearch"></a>ElasticSearch</h2><p>ElasticSearch的倒排索引也是基于Lucence实现的。功能强大，不仅提供了实时搜索功能，还有分析功能，DB-Engines上面的搜索引擎排名，目前已经超越Solr排名第一位了。因为太强大了，功能也特别多，我研究还不够深，简单说下吧。<br>es会将集群名字相同的机器归为一个集群（业务），所以先说下启动过程。</p>
+<h3 id="启动过程"><a href="#启动过程" class="headerlink" title="启动过程"></a>启动过程</h3><p><img src="http://githubforericwang.qiniudn.com/hexo/eric/es_start.png" alt="es_start"><br>当ElasticSearch的节点启动后，它会利用多播(multicast)(或者单播，如果用户更改了配置)寻找集群中的其它节点，并与之建立连接。</p>
+<h3 id="leader选举"><a href="#leader选举" class="headerlink" title="leader选举"></a>leader选举</h3><p>与SolrCloud相似，也是去中心化的，但是没有使用Zookeeper，而是自己实现了分布式锁，选主的流程叫做 ZenDiscovery（详情见第三个参考链接）：</p>
+<ul>
+<li>节点启动后先ping（这里的ping是 Elasticsearch 的一个RPC命令。如果 discovery.zen.ping.unicast.hosts 有设置，则ping设置中的host，否则尝试ping localhost 的几个端口， Elasticsearch 支持同一个主机启动多个节点）</li>
+<li>Ping的response会包含该节点的基本信息以及该节点认为的master节点</li>
+<li>选举开始，先从各节点认为的master中选，规则很简单，按照id的字典序排序，取第一个</li>
+<li>如果各节点都没有认为的master，则从所有节点中选择，规则同上。这里有个限制条件就是 discovery.zen.minimum_master_nodes，如果节点数达不到最小值的限制，则循环上述过程，直到节点数足够可以开始选举</li>
+<li>最后选举结果是肯定能选举出一个master，如果只有一个local节点那就选出的是自己</li>
+<li>如果当前节点是master，则开始等待节点数达到 minimum_master_nodes，然后提供服务</li>
+<li>如果当前节点不是master，则尝试加入master</li>
+<li>选举完leader后，主节点leader会去读取集群状态信息；因为主节点会监控其他节点，当其他节点出现故障时，会进行恢复工作。在这个阶段，主节点会去检查哪些分片可用，决定哪些分片作为主分片。</li>
+</ul>
+<p>选举完leader后，主节点leader会去读取集群状态信息；因为主节点会监控其他节点，当其他节点出现故障时，会进行恢复工作。在这个阶段，主节点会去检查哪些分片可用，决定哪些分片作为主分片。</p>
+<p>分片</p>
+<p>es在创建索引时，自己设置好分片个数，默认5个，整个过程类似于分裂的概念，如下图所示：</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/es_shard.svg" alt="es_shard"></p>
+<p>至于读写、写操作等于SolrCloud相似，等我细研究后后续再说吧，也可以说下实时索引怎么做的，细节很多，下次再说吧。至于文中为什么不说Lucence，因为Lucence其实就是个index lib，只是解决倒排、正排索引怎么存放的，并不是一个完整的搜索引擎解决方案。而ES为什么能脱颖而出的主要原因是配套设施完善，工具，Web UI都是非常赞的，对于很多开源产品，它能后来居上的主要原因就是它真实的能解决用户遇到的问题或者比其他产品更好用。搜索引擎发展这么多年了，架构这块能做的基本上大家都差不太多，最后能脱颖而出的肯定是第三方工具做的更完善，更好用的了。</p>
+<p>PS：<br>至于阿里搜索怎么做的，可以参考下这个文档，包括了阿里搜索里用到的很多基础模块了：<br><a href="https://share.weiyun.com/f66e79d9f6897d0aac683361531cf00d" target="_blank" rel="external">https://share.weiyun.com/f66e79d9f6897d0aac683361531cf00d</a></p>
+<p>参考链接：<br><a href="http://blog.haohtml.com/archives/13724" target="_blank" rel="external">http://blog.haohtml.com/archives/13724</a><br><a href="http://www.voidcn.com/blog/u011026968/article/p-4922079.html" target="_blank" rel="external">http://www.voidcn.com/blog/u011026968/article/p-4922079.html</a><br><a href="http://jolestar.com/elasticsearch-architecture/" target="_blank" rel="external">http://jolestar.com/elasticsearch-architecture/</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/solr/">solr</a><a href="/tags/elasticsearch/">elasticsearch</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/11/29/c_02/" title="linux下c语言编程" itemprop="url">linux下c语言编程</a>
   </h1>
   <p class="article-author">By
@@ -164,7 +442,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-29T12:14:00.000Z" itemprop="datePublished"> 发表于 2016-11-29</time>
+    <time datetime="2016-11-29T12:14:00.000Z" itemprop="datePublished"> Published 2016-11-29</time>
     
   </p>
 </header>
@@ -235,7 +513,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-29T11:55:00.000Z" itemprop="datePublished"> 发表于 2016-11-29</time>
+    <time datetime="2016-11-29T11:55:00.000Z" itemprop="datePublished"> Published 2016-11-29</time>
     
   </p>
 </header>
@@ -349,7 +627,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-17T02:52:00.000Z" itemprop="datePublished"> 发表于 2016-11-17</time>
+    <time datetime="2016-11-17T02:52:00.000Z" itemprop="datePublished"> Published 2016-11-17</time>
     
   </p>
 </header>
@@ -410,7 +688,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-11-17T02:47:00.000Z" itemprop="datePublished"> 发表于 2016-11-17</time>
+    <time datetime="2016-11-17T02:47:00.000Z" itemprop="datePublished"> Published 2016-11-17</time>
     
   </p>
 </header>
@@ -499,7 +777,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-06-14T03:59:00.000Z" itemprop="datePublished"> 发表于 2016-06-14</time>
+    <time datetime="2016-06-14T03:59:00.000Z" itemprop="datePublished"> Published 2016-06-14</time>
     
   </p>
 </header>
@@ -720,7 +998,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-06-08T10:36:50.000Z" itemprop="datePublished"> 发表于 2016-06-08</time>
+    <time datetime="2016-06-08T10:36:50.000Z" itemprop="datePublished"> Published 2016-06-08</time>
     
   </p>
 </header>
@@ -980,535 +1258,30 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/06/08/shell-2/" title="shell编程之执行环境" itemprop="url">shell编程之执行环境</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-06-08T08:36:50.000Z" itemprop="datePublished"> 发表于 2016-06-08</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>文章转自<a href="http://liwei.life/2016/05/30/shell%E7%BC%96%E7%A8%8B%E4%B9%8B%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83/" target="_blank" rel="external">SHELL编程之执行环境</a></p>
-<p>微博ID：<strong>orroz</strong></p>
-<p>微信公众号：<strong>Linux系统技术</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第三篇，主要介绍bash脚本的执行环境以及注意事项。通过本文，应该可以帮助您解决以下问题：</p>
-<ul>
-<li>执行bash和执行sh究竟有什么区别？</li>
-<li>如何调试bash脚本？</li>
-<li>如何记录用户在什么时候执行的某条命令？</li>
-<li>为什么有时ulimit命令的设置不生效或者报错？</li>
-<li>环境变量和一般变量有什么区别？？</li>
-</ul>
-<h2 id="常用参数"><a href="#常用参数" class="headerlink" title="常用参数"></a>常用参数</h2><h3 id="交互式login-shell"><a href="#交互式login-shell" class="headerlink" title="交互式login shell"></a>交互式login shell</h3><p>关于bash的编程环境，首先我们要先理解的就是bash的参数。不同方式启动的bash一般默认的参数是不一样的。一般在命令行中使用的bash，都是以login方式打开的，对应的参数是：-l或—login。还有-i参数，表示bash是以交互方式打开的，在默认情况下，不加任何参数的bash也是交互方式打开的。这两种方式都会在启动bash之前加载一些文件：</p>
-<p>首先，bash去检查/etc/profile文件是否存在，如果存在就读取并执行这个文件中的命令。</p>
-<p>之后，bash再按照以下列出的文件顺序依次查看是否存在这些文件，如果任何一个文件存在，就读取、执行文件中的命令：</p>
-<ol>
-<li>~/.bash_profile</li>
-<li>~/.bash_login</li>
-<li>~/.profile</li>
-</ol>
-<p>这里要注意的是，本步骤只会检查到一个文件并处理，即使同时存在2个或3个文件，本步骤也只会处理最优先的那个文件，而忽略其他文件。以上两个步骤的检查都可以用—noprofile参数进行关闭。</p>
-<p>当bash是以login方式登录的时候，在bash退出时（exit），会额外读取并执行~/.bash_logout文件中的命令。</p>
-<p>当bash是以交互方式登录时（-i参数），bash会读取并执行~/.bashrc中的命令。—norc参数可以关闭这个功能，另外还可以通过—rcfile参数指定一个文件替代默认的~/.bashrc文件。</p>
-<p>以上就是bash以login方式和交互式方式登录的主要区别，根据这个过程，我们到RHEL7的环境上看看都需要加载哪些配置：</p>
-<p>1.首先是加载/etc/profile。根据RHEL7上此文件内容，这个脚本还需要去检查/etc/profile.d/目录，将里面以.sh结尾的文件都加载一遍。具体细节可以自行查看本文件内容。<br>2.之后是检查~/.bash_profile。这个文件中会加载~/.bashrc文件。<br>3.之后是处理~/.bashrc文件。此文件主要功能是给bash环境添加一些alias，之后再加载/etc/bashrc文件。<br>4.最后处理/etc/bashrc文件。这个过程并不是bash自身带的过程，而是在RHEL7系统中通过脚本调用实现。</p>
-<p>了解了这些之后，如果你的bash环境不是在RHEL7系统上，也应该可以确定在自己环境中启动的bash到底加载了哪些配置文件。</p>
-<h3 id="bash和sh"><a href="#bash和sh" class="headerlink" title="bash和sh"></a>bash和sh</h3><p>几乎所有人都知道bash有个别名叫sh，也就是说在一个脚本前面写!#/bin/bash和#!/bin/sh似乎没什么不同。但是下面我们要看看它们究竟有什么不同。</p>
-<p>首先，第一个区别就是这两个文件并不是同样的类型。如果细心观察过这两个文件的话，大家会发现：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls -l /usr/bin/sh</div><div class="line">lrwxrwxrwx 1 root root 4 11月 24 04:20 /usr/bin/sh -&gt; bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls -l /usr/bin/bash</div><div class="line">-rwxr-xr-x 1 root root 791304 11月 24 04:20 /usr/bin/bash</div></pre></td></tr></table></figure>
-<p>sh是指向bash的一个符号链接。符号链接就像是快捷方式，那么执行sh就是在执行bash。这说明什么？说明这两个执行方式是等同的么？实际上并不是。我们都知道在程序中是可以获得自己执行命令的进程名称的，这个方法在bash编程中可以使用$0变量来实现，参见如下脚本：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat name.sh</div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">echo $0</div><div class="line"></div><div class="line">case $0 in</div><div class="line">*name.sh)</div><div class="line">echo &quot;My name is name!&quot;</div><div class="line">;;</div><div class="line">*na.sh)</div><div class="line">echo &quot;My name is na&quot; </div><div class="line">;;</div><div class="line">*)</div><div class="line">echo &quot;Name error!&quot;</div><div class="line">;;</div><div class="line">esac</div></pre></td></tr></table></figure>
-<p>这个脚本直接执行的结果是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./name.sh </div><div class="line">./name.sh</div><div class="line">My name is name!</div></pre></td></tr></table></figure>
-<p>大家也能看到脚本中有个逻辑是，如果进程名字是以na.sh结尾，那么打印的内容不一样。我们如何能让同一个程序触发这段不同的逻辑呢？其实很简单，就是给这个脚本创建一个叫na.sh的符号链接：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ln -s name.sh na.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ ./na.sh </div><div class="line">./na.sh</div><div class="line">My name is na</div></pre></td></tr></table></figure>
-<p>通过符号链接的方式改变进程名称是一种常见的编程技巧，我们可以利用这个办法让程序通过不同进程名触发不同处理逻辑。所以大家以后再遇到类似bash和sh这样的符号链接关系的进程时要格外注意它们的区别。在这里它们到底有什么区别呢？实际上bash的源代码中对以bash名称和sh名称执行的时候，会分别触发不同的逻辑，主要的逻辑区别是：以sh名称运行时，会相当于以—posix参数方式启动bash。这个方式跟一般方式的具体区别可以参见：<a href="http://tiswww.case.edu/php/chet/bash/POSIX。" target="_blank" rel="external">http://tiswww.case.edu/php/chet/bash/POSIX。</a></p>
-<p>我遇到过很多次因为不同文件名的处理逻辑不同而引发的问题。其中一次是因为posix模式和一般模式的ulimit -c设置不同导致的。ulimit -c参数可以设置进程出现coredump时产生的文件的大小限制。因为内存的页大多都是4k，所以一般core文件都是最小4k一个，当ulimit -c参数设置小于4k时，无法正常产生core文件。为了调试方便，我们的生产系统都开了ulimit -c限制单位为4。因为默认ulimit -c的限制单位是1k，ulimit -c 4就是4k，够用了。但是我们仍然发现部分服务器不能正常产生core文件，最后排查定位到，这些不能产生core文件的配置脚本只要将#!/bin/sh改为#!/bin/bash就可以正常产生core文件。于是郁闷之余，查阅了bash的处理代码，最终发现原来是这个坑导致的问题。原因是：在posix模式下，ulimit -c的参数单位不是1024，而是512。至于还有什么其他不同，在上述链接中都有说明。</p>
-<h2 id="脚本调试"><a href="#脚本调试" class="headerlink" title="脚本调试"></a>脚本调试</h2><p>程序员对程序的调试工作是必不可少的，bash本身对脚本程序提供的调试手段不多，printf大法是必要技能之一，当然在bash中就是echo大法。另外就是bash的-v参数、-x参数和-n参数。</p>
-<p>-v参数就是可视模式，它会在执行bash程序的时候将要执行的内容也打印出来，除此之外，并不改变bash执行的过程：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat arg.sh</div><div class="line">#!/bin/bash -v</div><div class="line"></div><div class="line">echo $0</div><div class="line">echo $1</div><div class="line">echo $2</div><div class="line">ls /123</div><div class="line">echo $3</div><div class="line">echo $4</div><div class="line"></div><div class="line">echo $#</div><div class="line">echo $*</div><div class="line">echo $?</div></pre></td></tr></table></figure>
-<p>执行结果是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./arg.sh 111 222 333 444 555</div><div class="line">#!/bin/bash -v</div><div class="line"></div><div class="line">echo $0</div><div class="line">./arg.sh</div><div class="line">echo $1</div><div class="line">111</div><div class="line">echo $2</div><div class="line">222</div><div class="line">ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">echo $3</div><div class="line">333</div><div class="line">echo $4</div><div class="line">444</div><div class="line"></div><div class="line">echo $#</div><div class="line">5</div><div class="line">echo $*</div><div class="line">111 222 333 444 555</div><div class="line">echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
-<p>-n参数用来检查bash的语法错误，并且不会真正执行bash脚本。这个就不举例子了。另外，三种方式除了可以直接在bash后面加参数以外，还可以在程序中随时使用内建命令set打开和关闭，方法如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat arg.sh</div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">set -v</div><div class="line">#set -o verbose</div><div class="line">echo $0</div><div class="line">set +v</div><div class="line">echo $1</div><div class="line">set -x</div><div class="line">#set -o xtrace</div><div class="line">echo $2</div><div class="line">ls /123</div><div class="line">echo $3</div><div class="line">set +x</div><div class="line">echo $4</div><div class="line"></div><div class="line">echo $#</div><div class="line"></div><div class="line">set -n</div><div class="line">#set -o noexec</div><div class="line">echo $*</div><div class="line">echo $?</div><div class="line">set +n</div></pre></td></tr></table></figure>
-<p>执行结果为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./arg.sh </div><div class="line">#set -o verbose</div><div class="line">echo $0</div><div class="line">./arg.sh</div><div class="line">set +v</div><div class="line"></div><div class="line">+ echo</div><div class="line"></div><div class="line">+ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">+ echo</div><div class="line"></div><div class="line">+ set +x</div><div class="line"></div><div class="line">0</div></pre></td></tr></table></figure>
-<p>以上例子中顺便演示了1、3、#、?的意义，大家可以自行对比它们的区别以理解参数的意义。另外再补充一个-e参数，这个参数可以让bash脚本命令执行错误的时候直接退出，而不是继续执行。这个功能在某些调试的场景下非常有用！</p>
-<p>本节只列出了几个常用的参数的意义和使用注意事项，希望可以起到抛砖引玉的作用。大家如果想要学习更多的bash参数，可以自行查看bash的man手册，并详细学习set和shopt命令的使用方法。</p>
-<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><p>我们目前已经知道有个PATH变量，bash会在查找外部命令的时候到PATH所记录的目录中进行查找，从这个例子我们可以先理解一下环境变量的作用。环境变量就类似PATH这种变量，是bash预设好的一些可能会对其状态和行为产生影响的变量。bash中实现的环境变量个数大概几十个，所有的帮助说明都可以在man bash中找到。我们还是拿一些会在bash编程中经常用到的来讲解一下。</p>
-<p>我们可以使用env命令来查看当前bash已经定义的环境变量。set命令不加任何参数可以查看当前bash环境中的所有变量，包括环境变量和私有的一般变量。一般变量的定义方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">[zorro@zorrozou-pc0 ~]$ set|grep aaa</div><div class="line">aaa=1000</div></pre></td></tr></table></figure>
-<p>上面我们定义了一个变量名字叫做aaa，我们能看到在set命令中可以显示出这个变量，但是env不显示。export命令可以将一个一般变量编程环境变量。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ export aaa</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ set|grep aaa</div><div class="line">aaa=1000</div></pre></td></tr></table></figure>
-<p>export之后，env和set都能看到这个变量了。一般变量和环境变量的区别是：一般变量不能被子进程继承，而环境变量会被子进程继承。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ bbb=2000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $bbb</div><div class="line">2000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep bbb</div><div class="line">[zorro@zorrozou-pc0 ~]$ bash</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $bbb</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 ~]$</div></pre></td></tr></table></figure>
-<p>上面测试中，我们的bash环境里有一个环境变量aaa＝1000，又定义了一个一般变量bbb＝2000。此时我们在用bash打开一个子进程，在子进程中我们发现，aaa变量仍然能取到值，但是bbb不可以。证明aaa可以被子进程继承，bbb不可以。</p>
-<p>搞清楚了环境变量的基础知识之后，再来看一下bash中常用的环境变量：</p>
-<p>进程自身信息相关</p>
-<p>BASH：当前bash进程的进程名。</p>
-<p>BASHOPTS：记录了shopt命令已经设置为打开的选项。</p>
-<p>BASH_VERSINFO：bash的版本号信息，是一个数组。可以使用命令：echo ${BASH_VERSINFO[*]}查看数组的信息。有关数组的操作我们会在其它文章里详细说明。</p>
-<p>BASH_VERSION：bash的版本号信息。比上一个信息更少一点。</p>
-<p>HOSTNAME：系统主机名信息。</p>
-<p>HOSTTYPE：系统类型信息。</p>
-<p>OLDPWD：上一个当前工作目录。</p>
-<p>PWD：当前工作目录。</p>
-<p>HOME：主目录。一般指进程uid对应用户的主目录。</p>
-<p>SHELL：bash程序所在路径。</p>
-<p>常用数字</p>
-<p>RANDOM：每次取这个变量的值都能得到一个0-32767的随机数。</p>
-<p>SECONDS：当前bash已经开启了多少秒。</p>
-<p>BASHPID：当前bash进程的PID。</p>
-<p>EUID：进程的有效用户id。</p>
-<p>GROUPS：进程组身份。</p>
-<p>PPID：父进程PID。</p>
-<p>UID：用户uid。</p>
-<p>提示符</p>
-<p>PS1：用户bash的交互提示符，主提示符。</p>
-<p>PS2：第二提示符，主要用在一些除了PS1之外常见的提示符场景，比如输入了’之后回车，就能看到这个提示符。</p>
-<p>PS3：用于select语句的交互提示符。</p>
-<p>PS4：用于跟踪执行过程时的提示符，一般显示为”+”。比如我们在bash中使用set -x之后的跟踪提示就是这个提示符显示的。</p>
-<h2 id="命令历史"><a href="#命令历史" class="headerlink" title="命令历史"></a>命令历史</h2><p>交互bash中提供一种方便追溯曾经使用的命令的功能，叫做命令历史功能。就是将曾经用过的命令纪录下来，以备以后查询或者重复调用。这个功能在交互方式的bash中默认打开，在bash编程环境中默认是没有开启的。可以使用set +H来关闭这个功能，set -H打开这个功能。在开启了history功能的bash中我们可以使用history内建命令查询当前的命令历史列表：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">1 sudo bash</div><div class="line">2 ps ax</div><div class="line">3 ls</div><div class="line">4 ip ad sh</div></pre></td></tr></table></figure>
-<p>命令历史的相关配置都是通过bash的环境变量来完成的：</p>
-<p>HISTFILE：记录命令历史的文件路径。</p>
-<p>HISTFILESIZE：命令历史文件的行数限制</p>
-<p>HISTCONTROL：这个变量可以用来控制命令历史的一些特性。比如一般的命令历史会完全按照我们执行命令的顺序来完整记录，如果我们连续执行相同的命令，也会重复记录，如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">......</div><div class="line">1173 pwd</div><div class="line">1174 pwd</div><div class="line">1175 pwd</div><div class="line">1176 history</div></pre></td></tr></table></figure>
-<p>我们可以利用这个变量的配置来消除命令历史中的重复记录：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ export HISTCONTROL=ignoredups</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">1177 export HISTCONTROL=ignoredups</div><div class="line">1178 history </div><div class="line">1179 pwd</div><div class="line">1180 history</div></pre></td></tr></table></figure>
-<p>这个变量还有其它配置，ignorespace可以用来让history忽略以空格开头的命令，ignoreboth可以同时起到ignoredups和ignorespace的作用，</p>
-<p>HISTIGNORE：可以控制history机制忽略某些命令，配置方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export HISTIGNORE=”pwd:ls:cd:”。</div></pre></td></tr></table></figure>
-<p>HISTSIZE：命令历史纪录的命令个数。</p>
-<p>HISTTIMEFORMAT：可以用来定义命令历史纪录的时间格式.在命令历史中记录命令执行时间有时候很有用，配置方法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export HISTTIMEFORMAT=&apos;%F %T &apos;</div></pre></td></tr></table></figure>
-<p>相关时间格式的帮助可以查看man 3 strftime。</p>
-<p>HISTCMD：当前命令历史的行数。</p>
-<p>在交互式操作bash的时候，可以通过一些特殊符号对命令历史进行快速调用，这些符号基本都是以!开头的，除非!后面跟的是空格、换行、等号=或者小括号()：</p>
-<p>!n：表示引用命令历史中的第n条命令，如：!123，执行第123条命令。</p>
-<p>!-n：表示引用命令历史中的倒数第n条命令，如：!-123，执行倒数第123条命令。</p>
-<p>!!：重复执行上一条命令。</p>
-<p>!string：在命令历史中找到最近的一条以string字符串开头的命令并执行。</p>
-<p>!?string[?]：在命令历史中找到最近的一条包括string字符的命令并执行。如果最有一个?省略的话，就是找到以string结尾的命令。</p>
-<p>^string1^string2^：将上一个命令中的string1字符串替换成string2字符串并执行。可以简写为：^string1^string2</p>
-<p>!#：重复当前输入的命令。</p>
-<p>以下符号可以作为某个命令的单词代号，如：</p>
-<p>^：!^表示上一条命令中的第一个参数，$123^表示第123条命令的第一个参数。</p>
-<p>$：!$表示上一条命令中的最后一个参数。!123$表示第123条命令的最后一个参数。</p>
-<p>n（数字）：!!0表示上一条命令的命令名，!!3上一条命令的第三个参数。!123:3第123条命令的第三个参数。</p>
-<p>：表示所有参数，如：!123:\或!123*</p>
-<p>x-y：x和y都是数字，表示从第x到第y个参数，如：!123:1-6表示第123条命令的第1个到第6个参数。只写成-y，取前y个，如：!123:-7表示0-7。</p>
-<p>x：表示取从第x个参数之后的所有参数，相当于x-$。如：!123:2\</p>
-<p>x-：表示取从第x个参数之后的所有参数，不包括最后一个。如：!123:2-</p>
-<p>选择出相关命令或者参数之后，我们还可以通过一些命令对其进行操作：</p>
-<p>h 删除所有后面的路径，只留下前面的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/passwd</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:h</div><div class="line">ls /etc</div><div class="line">...</div></pre></td></tr></table></figure>
-<p>紧接着上面的命令执行，相当于运行passwd。</p>
-<p>r 删除后缀.xxx, 留下文件名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls 123.txt</div><div class="line">ls: cannot access &apos;123.txt&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:r</div><div class="line">ls 123</div></pre></td></tr></table></figure>
-<p>e 删除文件名, 留下后缀</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ !-2:e</div><div class="line">.txt</div><div class="line">bash: .txt: command not found</div></pre></td></tr></table></figure>
-<p>p 只打印结果命令，但不执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/passwd</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:p</div><div class="line">ls /etc/passwd</div></pre></td></tr></table></figure>
-<p>q 防止代换参数被再次替换，相当于给选择的参数加上了’’，以防止其被转义。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls `echo /etc/passwd`</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:q</div><div class="line">&apos;ls `echo /etc/passwd`&apos;</div><div class="line">-bash: ls `echo /etc/passwd`: No such file or directory</div></pre></td></tr></table></figure>
-<p>x 作用同上，区别是每个参数都会分别给加上’’。如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ !-2:x</div><div class="line">&apos;ls&apos; &apos;`echo&apos; &apos;/etc/passwd`&apos;</div><div class="line">ls: cannot access &apos;`echo&apos;: No such file or directory</div><div class="line">ls: cannot access &apos;/etc/passwd`&apos;: No such file or directory</div></pre></td></tr></table></figure>
-<p>s/old/new/ 字符串替换，跟上面的^^类似，但是可以指定任意历史命令。只替换找到的第一个old字符串。<br>&amp; 重复上次替换<br>g 在执行s或者＆命令作为前缀使用，表示全局替换。</p>
-<h2 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h2><p>每一个进程环境中都有对于资源的限制，bash脚本也不例外。我们可以使用ulimit内建命令查看和设置bash环境中的资源限制。</p>
-<p>[zorro@zorrozou-pc0 ~]$ ulimit -a<br>core file size (blocks, -c) unlimited<br>data seg size (kbytes, -d) unlimited<br>scheduling priority (-e) 0<br>file size (blocks, -f) unlimited<br>pending signals (-i) 63877<br>max locked memory (kbytes, -l) 64<br>max memory size (kbytes, -m) unlimited<br>open files (-n) 1024<br>pipe size (512 bytes, -p) 8<br>POSIX message queues (bytes, -q) 819200<br>real-time priority (-r) 0<br>stack size (kbytes, -s) 8192<br>cpu time (seconds, -t) unlimited<br>max user processes (-u) 63877<br>virtual memory (kbytes, -v) unlimited<br>file locks (-x) unlimited</p>
-<p>在上文讲述bash和sh之间的区别时，我们已经接触过这个命令中的-c参数了，用来限制core文件的大小。我们再来看看其它参数的含义：</p>
-<p>data seg size：程序的数据段限制。</p>
-<p>scheduling priority：优先级限制。相关概念的理解可以参考这篇：<a href="http://wp.me/p79Cit-S" target="_blank" rel="external">http://wp.me/p79Cit-S</a></p>
-<p>file size：文件大小限制。</p>
-<p>pending signals：未决信号个数限制。</p>
-<p>max locked memory：最大可以锁内存的空间限制。</p>
-<p>max memory size：最大物理内存使用限制。</p>
-<p>open files：文件打开个数限制。</p>
-<p>pipe size：管道空间限制。</p>
-<p>POSIX message queues：POSIX消息队列空间限制。</p>
-<p>real-time priority：实时优先级限制。相关概念的理解可以参考这篇：<a href="http://wp.me/p79Cit-S" target="_blank" rel="external">http://wp.me/p79Cit-S</a></p>
-<p>stack size：程序栈空间限制。</p>
-<p>cpu time：占用CPU时间限制。</p>
-<p>max user processes：可以打开的的进程个数限制。</p>
-<p>virtual memory：虚拟内存空间限制。</p>
-<p>file locks：锁文件个数限制。</p>
-<p>以上参数涉及各方面的相关知识，我们在此就不详细描述这些相关内容了。在此我们主要关注open files和max user processes参数，这两个参数是我们在优化系统时最常用的两个参数。</p>
-<p>这里需要注意的是，使用ulimit命令配置完这些参数之后的bash产生的子进程都会继承父进程的相关资源配置。ulimit的资源配置的继承关系类似环境变量，父进程的配置变化可以影响子进程。所以，如果我们只是在某个登录shell或者交互式shell中修改了ulimit配置，那么在这个bash环境中执行的命令和产生的子进程都会受到影响，但是对整个系统的其它进程没有影响。如果我们想要让所有用户一登录就有相关的配置，可以考虑把ulimit命令写在bash启动的相关脚本中，如/etc/profile。如果只想影响某一个用户，可以写在这个用户的主目录的bash启动脚本中，如~/.bash_profile。系统的pam模块也给我们提供了配置ulimit相关限制的配置方法，在centos7中大家可以在以下目录和文件中找到相关配置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/security/limits.d/</div><div class="line">10-gcr.conf 99-audio.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/security/limits.conf </div><div class="line">/etc/security/limits.conf</div></pre></td></tr></table></figure>
-<p>即使是写在pam相关配置文件中的相关配置，也可能不是系统全局的。如果你想给某一个后台进程设置ulimit，最靠谱的办法还是在它的启动脚本中进行配置。无论如何，只要记得一点，如果相关进程的ulimit没生效，要想的是它的父进程是谁？它的父进程是不是生效了？</p>
-<p>ulimit参数中绝大多数配置都是root才有权限改的更大，而非root身份只能在现有的配置基础上减小限制。如果你执行ulimit的时候报错了，请注意是不是这个原因。<br>```</p>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>通过本文我们学习了bash编程的进程环境的相关内容，主要包括的知识点为：</p>
-<ul>
-<li>bash的常用参数。</li>
-<li>bash的环境变量。</li>
-<li>命令历史功能和相关变量配置。</li>
-<li>bash脚本的资源限制ulimit的使用。</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/shell/">shell</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/05/24/shell-1/" title="SHELL编程之执行过程" itemprop="url">SHELL编程之执行过程</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-05-24T01:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="SHELL编程之执行过程"><a href="#SHELL编程之执行过程" class="headerlink" title="SHELL编程之执行过程"></a>SHELL编程之执行过程</h1><p>每次看这位大大的文章都会收获很多<br>文章转自<a href="http://liwei.life/2016/05/23/shell%E7%BC%96%E7%A8%8B%E4%B9%8B%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/" target="_blank" rel="external">SHELL编程之执行过程</a><br>作者相关:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">微博ID：**orroz**</div><div class="line"></div><div class="line">微信公众号：**Linux系统技术**</div></pre></td></tr></table></figure></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第二篇，主要介绍bash脚本是如何执行命令的。通过本文，您应该可以解决以下问题：</p>
-<ul>
-<li><p>脚本开始的#!到底是怎么起作用的？</p>
-</li>
-<li><p>bash执行过程中的字符串判断顺序究竟是什么样？</p>
-</li>
-<li><p>如果我们定义了一个函数叫ls，那么调用ls的时候，到底bash是执行ls函数还是ls命令？</p>
-</li>
-<li><p>内建命令和外建命令到底有什么差别？</p>
-</li>
-<li><p>程度退出的时候要注意什么？</p>
-</li>
-</ul>
-<h1 id="以魔法-开始"><a href="#以魔法-开始" class="headerlink" title="以魔法#!开始"></a>以魔法#!开始</h1><p>一个脚本程序的开始方式都比较统一，它们几乎都开始于一个#!符号。这个符号的作用大家似乎也都知道，叫做声明解释器。脚本语言跟编译型语言的不一样之处主要是脚本语言需要解释器。因为脚本语言主要是文本，而系统中能够执行的文件实际上都是可执行的二进制文件，就是编译好的文件。文本的好处是人看方便，但是操作系统并不能直接执行，所以就需要将文本内容传递给一个可执行的二进制文件进行解析，再由这个可执行的二进制文件根据脚本的内容所确定的行为进行执行。可以做这种解析执行的二进制可执行程序都可以叫做解释器。</p>
-<p>脚本开头的#!就是用来声明本文件的文本内容是交给那个解释器进行解释的。比如我们写bash脚本，一般声明的方法是#!/bin/bash或#!/bin/sh。如果写的是一个python脚本，就用#!/usr/bin/python。当然，在不同环境的系统中，这个解释器放的路径可能不一样，所以固定写一个路径的方式就可能造成脚本在不同环境的系统中不通用的情况，于是就出现了这样的写法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env 脚本解释器名称</div></pre></td></tr></table></figure>
-<p>这就利用了env命令可以得到可执行程序执行路径的功能，让脚本自行找到在当前系统上到底解释器在什么路径。让脚本更具通用性。但是大家有没有想过一个问题，大多数脚本语言都是将#后面出现的字符当作是注释，在脚本中并不起作用。这个#!和这个注释的规则不冲突么？</p>
-<p>这就要从#!符号起作用的原因说起，其实也很简单，这个功能是由操作系统的程序载入器做的。在Linux操作系统上，出了1号进程以外，我们可以认为其它所有进程都是由父进程fork出来的。所以对bash来说，所谓的载入一个脚本执行，无非就是父进程调用fork()、exec()来产生一个子进程。这#!就是在内核处理exec的时候进行解析的。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">内核中整个调用过程如下（linux 4.4），内核处理exec族函数的主要实现在fs/exec.c文件的do_execveat_common()方法中，其中调用exec_binprm()方法处理执行逻辑，这函数中使用</div><div class="line">search_binary_handler()对要加载的文件进行各种格式的判断，脚本（script）只是其中的一种。确定是script格式后，就会调用script格式对应的load_binary方法：</div><div class="line">load_script()进行处理，#!就是在这个函数中解析的。解析到了#!以后，内核会取其后面的可执行程序路径，再传递给search_binary_handler（）重新解析。</div><div class="line">这样最终找到真正的可执行二进制文件进行相关执行操作。</div></pre></td></tr></table></figure>
-<p>因此，对脚本第一行的#!解析，其实是内核给我们变的魔术。#!后面的路径内容在起作用的时候还没有交给脚本解释器。很多人认为#!这一行是脚本解释器去解析的，然而并不是。了解了原理之后，也顺便明白了为什么#!一定要写在第一行的前两个字符，因为这是在内核里写死的，它就只检查前两个字符。当内核帮你选好了脚本解释器之后，后续的工作就都交给解释器做了。脚本的所有内容也都会原封不动的交给解释器再次解释，是的，包括#!。但是由于对于解释器来说，#开头的字符串都是注释，并不生效，所以解释器自然对#!后面所有的内容无感，继续解释对于它来说有意义的字符串去了。</p>
-<p>我们可以用一个自显示脚本来观察一下这个事情，什么是自显示脚本？无非就是#!/bin/cat，这样文本的所有内容包括#!行都会交给cat进行显示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat cat.sh </div><div class="line">#!/bin/cat</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./cat.sh </div><div class="line">#!/bin/cat</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div></pre></td></tr></table></figure>
-<p>或者自删除脚本：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat rm.sh </div><div class="line">#!/bin/rm</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ chmod +x rm.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ ./rm.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ cat rm.sh</div><div class="line">cat: rm.sh: No such file or directory</div></pre></td></tr></table></figure>
-<p>这就是#!的本质。</p>
-<h2 id="bash如何执行shell命令？"><a href="#bash如何执行shell命令？" class="headerlink" title="bash如何执行shell命令？"></a>bash如何执行shell命令？</h2><p>刚才我们从#!的作用原理讲解了一个bash脚本是如何被加载的。就是说当#!/bin/bash的时候，实际上内核给我们启动了一个bash进程，然后把脚本内容都传递给bash进行解析执行。实际上，无论在脚本里还是在命令行中，bash对文本的解析方法大致都是一样的。首先，bash会以一些特殊字符作为分隔符，将文本进行分段解析。最主要的分隔符无疑就是回车，类似功能的分隔符还有分号”;”。所以在bash脚本中是以回车或者分号作为一行命令结束的标志的。这基本上就是第一层级的解析，主要目的是将大段的命令行进行分段。</p>
-<p>之后是第二层级解析，这一层级主要是区分所要执行的命令。这一层级主要解析的字符是管道”|”，&amp;&amp;、||这样的可以起到连接命令作用的特殊字符。这一层级解析完后，bash就能拿到最基本的一个个的要执行的命令了。</p>
-<p>当然拿到命令之后还要继续第三层解析，这一层主要是区分出要执行的命令和其参数，主要解析的是空格和tab字符。这一层次解析完之后，bash才开始对最基本的字符串进行解释工作。当然，绝大多数解析完的字符串，bash都是在fork之后将其传递给exec进行执行，然后wait其执行完毕之后再解析下一行。这就是bash脚本也被叫做批处理脚本的原因，主要执行过程是一个一个指令串行执行的，上一个执行完才执行下一个。以上这个过程并不能涵盖bash解释字符串的全过程，实际情况要比这复杂。</p>
-<p>bash在解释命令的时候为了方便一些操作和提高某些效率做了不少特性，包括alias功能和外部命令路径的hash功能。bash还因为某些功能不能做成外部命令，所以必须实现一些内建命令，比如cd、pwd等命令。当然除了内建命令以外，bash还要实现一些关键字，比如其编程语法结构的if或是while这样的功能。实际上作为一种编程语言，bash还要实现函数功能，我们可以理解为，bash的函数就是将一堆命令做成一个命令，然后调用执行这个名字，bash就是去执行事先封装好的那堆命令。</p>
-<p>好吧，问题来了：我们已知有一个内建命令叫做cd，如果此时我们又建立一个alias也叫cd，那么当我在bash中敲入cd并回车之后，bash究竟是将它当成内建命令解释还是当成alias解释？同样，如果cd又是一个外部命令能？如果又是一个hash索引呢？如果又是一个关键字或函数呢？</p>
-<p>实际上bash在做这些功能的时候已经安排好了它们在名字冲突的情况下究竟该先以什么方式解释。优先顺序是：</p>
-<ol>
-<li><p>别名：alias</p>
-</li>
-<li><p>关键字：keyword</p>
-</li>
-<li><p>函数：function</p>
-</li>
-<li><p>内建命令：built in</p>
-</li>
-<li><p>哈西索引：hash</p>
-</li>
-<li><p>外部命令：command</p>
-</li>
-</ol>
-<p>这些bash要判断的字符串类型都可以用type命令进行判断，如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ type egrep</div><div class="line">egrep is aliased to &apos;egrep --color=auto&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ type if</div><div class="line">if is a shell keyword</div><div class="line">[zorro@zorrozou-pc0 bash]$ type pwd</div><div class="line">pwd is a shell builtin</div><div class="line">[zorro@zorrozou-pc0 bash]$ type passwd</div><div class="line">passwd is /usr/bin/passwd</div></pre></td></tr></table></figure>
-<h3 id="别名alias"><a href="#别名alias" class="headerlink" title="别名alias"></a>别名alias</h3><p>bash提供了一种别名(alias)功能，可以将某一个字符串做成另一个字符串的别名，使用方法如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias cat=&apos;cat -n&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ cat /etc/passwd</div><div class="line">     1  root:x:0:0:root:/root:/bin/bash</div><div class="line">     2  bin:x:1:1:bin:/bin:/usr/bin/nologin</div><div class="line">     3  daemon:x:2:2:daemon:/:/usr/bin/nologin</div><div class="line">     4  mail:x:8:12:mail:/var/spool/mail:/usr/bin/nologin</div><div class="line">     ......</div></pre></td></tr></table></figure>
-<p>于是我们再使用cat命令的时候，bash会将其解释为cat -n。</p>
-<p>这个功能在交互方式进行bash操作的时候可以提高不少效率。如果我们发现我们常用到某命令的某个参数的时候，就可以将其做成alias，以后就可以方便使用了。交互bash中，我们可以用alias命令查看目前已经有的alias列表。可以用unalias取消这个别名设置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias </div><div class="line">alias cat=&apos;cat -n&apos;</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ unalias cat</div></pre></td></tr></table></figure>
-<p>alias功能在交互打开的bash中是默认开启的，但是在bash脚本中是默认关闭的。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#shopt -s expand_aliases</div><div class="line"></div><div class="line">alias ls=&apos;ls -l&apos;</div><div class="line">ls /etc</div></pre></td></tr></table></figure>
-<p>此时本程序输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./alias.sh </div><div class="line">adjtime       cgconfig.conf         docker       group      ifplugd     libao.conf      mail.rc      netconfig       passwd   request-key.conf  shells         udisks2</div><div class="line">adobe         cgrules.conf          drirc   ...</div></pre></td></tr></table></figure>
-<p>使用注释行中的shopt -s expand_aliases命令可以打开alias功能支持，我们将这行注释取消掉之后的执行结果为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./alias.sh </div><div class="line">total 1544</div><div class="line">-rw-r--r-- 1 root    root        44 11月 13 19:53 adjtime</div><div class="line">drwxr-xr-x 2 root    root      4096 4月  20 09:34 adobe</div><div class="line">-rw-r--r-- 1 root    root       389 4月  18 22:19 appstream.conf</div><div class="line">-rw-r--r-- 1 root    root         0 10月  1 2015 arch-release</div><div class="line">-rw-r--r-- 1 root    root       260 7月   1 2014 asound.conf</div><div class="line">drwxr-xr-x 3 root    root      4096 3月  11 10:09 avahi</div></pre></td></tr></table></figure>
-<p>这就是bash的alias功能。</p>
-<h3 id="关键字：keyword"><a href="#关键字：keyword" class="headerlink" title="关键字：keyword"></a>关键字：keyword</h3><p>关键字的概念很简单，主要就是bash提供的语法。比如if，while，function等等。对这些关键字使用type命令会显示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ type function</div><div class="line">function is a shell keyword</div></pre></td></tr></table></figure>
-<p>说明这是一个keyword。我想这个概念没什么可以解释的了，无非就是bash提供的一种语法而已。只是要注意，bash会在判断alias之后才来判断字符串是不是个keyword。就是说，我们还是可以创建一个叫if的alias，并且在执行的时候，bash只把它当成alias看。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias if=&apos;echo zorro&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ if</div><div class="line">zorro</div><div class="line">[zorro@zorrozou-pc0 bash]$ unalias if</div></pre></td></tr></table></figure>
-<h3 id="函数：function"><a href="#函数：function" class="headerlink" title="函数：function"></a>函数：function</h3><p>bash在判断完字符串不是一个关键字之后，将会检查其是不是一个函数。在bash编程中，我们可以使用关键字function来定义一个函数，当然这个关键字其实也可以省略：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">name () compound-command [redirection]</div><div class="line">function name [()] compound-command [redirection]</div></pre></td></tr></table></figure>
-<p>语法结构中的compound-command一般是放在{}里的一个命令列表（list）。定义好的函数其实就是一系列shell命令的封装，并且它还具有很多bash程序的特征，比如在函数内部可以使用$1，$2等这样的变量来判断函数的参数，也可以对函数使用重定向功能。</p>
-<p>关于函数的更细节讨论我们会在后续的文章中展开说明，再这里我们只需要知道它对于bash来说是第几个被解释的即可。</p>
-<h3 id="内建命令：built-in"><a href="#内建命令：built-in" class="headerlink" title="内建命令：built in"></a>内建命令：built in</h3><p>在判断完函数之后，bash将查看给的字符串是不是一个内建命令。内建命令是相对于外建命令来说的。其实我们在bash中执行的命令最常见的是外建（外部）命令。比如常见的ls，find，passwd等。这些外建命令的特点是，它们是作为一个可执行程序放在$PATH变量所包含的目录中的。bash在执行这些命令的时候，都会进行fork(),exec()并且wait()。就是用标准的打开子进程的方式处理外部命令。但是内建命令不同，这些命令都是bash自身实现的命令，它们不依靠外部的可执行文件存在。只要有bash，这些命令就可以执行。典型的内建命令有cd、pwd等。大家可以直接help cd或者任何一个内建命令来查看它们的帮助。大家还可以man bash来查看bash相关的帮助，当然也包括所有的内建命令。</p>
-<p>其实内建命令的个数并不会很多，一共大概就这些：</p>
-<p>:,  ., [, alias, bg, bind, break, builtin, caller, cd, command, compgen, complete, compopt, continue, declare, dirs, disown, echo, enable, eval, exec, exit, export, false, fc,<br>   fg, getopts, hash, help, history, jobs, kill, let, local, logout, mapfile, popd, printf, pushd, pwd, read, readonly, return, set, shift, shopt, source, suspend,  test,  times,  trap,<br>   true, type, typeset, ulimit, umask, unalias, unset, wait</p>
-<p>我们在后续的文章中会展开讲解这些命令的功能。</p>
-<h3 id="哈西索引：hash"><a href="#哈西索引：hash" class="headerlink" title="哈西索引：hash"></a>哈西索引：hash</h3><p>hash功能实际上是针对外部命令做的一个功能。刚才我们已经知道了，外部命令都是放在$PATH变量对应的路径中的可执行文件。bash在执行一个外部命令时所需要做的操作是：如果发现这个命令是个外部命令就按照$PATH变量中按照目录路径的顺序，在每个目录中都遍历一遍，看看有没有对应的文件名。如果有，就fork、exec、wait。我们系统上一般的$PATH内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo $PATH</div><div class="line">/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:</div><div class="line">/usr/bin/vendor_perl:/usr/bin/core_perl:/home/zorro/.local/bin:/home/zorro/bin</div></pre></td></tr></table></figure>
-<p>当然，很多系统上的$PATH变量包含的路径可能更多，目录中的文件数量也可能会很多。于是，遍历这些目录去查询文件名的行为就可能比较耗时。于是bash提供了一种功能，就是建立一个bash表，在第一次找到一个命令的路径之后，对其命令名和对应的路径建立一个hash索引。这样下次再执行这个命令的时候，就不用去遍历所有的目录了，只要查询索引就可以更快的找到命令路径，以加快执行程序的速度。</p>
-<p>我们可以使用内建命令hash来查看当前已经建立缓存关系的命令和其命中次数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ hash</div><div class="line">hits    command</div><div class="line">   1    /usr/bin/flock</div><div class="line">   4    /usr/bin/chmod</div><div class="line">  20    /usr/bin/vim</div><div class="line">   4    /usr/bin/cat</div><div class="line">   1    /usr/bin/cp</div><div class="line">   1    /usr/bin/mkdir</div><div class="line">  16    /usr/bin/man</div><div class="line">  27    /usr/bin/ls</div></pre></td></tr></table></figure>
-<p>这个命令也可以对当前的hash表进行操作，-r参数用来清空当前hash表。手工创建一个hash：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -p /usr/sbin/passwd psw</div><div class="line">[root@zorrozou-pc0 bash]# psw</div><div class="line">Enter new UNIX password: </div><div class="line">Retype new UNIX password:</div></pre></td></tr></table></figure>
-<p>此时我们就可以通过执行psw来执行passwd命令了。查看更详细的hash对应关系：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -l</div><div class="line">builtin hash -p /usr/bin/netdata netdata</div><div class="line">builtin hash -p /usr/bin/df df</div><div class="line">builtin hash -p /usr/bin/chmod chmod</div><div class="line">builtin hash -p /usr/bin/vim vim</div><div class="line">builtin hash -p /usr/bin/ps ps</div><div class="line">builtin hash -p /usr/bin/man man</div><div class="line">builtin hash -p /usr/bin/pacman pacman</div><div class="line">builtin hash -p /usr/sbin/passwd psw</div><div class="line">builtin hash -p /usr/bin/ls ls</div><div class="line">builtin hash -p /usr/bin/ss ss</div><div class="line">builtin hash -p /usr/bin/ip ip</div></pre></td></tr></table></figure>
-<p>删除某一个hash对应：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -d psw</div><div class="line">[root@zorrozou-pc0 bash]# hash -l</div><div class="line">builtin hash -p /usr/bin/netdata netdata</div><div class="line">builtin hash -p /usr/bin/df df</div><div class="line">builtin hash -p /usr/bin/chmod chmod</div><div class="line">builtin hash -p /usr/bin/vim vim</div><div class="line">builtin hash -p /usr/bin/ps ps</div><div class="line">builtin hash -p /usr/bin/man man</div><div class="line">builtin hash -p /usr/bin/pacman pacman</div><div class="line">builtin hash -p /usr/bin/ls ls</div><div class="line">builtin hash -p /usr/bin/ss ss</div><div class="line">builtin hash -p /usr/bin/ip ip</div></pre></td></tr></table></figure>
-<p>显示某一个hash对应的路径：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -t chmod</div><div class="line">/usr/bin/chmod</div></pre></td></tr></table></figure>
-<p>在交互式bash操作和bash编程中，hash功能总是打开的，我们可以用set +h关闭hash功能。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat hash.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#set +h</div><div class="line"></div><div class="line">hash</div><div class="line"></div><div class="line">hash -p /usr/bin/useradd uad</div><div class="line"></div><div class="line">hash -t uad</div><div class="line"></div><div class="line">uad</div></pre></td></tr></table></figure>
-<p>默认打开hash的脚本输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./hash.sh </div><div class="line">hash: hash table empty</div><div class="line">/usr/bin/useradd</div><div class="line">Usage: uad [options] LOGIN</div><div class="line">       uad -D</div><div class="line">       uad -D [options]</div><div class="line"></div><div class="line">Options:</div><div class="line">  -b, --base-dir BASE_DIR       base directory for the home directory of the</div><div class="line">                            new account</div><div class="line">  -c, --comment COMMENT         GECOS field of the new account</div><div class="line">  -d, --home-dir HOME_DIR       home directory of the new account</div><div class="line">  -D, --defaults                print or change default useradd configuration</div><div class="line">  -e, --expiredate EXPIRE_DATE  expiration date of the new account</div><div class="line">  -f, --inactive INACTIVE       password inactivity period of the new account</div><div class="line">  -g, --gid GROUP               name or ID of the primary group of the new</div><div class="line">                            account</div><div class="line">  -G, --groups GROUPS           list of supplementary groups of the new</div><div class="line">                            account</div><div class="line">  -h, --help                    display this help message and exit</div><div class="line">  -k, --skel SKEL_DIR           use this alternative skeleton directory</div><div class="line">  -K, --key KEY=VALUE           override /etc/login.defs defaults</div><div class="line">  -l, --no-log-init             do not add the user to the lastlog and</div><div class="line">                            faillog databases</div><div class="line">  -m, --create-home             create the user&apos;s home directory</div><div class="line">  -M, --no-create-home          do not create the user&apos;s home directory</div><div class="line">  -N, --no-user-group           do not create a group with the same name as</div><div class="line">                            the user</div><div class="line">  -o, --non-unique              allow to create users with duplicate</div><div class="line">                            (non-unique) UID</div><div class="line">  -p, --password PASSWORD       encrypted password of the new account</div><div class="line">  -r, --system                  create a system account</div><div class="line">  -R, --root CHROOT_DIR         directory to chroot into</div><div class="line">  -s, --shell SHELL             login shell of the new account</div><div class="line">  -u, --uid UID                 user ID of the new account</div><div class="line">  -U, --user-group              create a group with the same name as the user</div></pre></td></tr></table></figure>
-<p>关闭hash之后的输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./hash.sh </div><div class="line">./hash.sh: line 5: hash: hashing disabled</div><div class="line">./hash.sh: line 7: hash: hashing disabled</div><div class="line">./hash.sh: line 9: hash: hashing disabled</div><div class="line">./hash.sh: line 11: uad: command not found</div></pre></td></tr></table></figure>
-<h3 id="外部命令：command"><a href="#外部命令：command" class="headerlink" title="外部命令：command"></a>外部命令：command</h3><p>除了以上说明之外的命令都会当作外部命令处理。执行外部命令的固定动作就是在$PATH路径下找命令，找到之后fork、exec、wait。如果没有这个可执行文件名，就报告命令不存在。这也是bash最后去判断的字符串类型。</p>
-<p>外建命令都是通过fork调用打开子进程执行的，所以bash单纯只用外建命令是不能实现部分功能的。比如大家都知道cd命令是用来修改当前进程的工作目录的，如果这个功能使用外部命令实现，那么进程将fork打开一个子进程，子进程通过chdir()进行当前工作目录的修改时，实际上只改变了子进程本身的当前工作目录，而父进程bash的工作目录没变。之后子进程退出，返回到父进程的交互操作环境之后，用户会发现，当前的bash的pwd还在原来的目录下。所以大家应该可以理解，虽然我们的原则是尽量将所有命令都外部实现，但是还是有一些功能不能以创建子进程的方式达到目的，那么这些功能就必须内部实现。这就是内建命令必须存在的原因。另外要注意：bash在正常调用内部命令的时候并不会像外部命令一样产生一个子进程。</p>
-<h2 id="脚本的退出"><a href="#脚本的退出" class="headerlink" title="脚本的退出"></a>脚本的退出</h2><p>一个bash脚本的退出一般有多种方式，比如使用exit退出或者所有脚本命令执行完之后退出。无论怎么样退出，脚本都会有个返回码，而且返回码可能不同。</p>
-<p>任何命令执行完之后都有返回码，主要用来判断这个命令是否执行成功。在交互中bash中，我们可以使用$?来查看上一个命令的返回码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">2</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls /</div><div class="line">bin  boot  cgroup  data  dev  etc  home  lib  lib64  lost+found  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
-<p>返回码逻辑上有两类，0为真，非零为假。就是说，返回为0表示命令执行成功，非零表示执行失败。返回码的取值范围为0-255。其中错误返回码为1-255。bash为我们提供了一个内建命令exit，通过中这个命令可以人为指定退出的返回码是多少。这个命令的使用是一般进行bash编程的运维人员所不太注意的。我们在上一篇的bash编程语法结构的讲解中说过，if、while语句的条件判断实际上就是判断命令的返回值，如果我们自己写的bash脚本不注意规范的使用脚本退出时的返回码的话，那么这样的bash脚本将可能不可以在别人编写脚本的时候，直接使用if将其作为条件判断，这可能会对程序的兼容性造成影响。因此，请大家注意自己写的bash程序的返回码状态。如果我们的bash程序没有显示的以一个exit指定返回码退出的话，那么其最后执行命令的返回码将成为整个bash脚本退出的返回码。</p>
-<p>当然，一个bash程序的退出还可能因为被中间打断而发生，这一般是因为进程接收到了一个需要程序退出的信号。比如我们日常使用的ctrl＋c操作，就是给进程发送了一个2号SIGINT信号。考虑到程序退出可能性的各种可能，系统将错误返回码设计成1-255，这其中还分成两类：</p>
-<ul>
-<li>程序退出的返回码：1-127。这部分返回码一般用来作为给程序员自行设定错误退出用的返回码，比如：如果一个文件不存在，ls将返回2。如果要执行的命令不存在，则bash统一返回127<br>。返回码125和126有特殊用处，一个是程序命令不存在的返回码，另一个是命令的文件在，但是不可执行的返回码。</li>
-<li>程序被信号打断的返回码：128-255。这部分系统习惯上是用来表示进程被信号打断的退出返回码的。一个进程如果被信号打断了，其退出返回码一般是128+信号编号的数字。</li>
-</ul>
-<p>比如说，如果一个进程被2号信号打断的话，其返回码一般是128+2=130。如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 1000</div><div class="line">^C</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">130</div></pre></td></tr></table></figure>
-<p>在执行sleep命令的过程中，我使用ctrl+c中断了进程的执行。此时返回值为130。可以用内建命令kill -l查看所有信号和其对应的编号：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ kill -l</div><div class="line"> 1) SIGHUP   2) SIGINT   3) SIGQUIT  4) SIGILL   5) SIGTRAP</div><div class="line"> 6) SIGABRT  7) SIGBUS   8) SIGFPE   9) SIGKILL 10) SIGUSR1</div><div class="line">11) SIGSEGV 12) SIGUSR2 13) SIGPIPE 14) SIGALRM 15) SIGTERM</div><div class="line">16) SIGSTKFLT   17) SIGCHLD 18) SIGCONT 19) SIGSTOP 20) SIGTSTP</div><div class="line">21) SIGTTIN 22) SIGTTOU 23) SIGURG  24) SIGXCPU 25) SIGXFSZ</div><div class="line">26) SIGVTALRM   27) SIGPROF 28) SIGWINCH    29) SIGIO   30) SIGPWR</div><div class="line">31) SIGSYS  34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1  64) SIGRTMAX</div></pre></td></tr></table></figure>
-<p>在我们编写bash脚本的时候，一般可以指定的返回码范围是1-124。建议大家养成编写返回码的编程习惯，但是系统并不对这做出限制，作为程序员你依然可以使用0-255的所有返回码。但是如果你滥用这些返回码，很可能会给未来程序的扩展造成不必要的麻烦。</p>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文中我们描述了一个脚本的执行过程，从#!开始，到中间的解析过程，再到最后的退出返回码。希望这些对大家深入理解bash的执行过程和编写更高质量的脚本有帮助。通过本文我们明确了以下知识点：</p>
-<ul>
-<li>脚本开始的#!的作用原理。</li>
-<li>bash的字符串解析过程。</li>
-<li>什么是alias。</li>
-<li>什么是关键字。</li>
-<li>什么是function。</li>
-<li>什么是内建命令，hash和外建命令以及它们的执行方法。</li>
-<li>如何退出一个bash脚本以及返回码的含义。</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/shell/">shell</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/05/22/ansible/" title="初试ansible" itemprop="url">初试ansible</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-05-22T11:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-22</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="ansible使用"><a href="#ansible使用" class="headerlink" title="ansible使用"></a>ansible使用</h1><p>ansible可以作为自动化运维工具，一直以来都是知道有这东西，却没有尝试过，现在是时候把吹过的牛逼补回来了</p>
-<p>1、简介</p>
-<p>ansible是自动化运维工具，基于Python开发，集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点，实现了批量系统配置、批量程序部署、批量运行命令等功能。ansible是基于模块工作的，本身没有批量部署的能力。真正具有批量部署的是ansible所运行的模块，ansible只是提供一种框架。主要包括：</p>
-<ul>
-<li><p>连接插件connection plugins：负责和被监控端实现通信；</p>
-</li>
-<li><p>host inventory：指定操作的主机，是一个配置文件里面定义监控的主机；</p>
-</li>
-<li><p>各种模块核心模块、command模块、自定义模块；</p>
-</li>
-<li><p>借助于插件完成记录日志邮件等功能；</p>
-</li>
-<li><p>playbook：剧本执行多个任务时，非必需可以让节点一次性运行多个任务。</p>
-</li>
-</ul>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>略过了，使用pip，安装很简单</p>
-<h2 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h2><p><img src="http://githubforericwang.qiniudn.com/hexo/eric/wKiom1Rsxz3ToUCAAAGROYAM3EI989.jpg" alt=""></p>
-<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><ul>
-<li><p>no agents：不需要在被管控主机上安装任何客户端；</p>
-</li>
-<li><p>no server：无服务器端，使用时直接运行命令即可；</p>
-</li>
-<li><p>modules in any languages：基于模块工作，可使用任意语言开发模块；</p>
-</li>
-<li><p>yaml，not code：使用yaml语言定制剧本playbook；</p>
-</li>
-<li><p>ssh by default：基于SSH工作；</p>
-</li>
-<li><p>strong multi-tier solution：可实现多级指挥。</p>
-</li>
-</ul>
-<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
-<li>轻量级，无需在客户端安装agent，更新时，只需在操作机上进行一次更新即可；</li>
-<li>批量任务执行可以写成脚本，而且不用分发到远程就可以执行；</li>
-<li>使用python编写，维护更简单，ruby语法过于复杂；</li>
-<li>支持sudo。</li>
-</ul>
-<h2 id="任务执行流程"><a href="#任务执行流程" class="headerlink" title="任务执行流程"></a>任务执行流程</h2><p><img src="http://githubforericwang.qiniudn.com/hexo/eric/wKiom1Rsx2uQYJZ5AAJplY08vOQ976.jpg" alt=""></p>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="搭建多个可操作的host"><a href="#搭建多个可操作的host" class="headerlink" title="搭建多个可操作的host"></a>搭建多个可操作的host</h3><p>没有机器，暂时用docker替代了<br>一个简单的sshd的Dockerfile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">FROM ubuntu:14.04</div><div class="line">MAINTAINER ericwang 123048591@qq.com</div><div class="line">RUN apt-get update &amp;&amp; apt-get install -y openssh-server \</div><div class="line">   &amp;&amp; sed -i &apos;s/UsePAM yes/UsePAM no/g&apos; /etc/ssh/sshd_config  \</div><div class="line">   &amp;&amp; useradd ansible \</div><div class="line">   &amp;&amp; echo ansible:ansible |chpasswd \</div><div class="line">   &amp;&amp; echo &quot;admin   ALL=(ALL)       ALL&quot; &gt;&gt; /etc/sudoers  \</div><div class="line">   &amp;&amp; mkdir /var/run/sshd</div><div class="line">RUN ssh-keygen  -t rsa -f /root/.ssh/id_rsa -P &quot;&quot;</div><div class="line">EXPOSE 22</div><div class="line">CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]</div></pre></td></tr></table></figure></p>
-<p>build脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">docker build  --tag sshd-server ./</div></pre></td></tr></table></figure></p>
-<p>run脚本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">set -x</div><div class="line">container_id=$(docker run -itd -P sshd-server)</div><div class="line">cat ~/.ssh/id_rsa.pub | docker exec --user=root -i $container_id  sh -c &apos;cat &gt;&gt; /root/.ssh/authorized_keys&apos;</div><div class="line">docker exec $container_id chmod 600 /root/.ssh/authorized_keys</div></pre></td></tr></table></figure>
-<p>练习的时候才发现docker exec使用流的时候有些问题，google看到<a href="https://forums.docker.com/t/docker-exec-api-using-stdin-to-upload-a-file/748" target="_blank" rel="external">这篇文章</a>，直接使用exec command &gt;&gt; file这种形式是不行的，会把流输出到宿主系统，完全就是错误的。期待那位linux　大神继续更新shell相关的博文，更深入地理解linux</p>
-<p>./build.sh 创建image,然后,./run.sh　这就创建了一个容器,也就是用来测试的ansible host。多次run后，就有了多个host机器了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  ~ docker ps</div><div class="line"></div><div class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                      NAMES</div><div class="line">a57b8c69e513        sshd-server         &quot;/usr/sbin/sshd -D&quot;      35 seconds ago      Up 34 seconds       0.0.0.0:32784-&gt;22/tcp      serene_saha</div></pre></td></tr></table></figure>
-<p>每一次run后都会产生一个容器,将端口22映射到主机的一个端口上，可以通过ssh登陆到docker容器中<br>如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">➜  ~ ssh root@127.0.0.1 -p 32784</div><div class="line">The authenticity of host &apos;[127.0.0.1]:32784 ([127.0.0.1]:32784)&apos; can&apos;t be established.</div><div class="line">ECDSA key fingerprint is 6a:d1:27:e4:89:93:98:96:8f:02:f7:bf:6e:d7:eb:7b.</div><div class="line">Are you sure you want to continue connecting (yes/no)? yes</div><div class="line">Warning: Permanently added &apos;[127.0.0.1]:32784&apos; (ECDSA) to the list of known hosts.</div><div class="line">root@a57b8c69e513:~#</div></pre></td></tr></table></figure></p>
-<p>第一次登陆需要add到know hosts，以后就是免密码登陆了</p>
-<p>启动了２个docker容器后,接下来是配置ansible了<br>默认hosts是在/etc/ansible/hosts,添加一组远程主机地址</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  ~ cat /etc/ansible/hosts </div><div class="line">[docker]</div><div class="line">[docker]</div><div class="line">127.0.0.1:32787 ansible_connection=ssh        ansible_ssh_user=root</div></pre></td></tr></table></figure>
-<p>关于inventory的配置，这个<a href="http://sapser.github.io/ansible/2014/07/10/ansible-inventory/" target="_blank" rel="external">博客</a>写的很详尽</p>
-<p>接下来尝试写playbook，<a href="http://sapser.github.io/ansible/2014/07/21/ansible-playbook/" target="_blank" rel="external">这篇</a>介绍的也不错。<br>写了一个简单的目录传输的playbook，很简单，功能很简单(其实就是发布系统的目录推送部分，其他功能待完善)<br>ansible目录下的两个文件,push_code.yml,update_git_code.sh</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">➜  ansible cat push_code.yml </div><div class="line">---</div><div class="line">- hosts: docker</div><div class="line">  remote_user: root</div><div class="line">  tasks:</div><div class="line">  - name: push data</div><div class="line">    copy: src=/data/git_code dest=/data/code/</div><div class="line">            owner=root group=root mode=0644</div></pre></td></tr></table></figure>
-<p>然后写一个简单的主机发送脚本吧</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">➜  ansible cat update_git_code.sh </div><div class="line">#!/bin/bash</div><div class="line">set -x</div><div class="line">cd dirname $0</div><div class="line">git_dir=/data/git_code/</div><div class="line">git --git-dir=$git_dir.git/ --work-tree=$git_dir pull --rebase origin master:master \</div><div class="line">&amp;&amp; ansible-playbook -check  push_code.yml</div></pre></td></tr></table></figure>
-<p>/data/git_code是预先建立好的git代码仓库。这样就实现了一个简单的发布系统。后面有时间结合下之前做的docker-laravel,搞一个自动化的吧</p>
-<p>ansible在github上也有关于lamp的例子<a href="https://github.com/ansible/ansible-examples" target="_blank" rel="external">ansible-examples</a></p>
-<p>就先这样吧　以后有机会再继续接触</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://sofar.blog.51cto.com/353572/1579894/" target="_blank" rel="external">自动化运维工具Ansible详细部署</a><br><a href="http://docs.ansible.com" target="_blank" rel="external">ansible 官方文档</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/ansible/">ansible</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">标签云</p>
+    <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -1560,7 +1333,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
 		  
 		
 		  
@@ -1721,7 +1494,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

@@ -46,7 +46,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -62,7 +62,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -80,6 +80,262 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/01/12/laravel/" title="laravel 的一些吐槽" itemprop="url">laravel 的一些吐槽</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-12T14:02:00.000Z" itemprop="datePublished"> Published 2016-01-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近在做业务项目迁移，把ec的代码迁移到laravel中，<br>为什么选用laravel，我也不知道(也不是我做选型)。其他的框架也没太多接触过，都是跑跑hello world，看的多一点的算是yaf了，不过个人理解，yaf没有orm，完全就是个vc框架，没有model层。需要自己去扩展，但是眼前项目很紧，明显不能这么用。以前用的框架是自己公司内部使用的，虽然思想的都不错，但是随便使用。<br>因为是公司内部物流系统，所以ui直接都是后端人员开发，ui框架选用的semantic，对于我这种不熟悉css，js的人来说也还不错，毕竟有文档，复制粘贴，大体的页面也就出来了。<br>但是开发过程中，还是想吐槽一下laravel。<br>1.最想吐槽的就是它的配置，放到.env里，每行其实就是个键值对，通过config目录下的配置读取，把这些配置替换过去，<br>但是我的项目配置不可能放在项目里啊，这是最基本的需求！因为不能对代码做入侵，所以可以在app初始化的时候，去set到外围目录里。为什么要set到外围目录？很简单，因为配置本就应该和代码分离，这样开发环境就能和线上环境区分出来了。但是这样远远不够，作为配置，很多项目是重复使用同一配置的，那就公用起来，做为每个项目不同的部分，也要区分出来，所以配置就成为了一个配置中心。以前在使用java开发时，比较简单，用的是superdiamond作为配置中心，公用的部分完全可以共用，独立的部分也不会被干扰。但是php显然不行，作为以进程为模型的语言，不可能每处理一个请求的时候就去读一遍配置，而应该是读取本地的某个固定目录的php文件，将配置载入。一旦配置发生改变（比如 redis迁移，mysql迁移，域名变更等）不需要一台一台地去更新配置，而是直接更新发布机的配置文件，直接发布到各机器上，这种方式可以使用ansible去做，Jenkins也可以做。也有自己去实现的，比如在每台机器上安装一个客户端，然后定时去和中心机器上的文件做对比，有不同就更新。想到的也就推模式和拉模式两种方式。<br>2.接下来就是blade模板，关于这个模板，文档实在是太少了，在页面上做变量嵌套的时候总是出问题，也无从查起，只能换种方式去做<br>3.log 这个就不多说了，实用的log并不多,php中的exception和fatal error是俩概念，无从和java的exception比拟。需要一个日志收集系统，去收集log，做分析。elk在这方面应该很强大，zabbix应该也可以。<br>4.分页，虽然可以自己实现，但是想短时间内做一个美观的无错误逻辑的，还是要花时间的。虽然这个在文档上有，但是用下来才发现，是给bootstrap模板使用的！一万个草泥马奔腾而过，然后github上找到了一份，还挺好用，虽然是个简单的实现。代码不贴了，在<a href="https://github.com/Landish/Pagination" target="_blank" rel="external">这里</a>,感谢开源。因为想尽量保证少量的依赖包，所以直接拷贝到文件里了。<br>先吐槽这些吧，吐槽归吐槽，laravel也有很多优点，比如依赖注入，validation，orm等等，很方便，不多说了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a><a href="/tags/laravel/">laravel</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/04/do_while/" title="do{...}while(0)的意义和用法" itemprop="url">do{...}while(0)的意义和用法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-04T13:23:35.000Z" itemprop="datePublished"> Published 2016-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在尝试写扩展时，阅读到了这样类似的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#define ZVAL_BOOL(z, b) do &#123;		\</div><div class="line">		zval *__z = (z);			\</div><div class="line">		Z_LVAL_P(__z) = ((b) != 0);	\</div><div class="line">		Z_TYPE_P(__z) = IS_BOOL;	\</div><div class="line">	&#125; while (0)</div></pre></td></tr></table></figure></p>
+<p>好奇怪，明明是只做一次运算，为何要使用do{}while(0)的方式<br>google一下，涨了很多姿势<br>接下来的大部分部分参考<a href="http://www.spongeliu.com/415.html" target="_blank" rel="external">do{…}while(0)的意义和用法</a></p>
+<p>linux内核和其他一些开源的代码中，经常会遇到这样的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">do&#123;</div><div class="line"> ...</div><div class="line">&#125;while(0)</div></pre></td></tr></table></figure></p>
+<p>总结起来这样写主要有以下几点好处：</p>
+<p>1、辅助定义复杂的宏，避免引用的时候出错：</p>
+<p>举例来说，假设你需要定义这样一个宏：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING()\</div><div class="line">               foo1();\</div><div class="line">               foo2()</div></pre></td></tr></table></figure></p>
+<p>这个宏的本意是，当调用DOSOMETHING()时，函数foo1()和foo2()都会被调用。但是如果你在调用的时候这么写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">    DOSOMETHING();</div></pre></td></tr></table></figure></p>
+<p>因为宏在预处理的时候会直接被展开，你实际上写的代码是这个样子的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">    foo1();</div><div class="line">foo2();</div></pre></td></tr></table></figure></p>
+<p>这就出现了问题，因为无论a是否大于0，foo2()都会被执行，导致程序出错。</p>
+<p>那么仅仅使用{}将foo1()和foo2()包起来行么？</p>
+<p>我们在写代码的时候都习惯在语句右面加上分号，如果在宏中使用{}，代码里就相当于这样写了：“{…};”，展开后就是这个样子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">&#123;</div><div class="line">    foo1();</div><div class="line">    foo2();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>所以碰到这种调用宏:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">if (a&gt;0)</div><div class="line">     DOSOMETHING();</div><div class="line">else</div><div class="line">     DOOTHERTHING();</div></pre></td></tr></table></figure></p>
+<p>会被扩展成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">if (a&gt;0) &#123;</div><div class="line">    foo1();</div><div class="line">    foo2();</div><div class="line">&#125;;</div><div class="line">else</div><div class="line">    DOOTHERTHING(wolf);</div></pre></td></tr></table></figure></p>
+<p>这样不会编译通过。所以，很多人才采用了do{…}while(0);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING() \</div><div class="line">        do&#123; \</div><div class="line">          foo1();\</div><div class="line">          foo2();\</div><div class="line">        &#125;while(0)\</div><div class="line">    </div><div class="line">...</div><div class="line"> </div><div class="line">if(a&gt;0)</div><div class="line">    DOSOMETHING();</div><div class="line"> </div><div class="line">...</div></pre></td></tr></table></figure>
+<p>这样，宏被展开后，才会保留初始的语义。GCC提供了Statement-Expressions用以替代do{…}while(0); 所以你也可以这样定义宏：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING() (&#123;\</div><div class="line">        foo1(); \</div><div class="line">        foo2(); \</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>2、避免使用goto对程序流进行统一的控制：</p>
+<p>有些函数中，在函数return之前我们经常会进行一些收尾的工作，比如free掉一块函数开始malloc的内存，goto一直都是一个比较简便的方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int foo()</div><div class="line">&#123;</div><div class="line">    somestruct* ptr = malloc(...);</div><div class="line"> </div><div class="line">    dosomething...;</div><div class="line">    if(error)</div><div class="line">    &#123;</div><div class="line">        goto END;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    dosomething...;</div><div class="line">    if(error)</div><div class="line">    &#123;</div><div class="line">        goto END;</div><div class="line">    &#125;</div><div class="line">    dosomething...;</div><div class="line"> </div><div class="line">END:</div><div class="line">    free(ptr);</div><div class="line">    return 0;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>由于goto不符合软件工程的结构化，而且有可能使得代码难懂，所以很多人都不倡导使用，那这个时候就可以用do{}while(0)来进行统一的管理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">int foo()</div><div class="line">&#123;</div><div class="line"> </div><div class="line">    somestruct* ptr = malloc(...);</div><div class="line"> </div><div class="line">    do&#123;</div><div class="line">        dosomething...;</div><div class="line">        if(error)</div><div class="line">        &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line"> </div><div class="line">        dosomething...;</div><div class="line">        if(error)</div><div class="line">        &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        dosomething...;</div><div class="line">    &#125;while(0);</div><div class="line"> </div><div class="line">    free(ptr);</div><div class="line">    return 0;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里将函数主体使用do()while(0)包含起来，使用break来代替goto，后续的处理工作在while之后，就能够达到同样的效果。</p>
+<p>3、避免空宏引起的warning</p>
+<p>内核中由于不同架构的限制，很多时候会用到空宏，在编译的时候，空宏会给出warning，为了避免这样的warning，就可以使用do{}while(0)来定义空宏：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#define EMPTYMICRO do&#123;&#125;while(0)</div></pre></td></tr></table></figure>
+<p>4、定义一个单独的函数块来实现复杂的操作：</p>
+<p>当你的功能很复杂，变量很多你又不愿意增加一个函数的时候，使用do{}while(0);，将你的代码写在里面，里面可以定义变量而不用考虑变量名会同函数之前或者之后的重复。</p>
+<p>理解了这个do{…}while(0),一切豁然开朗。<br>发现ZVAL_RESOURCE,ZVAL_STRING,ZVAL_ZVAL等宏也都是使用的do{}while(0)的形式,ZVAL_DOUBLE,ZVAL_LONG等并没有使用,个人理解ZVAL_BOOL这样定义宏属于第一种情况。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/C/">C</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/04/c/" title="C指针" itemprop="url">C指针</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-04T11:59:00.000Z" itemprop="datePublished"> Published 2016-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近深入学习写扩展，发现C功底太弱了，也印证了那句话，出来混迟早要还的。<br>大学里因为不喜欢指针，放弃了C转战java，结果到现在，也只有自己给自己填坑了。<br>所以找了些文章充实一下吧。<br>本文转自<a href="http://www.cnblogs.com/wchhuangya/archive/2009/12/24/1631121.html" target="_blank" rel="external">C指针</a></p>
+<h2 id="第一章-指针的概念"><a href="#第一章-指针的概念" class="headerlink" title="第一章 指针的概念"></a>第一章 指针的概念</h2><p>指针是一个特殊的变量，它里面存储的数值被解释成为内存里的一个地址。 </p>
+<p>要搞清一个指针需要搞清指针的四方面的内容：指针的类型，指针所指向的类型，指针的值或者叫指针所指向的内存区，还有指针本身所占据的内存区。让我们分别说明。<br>先声明几个指针放着做例子：<br>例一：<br>(1)int <em>ptr;<br>(2)char </em>ptr;<br>(3)int <em>*ptr;<br>(4)int (</em>ptr)[3];<br>(5)int <em>(</em>ptr)[4]; </p>
+<ol>
+<li><p>指针的类型。<br>从语法的角度看，你只要把指针声明语句里的指针名字去掉，剩下的部分就是这个指针的类型。这是指针本身所具有的类型。让我们看看例一中各个指针的类型：<br>(1)int <em>ptr; //指针的类型是int </em><br>(2)char <em>ptr; //指针的类型是char </em><br>(3)int <strong>ptr; //指针的类型是 int </strong><br>(4)int (<em>ptr)[3]; //指针的类型是 int(</em>)[3]<br>(5)int <em>(</em>ptr)[4]; //指针的类型是 int <em>(</em>)[4]<br>怎么样？找出指针的类型的方法是不是很简单？ </p>
+</li>
+<li><p>指针所指向的类型。<br>当你通过指针来访问指针所指向的内存区时，指针所指向的类型决定了编译器将把那片内存区里的内容当做什么来看待。从语法上看，你只须把指针声明语句中的指针名字和名字左边的指针声明符<em>去掉，剩下的就是指针所指向的类型。例如：<br>(1)int </em>ptr; //指针所指向的类型是int<br>(2)char <em>ptr; //指针所指向的的类型是char<br>(3)int **ptr; //指针所指向的的类型是 int </em><br>(4)int (<em>ptr)[3]; //指针所指向的的类型是 int()[3]<br>(5)int </em>(<em>ptr)[4]; //指针所指向的的类型是 int </em>()[4]<br>在指针的算术运算中，指针所指向的类型有很大的作用。指针的类型(即指针本身的类型)和指针所指向的类型是两个概念。当你对C越<br>来越熟悉时，你会发现，把与指针搅和在一起的”类型”这个概念分成”指针的类型”和”指针所指向的类型”两个概念，是精通指针的关键点之一。我看了不少书，发现有些写得差的书中，就把指针的这两个概念搅在一起了，所以看起书来前后矛盾，越看越糊涂。 </p>
+</li>
+<li><p>指针的值，或者叫指针所指向的内存区或地址。<br>指针的值是指针本身存储的数值，这个值将被编译器当作一个地址，而不是一个一般的数值。在32位程序里，所有类型的指针的值都是一个32位整数，因为32位程序里内存地址全都是32位长。指针所指向的内存区就是从指针的值所代表的那个内存地址开始，长度为si<br>zeof(指针所指向的类型)的一片内存区。以后，我们说一个指针的值是XX，就相当于说该指针指向了以XX为首地址的一片内存区域；我们说一个指针指向了某块内存区域，就相当于说该指针的值是这块内存区域的首地址。指针所指向的内存区和指针所指向的类型是两个完全不同的概念。在例一中，指针所指向的类型已经有了，但由于指针还未初始化，所以它所指向的内存区是不存在的，或者说是无意义的。以后，每遇到一个指针，都应该问问：这个指针的类型是什么？指针指向的类型是什么？该指针指向了哪里？ </p>
+</li>
+<li><p>指针本身所占据的内存区。<br>指针本身占了多大的内存？你只要用函数sizeof(指针的类型)测一下就知道<br>了。在32位平台里，指针本身占据了4个字节的长度。<br>指针本身占据的内存这个概念在判断一个指针表达式是否是左值时很有用。 </p>
+</li>
+</ol>
+<h2 id="第二章-指针的算术运算"><a href="#第二章-指针的算术运算" class="headerlink" title="第二章 指针的算术运算"></a>第二章 指针的算术运算</h2><p>指针可以加上或减去一个整数。指针的这种运算的意义和通常的数值的加减运算的意义是不一样的。例如：<br>例二：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">char a[20]; </div><div class="line">int *ptr=a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr++;</div></pre></td></tr></table></figure></p>
+<p>在上例中，指针ptr的类型是int*,它指向的类型是int，它被初始化为指向整形变量a。接下来的第3句中，指针ptr被加了1，编译器是这样处理的：它把指针ptr的值加上了sizeof(int)，在32位程序中，是被加上了4。由于地址是用字节做单位的，故ptr所指向的地址由原来的变量a的地址向高地址方向增加了4个字节。由于char类型的长度是一个字节，所以，原来ptr是指向数组a的第0号单元开始的四个字节，此时指向了数组a中从第4号单元开始的四个字节。我们可以用一个指针和一个循环来遍历一个数组，看例子：<br>例三：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">int array[20]; </div><div class="line">int *ptr=array; </div><div class="line">... </div><div class="line">//此处略去为整型数组赋值的代码。 </div><div class="line">... </div><div class="line">for(i=0;i&lt;20;i++) </div><div class="line">&#123; </div><div class="line">(*ptr)++; </div><div class="line">ptr++； </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个例子将整型数组中各个单元的值加1。由于每次循环都将指针ptr加1，所以每次循环都能访问数组的下一个单元。<br>再看例子：<br>例四：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">char a[20]; </div><div class="line">int *ptr=a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr+=5;</div><div class="line">``` </div><div class="line">在这个例子中，ptr被加上了5，编译器是这样处理的：将指针ptr的值加上5乘sizeof(int)，在32位程序中就是加上了5乘4=20。由于地址的单位是字节，故现在的ptr所指向的地址比起加5后的ptr所指向的地址来说，向高地址方向移动了20个字节。在这个例子中，没加5前的ptr指向数组a的第0号单元开始的四个字节，加5后，ptr已经指向了数组a的合法范围之外了。虽然这种情况在应用上会出问题，但在语法上却是可以的。这也体现出了指针的灵活性。如果上例中，ptr是被减去5，那么处理过程大同小异，只不过ptr的值是被减去5乘sizeof(int)，新的ptr指向的地址将比原来的ptr所指向的地址向低地址方向移动了20个字节。 </div><div class="line"></div><div class="line">总结一下，一个指针ptrold加上一个整数n后，结果是一个新的指针ptrnew,ptrnew的类型和ptrold的类型相同，ptrnew所指向的类型和ptrold所指向的类型也相同。ptrnew的值将比ptrold的值增加了n乘sizeof(ptrold所指向的类型)个字节。就是说,ptrnew所指向的内存区将比ptrold所指向的内存区向高地址方向移动了n乘sizeof(ptrold所指向的类型)个字节。一个指针ptrold减去一个整数n后，结果是一个新的指针ptrnew，ptrnew的类型和ptrold的类型相同，ptrnew所指向的类型和ptrold所指向的类型也相同。ptrnew的值将比ptrold的值减少了n乘sizeof(ptrold所指向的类型)个字节，就是说 ，ptrnew所指向的内存区将比ptrold所指向的内存区向低地址方向移动了n乘sizeof(ptrold所指向的类型)个字节。 </div><div class="line"></div><div class="line">第三章 运算符号&amp;和*</div><div class="line">-----------</div><div class="line"></div><div class="line">这里&amp;是取地址运算符，*是...书上叫做&quot;间接运算符&quot;。&amp;a的运算结果是一个指针，指针的类型是a的类型加个*，指针所指向的类型 </div><div class="line">是a的类型，指针所指向的地址嘛，那就是a的地址。*p的运算结果就五花八门了。总之*p的结果是p所指向的东西，这个东西有这 </div><div class="line">些特点：它的类型是p指向的类型，它所占用的地址是p所指向的地址。 </div><div class="line">例五：</div></pre></td></tr></table></figure></p>
+<p>int a=12;<br>int b;<br>int <em>p;<br>int **ptr;<br>p=&a;//&amp;a的结果是一个指针，类型是int</em>，指向的类型是int，指向的地址是a的地址。<br><em>p=24;//</em>p的结果，在这里它的类型是int，它所占用的地址是p所指向的地址，显然，<em>p就是变量a。<br>ptr=&p;//&amp;p的结果是个指针，该指针的类型是p的类型加个</em>，在这里是int<strong>。该指针所指向的类型是p的类型，这里是int<em>。该指针所指向的地址就是指针p自己的地址。 
+</em>ptr=&b;//<em>ptr是个指针，&amp;b的结果也是个指针，且这两个指针的类型和所指向的类型是一样的，所以用&amp;b来给</em>ptr赋值就是毫无      问题的了。 
+</strong>ptr=34;//<em>ptr的结果是ptr所指向的东西，在这里是一个指针，对这个指针再做一次</em>运算，结果就是一个int类型的变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">第四章 指针表达式</div><div class="line">---------</div><div class="line"></div><div class="line">一个表达式的最后结果如果是一个指针，那么这个表达式就叫指针表达式。下面是一些指针表达式的例子： </div><div class="line">例六：</div></pre></td></tr></table></figure></p>
+<p>int a,b;<br>int array[10];<br>int <em>pa;<br>pa=&a;//&amp;a是一个指针表达式。<br>int **ptr=&pa;//&amp;pa也是一个指针表达式。 
+</em>ptr=&b;//*ptr和&amp;b都是指针表达式。<br>pa=array;<br>pa++;//这也是指针表达式。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">例七：</div><div class="line">``` </div><div class="line">char *arr[20]; </div><div class="line">char **parr=arr;//如果把arr看作指针的话，arr也是指针表达式 </div><div class="line">char *str; </div><div class="line">str=*parr;//*parr是指针表达式 </div><div class="line">str=*(parr+1);//*(parr+1)是指针表达式 </div><div class="line">str=*(parr+2);//*(parr+2)是指针表达式</div></pre></td></tr></table></figure></p>
+<p>由于指针表达式的结果是一个指针，所以指针表达式也具有指针所具有的四个要素：指针的类型，指针所指向的类型，指针指向的内存区，指针自身占据的内存。好了，当一个指针表达式的结果指针已经明确地具有了指针自身占据的内存的话，这个指针表达式就是一个左值，否则就不是一个左值。<br>在例六中，&amp;a不是一个左值，因为它还没有占据明确的内存。<em>ptr是一个左值，因为</em>ptr这个指针已经占据了内存，其实<em>ptr就是指针pa，既然pa已经在内存中有了自己的位置，那么</em>ptr当然也有了自己的位置。 </p>
+<h2 id="第五章-数组和指针的关系"><a href="#第五章-数组和指针的关系" class="headerlink" title="第五章 数组和指针的关系"></a>第五章 数组和指针的关系</h2><p>数组的数组名其实可以看作一个指针。看下例：<br>例八：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">int array[10]=&#123;0,1,2,3,4,5,6,7,8,9&#125;,value; </div><div class="line">... </div><div class="line">... </div><div class="line">value=array[0];//也可写成：value=*array; </div><div class="line">value=array[3];//也可写成：value=*(array+3); </div><div class="line">value=array[4];//也可写成：value=*(array+4);</div><div class="line">``` </div><div class="line">上例中，一般而言数组名array代表数组本身，类型是int [10]，但如果把array看做指针的话，它指向数组的第0个单元，类型是int *，所指向的类型是数组单元的类型即int。因此*array等于0就一点也不奇怪了。同理，array+3是一个指向数组第3个单元的指针，所以*(array+3)等于3。其它依此类推。 </div><div class="line"></div><div class="line">例九： </div><div class="line">``` </div><div class="line">char *str[3]=&#123; </div><div class="line">&quot;Hello,this is a sample!&quot;, </div><div class="line">&quot;Hi,good morning.&quot;, </div><div class="line">&quot;Hello world&quot; </div><div class="line">&#125;; </div><div class="line">char s[80]； </div><div class="line">strcpy(s,str[0]);//也可写成strcpy(s,*str); </div><div class="line">strcpy(s,str[1]);//也可写成strcpy(s,*(str+1)); </div><div class="line">strcpy(s,str[2]);//也可写成strcpy(s,*(str+2));</div></pre></td></tr></table></figure></p>
+<p>上例中，str是一个三单元的数组，该数组的每个单元都是一个指针，这些指针各指向一个字符串。把指针数组名str当作一个指针的话，它指向数组的第0号单元，它的类型是char<strong>，它指向的类型是char <em>。</em>str也是一个指针，它的类型是char*，它所指向的类型是char，它指向的地址是字符串”Hello,this is a sample!”的第一个字符的地址，即’H’的地址。str+1也是一个指针，它指向数组的第1号单元，它的类型是char</strong>，它指向的类型是char <em>。 </em>(str+1)也是一个指针，它的类型是char*，它所指向的类型是char，它指向 “Hi,good morning.”的第一个字符’H’，等等。 </p>
+<p>下面总结一下数组的数组名的问题。声明了一个数组TYPE array[n]，则数组名称array就有了两重含义：第一，它代表整个数组，它的类型是TYPE [n]；第二，它是一个指针，该指针的类型是TYPE<em>，该指针指向的类型是TYPE，也就是数组单元的类型，该指针指向的内存区就是数组第0号单元，该指针自己占有单独的内存区，注意它和数组第0号单元占据的内存区是不同的。该指针的值是不能修改的，即类似array++的表达式是错误的。<br>在不同的表达式中数组名array可以扮演不同的角色。在表达式sizeof(array)中，数组名array代表数组本身，故这时sizeof函数<br>测出的是整个数组的大小。在表达式</em>array中，array扮演的是指针，因此这个表达式的结果就是数组第 0号单元的值。sizeof(<em>array)测出的是数组单元的大小。 表达式array+n（其中n=0，1，2，….。）中，array扮演的是指针，故arr<br>ay+n的结果是一个指针，它的类型是TYPE</em>，它指向的类型是TYPE，它指向数组第<br>n号单元。故sizeof(array+n)测出的是指针类型的大小。<br>例十：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int array[10]; </div><div class="line">int (*ptr)[10]; </div><div class="line">ptr=&amp;array;</div></pre></td></tr></table></figure></p>
+<p>上例中ptr是一个指针，它的类型是int (*)[10]，他指向的类型是int [10]，我们用整个数组的首地址来初始化它。在语句ptr=&amp;array中，array代表数组本身。 </p>
+<p>本节中提到了函数sizeof()，那么我来问一问，sizeof(指针名称)测出的究竟是指针自身类型的大小呢还是指针所指向的类型的大小？答案是前者。例如： </p>
+<p>int (*ptr)[10];<br>则在32位程序中，有：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sizeof(int(*)[10])==4 </div><div class="line">sizeof(int [10])==40 </div><div class="line">sizeof(ptr)==4</div></pre></td></tr></table></figure></p>
+<p>实际上，sizeof(对象)测出的都是对象自身的类型的大小，而不是别的什么类型的大小。 </p>
+<h2 id="第六章-指针和结构类型的关系"><a href="#第六章-指针和结构类型的关系" class="headerlink" title="第六章 指针和结构类型的关系"></a>第六章 指针和结构类型的关系</h2><p>可以声明一个指向结构类型对象的指针。<br>例十一：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">struct MyStruct </div><div class="line">&#123; </div><div class="line">int a; </div><div class="line">int b; </div><div class="line">int c; </div><div class="line">&#125; </div><div class="line">MyStruct ss=&#123;20,30,40&#125;;//声明了结构对象ss，并把ss的三个成员初始化为20，30和40。 </div><div class="line">MyStruct *ptr=&amp;ss;//声明了一个指向结构对象ss的指针。它的类型是MyStruct*,它指向的类型是MyStruct。 </div><div class="line">int *pstr=(int*)&amp;ss;//声明了一个指向结构对象ss的指针。但是它的类型和它指向的类型和ptr是不同的。</div></pre></td></tr></table></figure></p>
+<p>请问怎样通过指针ptr来访问ss的三个成员变量？<br>答案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ptr-&gt;a; </div><div class="line">ptr-&gt;b; </div><div class="line">ptr-&gt;c;</div></pre></td></tr></table></figure></p>
+<p>又请问怎样通过指针pstr来访问ss的三个成员变量？<br>答案：<br><em>pstr；//访问了ss的成员a。 
+</em>(pstr+1);//访问了ss的成员b。<br><em>(pstr+2)//访问了ss的成员c。<br>呵呵，虽然我在我的MSVC++6.0上调式过上述代码，但是要知道，这样使用pstr来访问结构成员是不正规的，为了说明为什么不正规，让我们看看怎样通过指针来访问数组的各个单元：<br>例十二：<br>int array[3]={35,56,37};<br>int </em>pa=array;<br>通过指针pa访问数组array的三个单元的方法是：<br><em>pa;//访问了第0号单元 
+</em>(pa+1);//访问了第1号单元<br><em>(pa+2);//访问了第2号单元<br>从格式上看倒是与通过指针访问结构成员的不正规方法的格式一样。所有的C/C++编译器在排列数组的单元时，总是把各个数组单元存放在连续的存储区里，单元和单元之间没有空隙。但在存放结构对象的各个成员时，在某种编译环境下，可能会需要字对齐或双字对齐或者是别的什么对齐，需要在相邻两个成员之间加若干?quot;填充字节”，这就导致各个成员之间可能会有若干个字节的空隙。<br>所以，在例十二中，即使</em>pstr访问到了结构对象ss的第一个成员变量a，也不能保证<em>(pstr+1)就一定能访问到结构成员b。因为成员a和成员b之间可能会有若干填充字节，说不定</em>(pstr+1)就正好访问到了这些填充字节呢。这也证明了指针的灵活性。要是你的目的就是想看看各个结构成员之间到底有没有填充字节，嘿，这倒是个不错的方法。 通过指针访问结构成员的正确方法应该是象例十二中使用指针ptr的方法。 </p>
+<h2 id="第七章-指针和函数的关系"><a href="#第七章-指针和函数的关系" class="headerlink" title="第七章 指针和函数的关系"></a>第七章 指针和函数的关系</h2><p>可以把一个指针声明成为一个指向函数的指针。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">int fun1(char*,int); </div><div class="line">int (*pfun1)(char*,int); </div><div class="line">pfun1=fun1; </div><div class="line">.... </div><div class="line">.... </div><div class="line">int a=(*pfun1)(&quot;abcdefg&quot;,7);//通过函数指针调用函数。</div></pre></td></tr></table></figure></p>
+<p>可以把指针作为函数的形参。在函数调用语句中，可以用指针表达式来作为实参。<br>例十三：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">int fun(char*); </div><div class="line">int a; </div><div class="line">char str[]=&quot;abcdefghijklmn&quot;; </div><div class="line">a=fun(str); </div><div class="line">... </div><div class="line">... </div><div class="line">int fun(char*s) </div><div class="line">&#123; </div><div class="line">int num=0; </div><div class="line">for(int i=0;i&lt;strlen(s);i++) </div><div class="line">&#123; </div><div class="line">num+=*s;s++; </div><div class="line">&#125; </div><div class="line">return num; </div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>这个例子中的函数fun统计一个字符串中各个字符的ASCII码值之和。前面说了，数组的名字也是一个指针。在函数调用中，当把str作为实参传递给形参s后，实际是把str的值传递给了s，s所指向的地址就和str所指向的地址一致，但是str和s各自占用各自的存储空间。在函数体内对s进行自加1运算，并不意味着同时对str进行了自加1运算。 </p>
+<h2 id="第八章-指针类型转换"><a href="#第八章-指针类型转换" class="headerlink" title="第八章 指针类型转换"></a>第八章 指针类型转换</h2><p>当我们初始化一个指针或给一个指针赋值时，赋值号的左边是一个指针，赋值号的右边是一个指针表达式。在我们前面所举的例子中，绝大多数情况下，指针的类型和指针表达式的类型是一样的，指针所指向的类型和指针表达式所指向的类型是一样的。<br>例十四：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">float f=12.3; </div><div class="line">float *fptr=&amp;f; </div><div class="line">int *p;</div></pre></td></tr></table></figure></p>
+<p>在上面的例子中，假如我们想让指针p指向实数f，应该怎么搞？是用下面的语句吗？<br>p=&f;<br>不对。因为指针p的类型是int<em>，它指向的类型是int。表达式&amp;f的结果是一个指针，指针的类型是float</em>,它指向的类型是float。两者不一致，直接赋值的方法是不行的。至少在我的MSVC++6.0上，对指针的赋值语句要求赋值号两边的类型一致，所指向的类型也一致，其它的编译器上我没试过，大家可以试试。为了实现我们的目的，需要进行”强制类型转换”：<br>p=(int<em>)&f;<br>如果有一个指针p，我们需要把它的类型和所指向的类型改为TYEP</em>和TYPE,那么语法格式是：<br>(TYPE<em>)p；<br>这样强制类型转换的结果是一个新指针，该新指针的类型是TYPE</em>，它指向的类型是TYPE，它指向的地址就是原指针指向的地址。而原来的指针p的一切属性都没有被修改。 </p>
+<p>一个函数如果使用了指针作为形参，那么在函数调用语句的实参和形参的结合过程中，也会发生指针类型的转换。<br>例十五：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">void fun(char*); </div><div class="line">int a=125,b; </div><div class="line">fun((char*)&amp;a); </div><div class="line">... </div><div class="line">... </div><div class="line">void fun(char*s) </div><div class="line">&#123; </div><div class="line">char c; </div><div class="line">c=*(s+3);*(s+3)=*(s+0);*(s+0)=c; </div><div class="line">c=*(s+2);*(s+2)=*(s+1);*(s+1)=c; </div><div class="line">&#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意这是一个32位程序，故int类型占了四个字节，char类型占一个字节。函数fun的作用是把一个整数的四个字节的顺序来个颠倒。注意到了吗？在函数调用语句中，实参&amp;a的结果是一个指针，它的类型是int <em>，它指向的类型是int。形参这个指针的类型是char</em>，它指向的类型是char。这样，在实参和形参的结合过程中，我们必须进行一次从int<em>类型到char</em>类型的转换。结合这个例子，我们可以这样来想象编译器进行转换的过程：编译器先构造一个临时指针 char<em>temp，然后执行temp=(char</em>)&amp;a，最后再把temp的值传递给s。所以最后的结果是：s的类型是char*,它指向的类型是char，它指向的地址就是a的首地址。 </p>
+<p>我们已经知道，指针的值就是指针指向的地址，在32位程序中，指针的值其实是一个32位整数。那可不可以把一个整数当作指针的值直接赋给指针呢？就象下面的语句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">unsigned int a; </div><div class="line">TYPE *ptr;//TYPE是int，char或结构类型等等类型。 </div><div class="line">... </div><div class="line">... </div><div class="line">a=20345686; </div><div class="line">ptr=20345686;//我们的目的是要使指针ptr指向地址20345686（十进制 </div><div class="line">） </div><div class="line">ptr=a;//我们的目的是要使指针ptr指向地址20345686（十进制）</div></pre></td></tr></table></figure></p>
+<p>编译一下吧。结果发现后面两条语句全是错的。那么我们的目的就不能达到了吗？不，还有办法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">unsigned int a; </div><div class="line">TYPE *ptr;//TYPE是int，char或结构类型等等类型。 </div><div class="line">... </div><div class="line">... </div><div class="line">a=某个数，这个数必须代表一个合法的地址； </div><div class="line">ptr=(TYPE*)a；//呵呵，这就可以了。</div></pre></td></tr></table></figure></p>
+<p>严格说来这里的(TYPE<em>)和指针类型转换中的(TYPE</em>)还不一样。这里的(TYPE*)的意思是把无符号整数a的值当作一个地址来看待。<br>上面强调了a的值必须代表一个合法的地址，否则的话，在你使用ptr的时候，就会出现非法操作错误。 </p>
+<p>想想能不能反过来，把指针指向的地址即指针的值当作一个整数取出来。完全可以。下面的例子演示了把一个指针的值当作一个整数取出来，然后再把这个整数当作一个地址赋给一个指针：<br>例十六：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">int a=123,b; </div><div class="line">int *ptr=&amp;a; </div><div class="line">char *str; </div><div class="line">b=(int)ptr;//把指针ptr的值当作一个整数取出来。 </div><div class="line">str=(char*)b;//把这个整数的值当作一个地址赋给指针str。</div></pre></td></tr></table></figure></p>
+<p>好了，现在我们已经知道了，可以把指针的值当作一个整数取出来，也可以把一个整数值当作地址赋给一个指针。 </p>
+<h2 id="第九章-指针的安全问题"><a href="#第九章-指针的安全问题" class="headerlink" title="第九章 指针的安全问题"></a>第九章 指针的安全问题</h2><p>看下面的例子：<br>例十七：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">char s=’a’; </div><div class="line">int *ptr; </div><div class="line">ptr=(int*)&amp;s; </div><div class="line">*ptr=1298；</div></pre></td></tr></table></figure></p>
+<p>指针ptr是一个int*类型的指针，它指向的类型是int。它指向的地址就是s的首地址。在32位程序中，s占一个字节，int类型占四个字节。最后一条语句不但改变了s所占的一个字节，还把和s相临的高地址方向的三个字节也改变了。这三个字节是干什么的？只有编译程序知道，而写程序的人是不太可能知道的。也许这三个字节里存储了非常重要的数据，也许这三个字节里正好是程序的一条代码，而由于你对指针的马虎应用，这三个字节的值被改变了！这会造成崩溃性的错误。<br>让我们再来看一例：<br>例十八：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">char a; </div><div class="line">int *ptr=&amp;a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr++; </div><div class="line">*ptr=115;</div></pre></td></tr></table></figure></p>
+<p>该例子完全可以通过编译，并能执行。但是看到没有？第3句对指针ptr进行自加1运算后，ptr指向了和整形变量a相邻的高地址方向的一块存储区。这块存储区里是什么？我们不知道。有可能它是一个非常重要的数据，甚至可能是一条代码。而第4句竟然往这片存储区里写入一个数据！这是严重的错误。所以在使用指针时，程序员心里必须非常清楚：我的指针究竟指向了哪里。<br>在用指针访问数组的时候，也要注意不要超出数组的低端和高端界限，否则也会造成类似的错误。<br>在指针的强制类型转换：ptr1=(TYPE*)ptr2中，如果sizeof(ptr2的类型)大于sizeof(ptr1的类型)，那么在使用指针ptr1来访问ptr2所指向的存储区时是安全的。如果sizeof(ptr2的类型)小于sizeof(ptr1的类型)，那么在使用指针ptr1来访问ptr2所指向的存储区时是不安全的。至于为什么，读者结合例十七来想一想，应该会明白的。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/C/">C</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/01/04/other_02/" title="无题" itemprop="url">无题</a>
   </h1>
   <p class="article-author">By
@@ -87,7 +343,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-01-04T02:55:01.000Z" itemprop="datePublished"> 发表于 2016-01-04</time>
+    <time datetime="2016-01-04T02:55:01.000Z" itemprop="datePublished"> Published 2016-01-04</time>
     
   </p>
 </header>
@@ -142,7 +398,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-24T11:11:00.000Z" itemprop="datePublished"> 发表于 2015-12-24</time>
+    <time datetime="2015-12-24T11:11:00.000Z" itemprop="datePublished"> Published 2015-12-24</time>
     
   </p>
 </header>
@@ -204,7 +460,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-02T01:19:17.000Z" itemprop="datePublished"> 发表于 2015-12-02</time>
+    <time datetime="2015-12-02T01:19:17.000Z" itemprop="datePublished"> Published 2015-12-02</time>
     
   </p>
 </header>
@@ -277,7 +533,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-11-29T12:02:00.000Z" itemprop="datePublished"> 发表于 2015-11-29</time>
+    <time datetime="2015-11-29T12:02:00.000Z" itemprop="datePublished"> Published 2015-11-29</time>
     
   </p>
 </header>
@@ -340,7 +596,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-11-23T09:20:00.000Z" itemprop="datePublished"> 发表于 2015-11-23</time>
+    <time datetime="2015-11-23T09:20:00.000Z" itemprop="datePublished"> Published 2015-11-23</time>
     
   </p>
 </header>
@@ -407,7 +663,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-11-23T00:58:00.000Z" itemprop="datePublished"> 发表于 2015-11-23</time>
+    <time datetime="2015-11-23T00:58:00.000Z" itemprop="datePublished"> Published 2015-11-23</time>
     
   </p>
 </header>
@@ -527,7 +783,7 @@ proxy_set_header X-Forwarded-For $remote_addr;
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-11-13T11:11:00.000Z" itemprop="datePublished"> 发表于 2015-11-13</time>
+    <time datetime="2015-11-13T11:11:00.000Z" itemprop="datePublished"> Published 2015-11-13</time>
     
   </p>
 </header>
@@ -584,262 +840,30 @@ proxy_set_header X-Forwarded-For $remote_addr;
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/11/13/mysql_03/" title="MYSQL大小写问题" itemprop="url">MYSQL大小写问题</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-11-13T06:14:01.000Z" itemprop="datePublished"> 发表于 2015-11-13</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>这个问题坑了自己2次<br>第一次  搭建superdiamond的时候，给出的表名都是大写的，但是启动后报错，原因是没有找到表<br>第二次  比较惨，改了很久，数据库里存储的用户名是大写的，取出用户名后，使用的是小写符号做的加密，自己被坑的很惨，因为测试环境里并没有大写的名字</p>
-<p>今天比较空闲，学一下吧</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">insert into test values(&apos;A&apos;);  </div><div class="line">insert into test values(&apos;a&apos;);</div></pre></td></tr></table></figure>
-<p>如果对其做主键约束的话，是会报错的，Duplicate entry。</p>
-<p>MySQL在Linux下数据库名、表名、列名、别名大小写规则是这样的：</p>
-<p>1、数据库名与表名是严格区分大小写的；<br>2、表的别名是严格区分大小写的；<br>3、列名与列的别名在所有的情况下均是忽略大小写的；<br>4、变量名也是严格区分大小写的；</p>
-<p><strong>MySQL在查询字符串时是大小写不敏感的，在编绎MySQL时一般以ISO-8859字符集作为默认的字符集，这个字符集对大小写不敏感,因此在比较过程中中文编码字符大小写转换造成了这种现象。</strong></p>
-<p>第1条就可以解释superdiamond为什么启动时会找不到表名，因为建表语句是大写的，而到了代码层，则是常规写法。</p>
-<p>而如果想在插入时区分大小写，可以强制字段值需要设置BINARY属性</p>
-<p>一些参考：<br><a href="http://www.iteye.com/topic/766135" target="_blank" rel="external">http://www.iteye.com/topic/766135</a><br><a href="http://stackoverflow.com/questions/3936967/mysql-case-insensitive-select" target="_blank" rel="external">http://stackoverflow.com/questions/3936967/mysql-case-insensitive-select</a><br><a href="http://dev.mysql.com/doc/refman/5.0/en/case-sensitivity.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.0/en/case-sensitivity.html</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/mysql/">mysql</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/mysql/">mysql</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/08/other_01/" title="大型网站之分布式会话管理" itemprop="url">大型网站之分布式会话管理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-07T17:10:43.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>ifeve上的文章越来越快餐化了，这篇不错还是转了吧,免密码登陆时常用的方法。个人倾向使用memcache，redis这类nosql来做session集中管理，当然内部系统，有时候也用cookie，简单。<br>原文地址: <a href="http://ifeve.com/dis-session-manager/" target="_blank" rel="external">大型网站之分布式会话管理</a><br>随着网站的功能和用户越来越多，单机器服务部署的Web应用已经不能再支持了。这时候就需要优化或调整目前的架构，具体怎么优化，或先优化哪部分，这取决于网站的具体情况， 并非总是一个套路。</p>
-<p>如根据使用情况得知，数据库压力大，则就可以先设施读写分离，分库分表，是垂直划分(可以简单的理解为按业务功能划分)， 还是水平划分(如用户表数据量很多，就可以按一定的规则分表设计,表结构仍然是相同的)。如Web应用服务器压力大,可以增加一台服务部署应用， 即从单台服务变为集群。变为集群后，用户访问网站，到底是选择哪一台服务器呢？这就需要在应用服务器前增加负载均衡设备来解决。还有点就是会话session 管理的问题，接下来会详细说明这问题。</p>
-<p>具体的问题</p>
-<p>当一个带有会话表示的Http请求到Web服务器后，需求在请求中的处理过程中找到session数据。而问题就在于，session是保存在单机上的。 假设我们有应用A和应用B，现在一位用户第一次访问网站，session数据保存在应用A中。如果我们不做处理，怎么保障接下来的请求每次都请求到应用A呢? 如请求到了应用B中，就会发现没有这位用户的session数据，这绝对是不能容忍的。</p>
-<p>解决方案</p>
-<p>解决方案有Session Stick，Session复制，Session集中管理，基于Cookie管理，下面一一说明。</p>
-<p>Session Stick<br>在单机情况，session保存在单机上，请求也是到这台单机上，不会有问题。变成多台后，如果能保障每次请求都到同一台服务，那就和单机一样了。 这需要在负载均衡设备上修改。这就是Session Stick，这种方式也会有问题：</p>
-<p>如果某一台服务器宕机或重启，那么这台服务器上的session数据就丢失了。如果session数据中还有登录状态信息，那么用户需要重现登录。<br>负载均衡要处理具体的session到服务器的映射。<br>Session复制<br>Session复制顾名思义，就是每台应用服务，都保存会话session数据，一般的应用容器都支持。与Session Stick相比，sessioon复制对负载均衡 没有太多的要求。不过这个方案还是有缺点：</p>
-<p>同步session数据带来都网络开销。只要session数据变化，就需要同步到所有机器上，机器越多，网络开销越大。<br>由于每台服务器都保存session数据，如果集群的session数据很多，比如90万人在访问网站，每台机器用于保存session数据的内容占用很严重。<br>这就是Session复制，这个方案是靠应用容器来完成，并不依赖应用，如果应用服务数量并不是很多，可以考虑。</p>
-<p>Session集中管理<br>这个也很好理解，再加一台服务，专门来管理session数据，每台应用服务都从专门的session管理服务中取会话session数据。可以使用数据库，NOSQL数据库等。 和Session复制相比，减少了每台应用服务的内存使用，同步session带来的网络开销问题。但还是有缺点：</p>
-<p>读写session引入了网络操作，相对于本机读写session，带来了延时和不稳定性。<br>如Session集中服务有问题，会影响应用。<br>基于Cookie管理<br>最后一个是基于Cookie管理，我们把session数据存放在cookie中，然后请求过来后，从cookie中获取session数据。与集中管理相比，这个方案并不依赖外部 的存储系统，读写session数据带来的网络操作延时和不稳定性。但依然有缺点：</p>
-<p>Cookie有长度限制，这会影响session数据的长度。<br>安全性。session数据本来存储在服务端的，而这个方案是让session数据转到外部网络或客户端中，所以会有安全性问题。不过可以对写入Cookie的session 数据做加密。<br>带宽消耗。由于加了session数据，带宽当然也会增加一点。<br>性能消耗。每次Http请求和响应都带有Session数据，对于Web服务器来说，在同样的处理情况下，响应的结果输出越少，支持的并发请求越多。<br>总结</p>
-<p>这4种方案都是可用的方案，我比较倾向于使用Session集中管理，不过这4种方案都各有优劣，需要根据具体的实际场景做出合适的选择。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/other/">other</a>
-</div>
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/05/json/" title="JSON数据乱码问题" itemprop="url">JSON数据乱码问题</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-05T06:17:00.000Z" itemprop="datePublished"> 发表于 2015-10-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>文章转自<a href="http://ifeve.com/json-code-problem/" target="_blank" rel="external">JSON数据乱码问题</a></p>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>程序员一提到编码应该都不陌生，像gbk、utf-8、ascii等这些编码更是经常在用，但时不时也会出个乱码问题，解决这个问题的方法大部分都是先google和baidu一下，最后可能在某个犄角旮旯里找到一点信息，然后就机械的按部就班的模仿下来,结果问题可能真就迎刃而解了,然后就草草了事,下回遇到相似的问题,可能又是重复上面的过程。很少有人有耐心去花精力弄明白这写问题的根本原因，以及解决这些问题的原理是什么。这篇文章就是通过一个实际案例,试着去讲清楚什么是编码,乱码又是怎么产生的,以及如何解决。该案例是从lua_cjson.c这个库开始的,对这个库不熟悉也没关系,也不需要熟悉它,我们只是借用它来说明乱码问题,只需要跟着文章的思路走就可以。</p>
-<p>前段时间同事在作一个新项目的时候用到了lua_cjson.c这个库(以下简称cjson)，将json串转换成LUA本地的数据结构,但是在使用的过程中出现了中文乱码问题，奇怪的是只有那么几个字是乱码，这其中就包括”朶”字，其他字一切正常。经了解json串用的是GBK编码，那问题就来了，为什么用gbk编码会出现这个问题，原因是什么？又应该怎么解决这个问题？</p>
-<p>要解释清楚这个问题，首先我们来看看json串都有哪些要求。</p>
-<h2 id="JSON规范"><a href="#JSON规范" class="headerlink" title="JSON规范"></a>JSON规范</h2><hr>
-<p>json全称JavaScript Object Notion是结构化数据序列化的一个文本，可以描述四种基本类型(strings,numbers,booleans and null)和两种结构类型(objects and arrays)。</p>
-<p>RFC4627中有这样一段话</p>
-<p>A string is a sequence of zero or more Unicode characters.<br>字符串有零个或多个unicode字符序列组成.</p>
-<p>在这里稍微解释下什么是unicode字符。我们都知道ascii字符有字母、数字等,但是他收录的字只有一百多个。比如汉字就不是ascii字符，但是unicode收录了汉字,所以汉字可以是unicode字符。这里要说明的是unicode字符其实就是一些符号。</p>
-<p>现在另一个问题出来了，在json文本中应该怎么表示这些字符。<br>在规范的Encoding片段是这样说的</p>
-<p>JSON text SHALL be encoded in Unicode. The default encoding is UTF-8。<br>JSON文本SHALL把unicode字符编码。默认使用utf-8编码。</p>
-<p>我们看到在这里用到了SHALL[RFC2119]这个关键字，也就是说字符必须被编码后才能作为JSON串使用。而且默认使用utf-8编码。<br>如何判断使用的是那种unicode编码呢?</p>
-<p>Since the first two characters of a JSON text will always be ASCII characters[RFC0020],<br>it is possible to determine whether an octet stream is UTF-8、UTF-16(BE or LE), or<br>UTF-32(BE or LE)by looking at the pattern of nulls in the first four octets.</p>
-<p>由于json文本的前两个字符(注意这里说的是字符,不是字节)一定是ASCII字符,因此可以从一个字节<br>流的前四个字节(注意是字节)中判断出该字节流是UTF-8、UTF-16(BE or LE)、or UTF-32(BE or LE)编码。</p>
-<p>00 00 00 xx UTF-32BE  (u32编码大端)<br>xx 00 00 00 UTF-32LE  (u32编码小端)<br>00 xx 00 xx UTF-16BE  (u16编码大端)<br>xx 00 xx 00 UTF-16LE  (u16编码小端)<br>xx xx xx xx UTF-8   (utf-8编码)<br>ps:<br>u32用32位的4字节整数表示一个字符；</p>
-<p>u16用16位的2字节整数表示一个字符,如果2字节表示不了,就用连续两个16位的2字节整<br>数表示，所以就会出现u16编码中有4个字节表示一个字符的情况，和u32的四字节不一<br>样的是,该字符在u16中的前两个字节和后两个字节之间不会有字序的问题。</p>
-<p>utf-8用多个8位的1字节序列来表示一个字符,所以没有字序的问题.</p>
-<p>截止到现在我们没有看到任何关于可以使用GBK编码的信息,难道json文本就不能用gbk编码吗,如果真的不能用的话，那为什么cjson不是把所有的gbk编码解释称乱码,而是只有某几个字是乱码.<br>在规范中对json解析器有这样一段描述:</p>
-<p>A JSON parser transforms a JSON text into another representation.<br>A JSON parser MUST accept all texts that conform to the JSON grammar.<br>A JSON parser MAY accept non-JSON forms or extensions.</p>
-<p>json解析器可以将一个json文本转换成其他表示方式。<br>json解析器MUST接受所有符合json语法的文本.<br>json解析器MAY接受非json形式或扩展的文本.</p>
-<p>乱码的原因<br>从规范对对解析器的描述可以看到,规范并没有要求解析器必须对文本的编码方式做校验,而且解析器也可以有选择的去接受非json形式的文本。</p>
-<p>现在我们再来看看cjson解析器是如何做的，在cjson开头的注释中说了这么一句话:</p>
-<p>Invalid UTF-8 characters are not detected and will be passed untouched。<br>If required, UTF-8 error checking should be done outside this library。<br>发现无效的UTF-8编码会直接放过,如果有必要对UTF-8编码的检查应该在该库的之外。</p>
-<p>说的很清楚,对非utf8编码直接放过，不做任何检查,所以用gbk编码不符合规范,但又可以被解析的答案就出来了。那”朶”等这些字的乱码问题又是怎么回事? 我们现在看看cjson对规范中的另外两个编码utf16、utf32是如何做的，然后再说乱码问题.</p>
-<p>在cjson解析方法的开始处是这么做的:</p>
-<p>/<em> Detect Unicode other than UTF-8(see RFC 4627, Sec 3)
-</em></p>
-<ul>
-<li>CJSON can support any simple data type, hence only the first</li>
-<li>character is guaranteed to be ASCII (at worst:’”‘). This is</li>
-<li>still enough to detect whether the wrong encoding is in use.<br>*/<br>if (json_len &gt;=2 &amp;&amp; (!json.data[0] || !json.data[1]))<br>luaL_error(1,”JSON parser does not support UTF-16 or UTF-32”);</li>
-</ul>
-<p>前面我们说过一个json串的前两个字符一定是ascii字符,也就是说一个json串至少也的有两个字节.所以这段代码首先判断json串的长度是不是大于等2,然后根据串的前两个字节的值,是否有零来判断该文本是否是非utf-8编码。结果已经看到了，人家不支持规范上说的u16和u32编码.</p>
-<p>现在我们就来看看”朶”这个子是如何变成乱码的，经过对cjson源码的分析得知,cjson在处理字节流的时候当遇见’\’反斜杠时会猜测后一个字节应该是要被转义的字符,比如\b、\r之类的字符,如果是就放行,如果不是,cjson就认为这不是一个正确的json格式,就会把这个字节给干掉,所以本来用两个字节表示的汉子就硬生生的给掰弯了。<br>那”朶”字跟’\’反斜杠又有什么关系? 查询这两字符在编码中的表示得出:<br>“朶” 0x965C<br>“\” 0x5C<br>这样我们就看到”朶”字的低位字节和”\”字符相同,都是0x5C,如果这时候”朶”字后边不是b、r之类的可以被转移ascii字符,cjson就会把这个字节和紧跟其后的一个字节抹掉,所以乱码就产生了。</p>
-<p>那我们应该怎么解决这个问题,让cjson可以顺利的支持gbk编码呢,首先我们看看gbk编码是怎么回事,为什么会出现低位字节和ascii冲突的问题.</p>
-<h2 id="GB-编码系列"><a href="#GB-编码系列" class="headerlink" title="GB_编码系列"></a>GB_编码系列</h2><hr>
-<p>先来了解一下GB系列的编码范围问题:<br>GB2312(1980)共收录7445个字符，6763个汉字和682个其他字符。<br>每个汉字及符号用两个字节表示,为了跟ascii兼容,处理程序使用EUC存储方法。<br>汉字的编码范围<br>高字节: 0xB0 – 0xF7,<br>低字节: 0xA1 – 0xFE,<br>占用72*94=6768,0xD7FA – 0xD7FE未使用。</p>
-<p>GBK共收录21886个字符,采用一字节和双字节编码。<br>单字节表示范围<br>8位: 0x0 – 0x7F<br>双字节表示范围<br>高字节: 0x81 – 0xFE<br>低字节: 0x40 – 0x7E、0x80 – 0xFE</p>
-<p>GB18030收录70244个汉字,采用1、2、4字节编码。<br>单字节范围<br>8位: 0x0 – 0x7F<br>双字节范围<br>高字节: 0x81 – 0xFE<br>低字节: 0x40 – 0xFE<br>四字节范围<br>第一字节:0x81 – 0xFE<br>第二字节:0x30 – 0x39<br>第三字节:0x81 – 0xFE<br>第四字节:0x30 – 0x39</p>
-<p>由于GB类的编码都是向下兼容的，这里就有一个问题，因为GB2312的两个字节的高位都是1,符合这个条件的码位只有128*128=16384个。GBK和GB18030都大于这个数,所以为了兼容,我们从上面的编码范围看到,这两个编码都用到了低位字节的最高位可以为0的情况。</p>
-<p>最终得出的结论就是,在GBK编码中只要该字符是两个字节表示,并且低位字节是0x5C的字符都会被cjson弄成乱码.</p>
-<p>解决方案:<br>1) 不要使用gbk编码,将你的字符串转换成utf-8编码.<br>2) 对cjson源码稍微做个改动,就是在每个字节到来之前先判断该字节是否大于127,如果大于则将该字节个随后的一个字节放过,否则交给cjson去处理。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/other/">other</a>
-</div>
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">标签云</p>
+    <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -891,7 +915,7 @@ proxy_set_header X-Forwarded-For $remote_addr;
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
 		  
 		
 		  
@@ -1052,7 +1076,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

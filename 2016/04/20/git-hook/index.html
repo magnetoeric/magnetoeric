@@ -1,0 +1,516 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>git hook | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="hook使用了很久git了，但是hook用的很少，今天研究一下git的hook放在GIT_DIR/.git/hooks目录下12345678910111213➜  hooks git:(master) ls -al总用量 48drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..-r">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git hook">
+<meta property="og:url" content="http://magnetoeric.github.io/2016/04/20/git-hook/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="hook使用了很久git了，但是hook用的很少，今天研究一下git的hook放在GIT_DIR/.git/hooks目录下12345678910111213➜  hooks git:(master) ls -al总用量 48drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..-r">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git hook">
+<meta name="twitter:description" content="hook使用了很久git了，但是hook用的很少，今天研究一下git的hook放在GIT_DIR/.git/hooks目录下12345678910111213➜  hooks git:(master) ls -al总用量 48drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..-r">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/20/git-hook/" title="git hook" itemprop="url">git hook</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-20T08:13:00.000Z" itemprop="datePublished"> 发表于 2016-04-20</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#hook"><span class="toc-number">1.</span> <span class="toc-text">hook</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#客户端钩子"><span class="toc-number">2.</span> <span class="toc-text">客户端钩子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#commit-msg"><span class="toc-number">2.1.</span> <span class="toc-text">commit-msg</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pre-commit"><span class="toc-number">2.2.</span> <span class="toc-text">pre-commit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#prepare-commit-msg"><span class="toc-number">2.3.</span> <span class="toc-text">prepare-commit-msg</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#服务器钩子"><span class="toc-number">3.</span> <span class="toc-text">服务器钩子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pre-receive"><span class="toc-number">3.1.</span> <span class="toc-text">pre-receive</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update"><span class="toc-number">3.2.</span> <span class="toc-text">update</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#post-receive"><span class="toc-number">3.3.</span> <span class="toc-text">post-receive</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用gitlab的webhook"><span class="toc-number">4.</span> <span class="toc-text">使用gitlab的webhook</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="hook"><a href="#hook" class="headerlink" title="hook"></a>hook</h2><p>使用了很久git了，但是hook用的很少，今天研究一下<br>git的hook放在GIT_DIR/.git/hooks目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  hooks git:(master) ls -al</div><div class="line">总用量 48</div><div class="line">drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .</div><div class="line">drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..</div><div class="line">-rwxrwxr-x 1 eric eric  452  4月 20 16:18 applypatch-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  896  4月 20 16:18 commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  189  4月 20 16:18 post-update.sample</div><div class="line">-rwxrwxr-x 1 eric eric  398  4月 20 16:18 pre-applypatch.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1642  4月 20 16:18 pre-commit.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1239  4月 20 16:18 prepare-commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1352  4月 20 16:18 pre-push.sample</div><div class="line">-rwxrwxr-x 1 eric eric 4898  4月 20 16:18 pre-rebase.sample</div><div class="line">-rwxrwxr-x 1 eric eric 3611  4月 20 16:18 update.sample</div></pre></td></tr></table></figure></p>
+<p>可以看到该目录下有很多以sample结尾的文件<br>这里尝试几个简单的吧</p>
+<h2 id="客户端钩子"><a href="#客户端钩子" class="headerlink" title="客户端钩子"></a>客户端钩子</h2><h3 id="commit-msg"><a href="#commit-msg" class="headerlink" title="commit-msg"></a>commit-msg</h3><p>将commit-msg.sample 重命名commit-msg<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">mv commit-msg.sample commit-msg</div><div class="line">➜  hooks git:(master) cat commit-msg </div><div class="line">#!/bin/sh</div><div class="line">#</div><div class="line"># An example hook script to check the commit log message.</div><div class="line"># Called by &quot;git commit&quot; with one argument, the name of the file</div><div class="line"># that has the commit message.  The hook should exit with non-zero</div><div class="line"># status after issuing an appropriate message if it wants to stop the</div><div class="line"># commit.  The hook is allowed to edit the commit message file.</div><div class="line">#</div><div class="line"># To enable this hook, rename this file to &quot;commit-msg&quot;.</div><div class="line"></div><div class="line"># Uncomment the below to add a Signed-off-by line to the message.</div><div class="line"># Doing this in a hook is a bad idea in general, but the prepare-commit-msg</div><div class="line"># hook is more suited to it.</div><div class="line">#</div><div class="line"># SOB=$(git var GIT_AUTHOR_IDENT | sed -n &apos;s/^\(.*&gt;\).*$/Signed-off-by: \1/p&apos;)</div><div class="line"># grep -qs &quot;^$SOB&quot; &quot;$1&quot; || echo &quot;$SOB&quot; &gt;&gt; &quot;$1&quot;</div><div class="line"></div><div class="line"># This example catches duplicate Signed-off-by lines.</div><div class="line"></div><div class="line">test &quot;&quot; = &quot;$(grep &apos;^Signed-off-by: &apos; &quot;$1&quot; |</div><div class="line">	 sort | uniq -c | sed -e &apos;/^[ 	]*1[ 	]/d&apos;)&quot; || &#123;</div><div class="line">	echo &gt;&amp;2 Duplicate Signed-off-by lines.</div><div class="line">	exit 1</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看介绍，应该是在git commit 命令时检查log message的脚本，有一个参数，存放commit message的文件名<br>在最后加上判断log message低于3个时不得提交的脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">words=$(cat $1 |wc -w)</div><div class="line">if test $words -lt 3</div><div class="line"> then  echo &quot;commit message should larger than 3 words&quot;</div><div class="line">       exit 1</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p>然后添加一个文件,提交。无法提交，原因是message单词数没有超过3个，过于简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  git-hooks git:(master) ✗ echo 1111&gt;aaa</div><div class="line">➜  git-hooks git:(master) ✗ git add .</div><div class="line">➜  git-hooks git:(master) ✗ git commit -m &apos;add aaa&apos;</div><div class="line">commit message should larger than 3 words</div></pre></td></tr></table></figure></p>
+<h3 id="pre-commit"><a href="#pre-commit" class="headerlink" title="pre-commit"></a>pre-commit</h3><p>git commit 触发  先于commit-msg，不接收参数</p>
+<h3 id="prepare-commit-msg"><a href="#prepare-commit-msg" class="headerlink" title="prepare-commit-msg"></a>prepare-commit-msg</h3><p>效果与pre-commit类似，先于pre-commit执行</p>
+<h2 id="服务器钩子"><a href="#服务器钩子" class="headerlink" title="服务器钩子"></a>服务器钩子</h2><h3 id="pre-receive"><a href="#pre-receive" class="headerlink" title="pre-receive"></a>pre-receive</h3><p>在客户端推送时最先执行，可以用它来拒绝客户端的推送。<br>我能想到的，可以做语法检查，拼写等等</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>与 pre-receive 类似，但会在每个分支都执行一次。</p>
+<h3 id="post-receive"><a href="#post-receive" class="headerlink" title="post-receive"></a>post-receive</h3><p>在客户端推送完成后执行</p>
+<h2 id="使用gitlab的webhook"><a href="#使用gitlab的webhook" class="headerlink" title="使用gitlab的webhook"></a>使用gitlab的webhook</h2><p>现在很多版本控制都是使用git，gitlab来管理git项目仓库，其提供了方便的web管理，用户访问及权限，是搭建私人git仓库的推荐选择。<br>具体安装可以参考官方的wiki，因为gitlab比较吃内存，，所以我不想把它安装到机器上，所以就用docker来操作吧。<br>创建一个名为gitlab的容器，并将其80端口映射到苏主机的8088端口<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -itd -p 8088:80 --name gitlab gitlab/gitlab-ce</div></pre></td></tr></table></figure></p>
+<p>等待一段时间，就可以访问本机的8088端口，进入到gitlab的web管理界面了，初次使用要设置root的密码，然后就可以登录了，默认管理员帐号是root，密码是初次进入时设置的。<br>登录后点击 new project创建一个git项目,就叫做testHook把<br>接下来再启动一个docker 容器来作为git的客户端<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -it --link=gitlab ubuntu:14.04 /bin/bash</div></pre></td></tr></table></figure></p>
+<p>启动后安装git<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~# apt-get update &amp;&amp; apt-get install git</div></pre></td></tr></table></figure></p>
+<p>生成sshkey<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen</div></pre></td></tr></table></figure></p>
+<p>一直回车就可以了，在~/.ssh/下就生成了2个文件，私钥和公钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
+<p>把公钥设置到gitlab里，搜索框里搜索sshkey，把公钥复制到key中，title可以随意设置，gitlab也会自动生成<br>接下来把git项目clone到客户端中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~#git clone git@b9a4402e85aa:root/testhook.git</div></pre></td></tr></table></figure></p>
+<p>home目录下就会有一个空的git项目testHook，</p>
+<p>接下来设置webhook,可以为每个项目设置webhook，比如我创建的这个git项目，在<a href="http://localhost:8088/root/testhook/hooks" target="_blank" rel="external">http://localhost:8088/root/testhook/hooks</a> 中设置<br>这里我只添加push event，这个钩子作用应该类似post-receive，url是钩子触发时，需要向“谁”报告,这里我只在本机上启动了一个swoole-server,url请求swoole来看看gitlab钩子触发时具体发了些什么信息<br>swoole的代码就直接粘贴到这里了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">// Server</div><div class="line">class Server</div><div class="line">&#123;</div><div class="line">    private $serv;</div><div class="line"></div><div class="line">    public function __construct() &#123;</div><div class="line">        $this-&gt;serv = new swoole_server(&quot;0.0.0.0&quot;, 9501);</div><div class="line">        $this-&gt;serv-&gt;set(array(</div><div class="line">            &apos;worker_num&apos; =&gt; 8,</div><div class="line">            &apos;daemonize&apos; =&gt; false,</div><div class="line">            &apos;max_request&apos; =&gt; 10000,</div><div class="line">            &apos;dispatch_mode&apos; =&gt; 2,</div><div class="line">            &apos;debug_mode&apos;=&gt; 1</div><div class="line">        ));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;on(&apos;Start&apos;, array($this, &apos;onStart&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Connect&apos;, array($this, &apos;onConnect&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Receive&apos;, array($this, &apos;onReceive&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Close&apos;, array($this, &apos;onClose&apos;));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onStart( $serv ) &#123;</div><div class="line">        echo &quot;Start\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onConnect( $serv, $fd, $from_id ) &#123;</div><div class="line">        $serv-&gt;send( $fd, &quot;Hello &#123;$fd&#125;!,this is swoole server &quot; );</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onReceive( swoole_server $serv, $fd, $from_id, $data ) &#123;</div><div class="line">        echo &quot;Get Message From Client &#123;$fd&#125;:&#123;$data&#125;\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onClose( $serv, $fd, $from_id ) &#123;</div><div class="line">        echo &quot;Client &#123;$fd&#125; close connection\n&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">// 启动服务器</div><div class="line">$server = new Server();</div></pre></td></tr></table></figure></p>
+<p>启动swooleserver</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php swoole-server.php</div></pre></td></tr></table></figure>
+<p>然后来操作下客户端，需要设置git的user.name 和user.email不然不能commit<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# echo 1&gt;test</div><div class="line">root@ed6dd236d56b:~/testhook# git add test</div><div class="line">root@ed6dd236d56b:~/testhook# git commit -m &apos;add test&apos;</div><div class="line">[master 7923a94] add test</div><div class="line">1 file changed, 1 insertion(+)</div><div class="line">create mode 100644 test</div></pre></td></tr></table></figure></p>
+<p>接下来push，让gitlab产生一个触发<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# git push origin master</div><div class="line">Counting objects: 4, done.</div><div class="line">Delta compression using up to 4 threads.</div><div class="line">Compressing objects: 100% (2/2), done.</div><div class="line">Writing objects: 100% (3/3), 256 bytes | 0 bytes/s, done.</div><div class="line">Total 3 (delta 0), reused 0 (delta 0)</div><div class="line">To git@b9a4402e85aa:root/testhook.git</div><div class="line">79a7567..7923a94  master -&gt; master</div></pre></td></tr></table></figure></p>
+<p>可以看到swoole产生的日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  php swoole-server.php</div><div class="line">Start</div><div class="line">Get Message From Client 1:POST /swoole/swoole-client.php HTTP/1.1</div><div class="line">Content-Type: application/json</div><div class="line">X-Gitlab-Event: Push Hook</div><div class="line">Connection: close</div><div class="line">Host: 10.207.26.234:9501</div><div class="line">Content-Length: 1532</div><div class="line"></div><div class="line"></div><div class="line">Get Message From Client 1:&#123;&quot;object_kind&quot;:&quot;push&quot;,&quot;before&quot;:&quot;79a7567c469738a689d38510f9cfc6b5132eda02&quot;,&quot;after&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;ref&quot;:&quot;refs/heads/master&quot;,&quot;checkout_sha&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:null,&quot;user_id&quot;:1,&quot;user_name&quot;:&quot;Administrator&quot;,&quot;user_email&quot;:&quot;admin@example.com&quot;,&quot;user_avatar&quot;:&quot;http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon&quot;,&quot;project_id&quot;:1,&quot;project&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;description&quot;:&quot;&quot;,&quot;web_url&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;avatar_url&quot;:null,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;namespace&quot;:&quot;root&quot;,&quot;visibility_level&quot;:20,&quot;path_with_namespace&quot;:&quot;root/testhook&quot;,&quot;default_branch&quot;:&quot;master&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;&#125;,&quot;commits&quot;:[&#123;&quot;id&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:&quot;add test\n&quot;,&quot;timestamp&quot;:&quot;2016-05-12T03:36:03+00:00&quot;,&quot;url&quot;:&quot;http://b9a4402e85aa/root/testhook/commit/7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;author&quot;:&#123;&quot;name&quot;:&quot;ericwang&quot;,&quot;email&quot;:&quot;ericwang@leju.com&quot;&#125;,&quot;added&quot;:[&quot;test&quot;],&quot;modified&quot;:[],&quot;removed&quot;:[]&#125;],&quot;total_commits_count&quot;:1,&quot;repository&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;description&quot;:&quot;&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;visibility_level&quot;:20&#125;&#125;</div></pre></td></tr></table></figure></p>
+<p>关于webhook具体的细节，在gitlab搜索框中搜索webhook也可以查阅</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>   [1] <a href="https://www.kernel.org/pub/software/scm/git/docs/githooks.html" target="_blank" rel="external">https://www.kernel.org/pub/software/scm/git/docs/githooks.html</a><br>   [2] <a href="https://www.atlassian.com/git/tutorials/git-hooks/local-hooks" target="_blank" rel="external">https://www.atlassian.com/git/tutorials/git-hooks/local-hooks</a><br>   [3] <a href="http://www.ituring.com.cn/article/206985" target="_blank" rel="external">http://www.ituring.com.cn/article/206985</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/git/">git</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/git/">git</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2016/04/20/git-hook/" data-title="git hook | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/04/20/rabbitmq-搭建/" title="rabbitmq 环境搭建">
+  <strong>上一篇：</strong><br/>
+  <span>
+  rabbitmq 环境搭建</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/04/21/other_03/"  title="无题">
+ <strong>下一篇：</strong><br/> 
+ <span>无题
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#hook"><span class="toc-number">1.</span> <span class="toc-text">hook</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#客户端钩子"><span class="toc-number">2.</span> <span class="toc-text">客户端钩子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#commit-msg"><span class="toc-number">2.1.</span> <span class="toc-text">commit-msg</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pre-commit"><span class="toc-number">2.2.</span> <span class="toc-text">pre-commit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#prepare-commit-msg"><span class="toc-number">2.3.</span> <span class="toc-text">prepare-commit-msg</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#服务器钩子"><span class="toc-number">3.</span> <span class="toc-text">服务器钩子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pre-receive"><span class="toc-number">3.1.</span> <span class="toc-text">pre-receive</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#update"><span class="toc-number">3.2.</span> <span class="toc-text">update</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#post-receive"><span class="toc-number">3.3.</span> <span class="toc-text">post-receive</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用gitlab的webhook"><span class="toc-number">4.</span> <span class="toc-text">使用gitlab的webhook</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

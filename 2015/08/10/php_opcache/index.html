@@ -1,0 +1,508 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>read-phps-opcode | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="Vulcan Logic Disassembler本文翻译自http://rancoud.com/read-phps-opcode/VLD(Vulcan Logic Disassembler)是一个向你解释zend引擎如何将你的脚本转化成opcode的扩展.扩展下载地址我将解释如何安装，使用并阅读opcode 首先，你要安装PEARaptitude install php-pear然后就可以添加v">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="read-phps-opcode">
+<meta property="og:url" content="http://magnetoeric.github.io/2015/08/10/php_opcache/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="Vulcan Logic Disassembler本文翻译自http://rancoud.com/read-phps-opcode/VLD(Vulcan Logic Disassembler)是一个向你解释zend引擎如何将你的脚本转化成opcode的扩展.扩展下载地址我将解释如何安装，使用并阅读opcode 首先，你要安装PEARaptitude install php-pear然后就可以添加v">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="read-phps-opcode">
+<meta name="twitter:description" content="Vulcan Logic Disassembler本文翻译自http://rancoud.com/read-phps-opcode/VLD(Vulcan Logic Disassembler)是一个向你解释zend引擎如何将你的脚本转化成opcode的扩展.扩展下载地址我将解释如何安装，使用并阅读opcode 首先，你要安装PEARaptitude install php-pear然后就可以添加v">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/10/php_opcache/" title="read-phps-opcode" itemprop="url">read-phps-opcode</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T09:32:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Vulcan-Logic-Disassembler"><span class="toc-number">1.</span> <span class="toc-text">Vulcan Logic Disassembler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何使用"><span class="toc-number">2.</span> <span class="toc-text">如何使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何阅读"><span class="toc-number">3.</span> <span class="toc-text">如何阅读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他方式"><span class="toc-number">4.</span> <span class="toc-text">其他方式</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="Vulcan-Logic-Disassembler"><a href="#Vulcan-Logic-Disassembler" class="headerlink" title="Vulcan Logic Disassembler"></a>Vulcan Logic Disassembler</h2><p>本文翻译自<a href="http://rancoud.com/read-phps-opcode/" target="_blank" rel="external">http://rancoud.com/read-phps-opcode/</a><br>VLD(Vulcan Logic Disassembler)是一个向你解释zend引擎如何将你的脚本转化成opcode的扩展.<br><a href="http://pecl.php.net/package/vld" target="_blank" rel="external">扩展下载地址</a><br>我将解释如何安装，使用并阅读opcode</p>
+<p>首先，你要安装PEAR<br><code>aptitude install php-pear</code><br>然后就可以添加vld<br><code>pecl install &quot;channel://pecl.php.net/vld-0.12.0&quot;</code><br>编辑php.ini文件使扩展生效<br>注意，这个文件是cli模式的,跟php.ini不同<br><code>nano /etc/php5/cli/php.ini</code><br>将下面这行加到静态扩展区域<br><code>extension=vld.so</code></p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php -dvld.dump_paths=1 -dvld.verbosity=0 -dvld.save_paths=1 -dvld.active=1 yourscript.php</div></pre></td></tr></table></figure>
+<p>以下列出参数列表及默认值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"># Activate extension: boolean </div><div class="line">vld.active	 0</div><div class="line"># The caracter used for writing columns: carater</div><div class="line">vld.col_sep	 &quot;\t&quot;</div><div class="line"># Dumps branch and paths: boolean</div><div class="line">vld.dump_paths	 1</div><div class="line"># Execute code in the same time: boolean</div><div class="line">vld.execute	 1</div><div class="line"># Format output analyze: boolean</div><div class="line">vld.format	 0</div><div class="line"># Where to save the file for graphviz .dot file: string</div><div class="line">vld.save_dir	    /tmp</div><div class="line"># dump path information has a graphviz .dot file: boolean</div><div class="line">vld.save_paths	 0</div><div class="line"># suppresses output and loading of auto_append_file respectively if vld.active=1 and vld.execute=0: boolean</div><div class="line">vld.skip_append	 0</div><div class="line"># suppresses output and loading of auto_prepend_file respectively if vld.active=1 and vld.execute=0: boolean</div><div class="line">vld.skip_prepend 0</div><div class="line"># Verbosities&apos; level (0:none, 1, 2, 3): integer</div><div class="line">vld.verbosity	 1</div></pre></td></tr></table></figure>
+<p>现在我门可以看这个网站的结果<br>(<a href="http://blog.pascal-martin.fr/post/php-obtenir-dump-opcodes" target="_blank" rel="external">http://blog.pascal-martin.fr/post/php-obtenir-dump-opcodes</a>)<br>php代码  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">for ($i=0 ; $i&gt;10 ; $i++) &#123; </div><div class="line">    if ($i % 2 === 0) &#123;</div><div class="line">        echo &quot;Pair : &quot;;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        echo &quot;Impair : &quot;;</div><div class="line">    &#125;</div><div class="line">    echo $i, &quot;\n&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>VLD 输出  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">$ ~/bin/php-5.3/bin/php -dextension=vld.so -dvld.active=1 -dvld.verbosity=0 -dvld.execute=0 exemples/003-control.php </div><div class="line">filename:       /.../exemples/003-control.php</div><div class="line">function name:  (null)</div><div class="line">number of ops:  16</div><div class="line">compiled vars:  !0 = $i</div><div class="line">line     # *  op                           fetch          ext  return  operands</div><div class="line">---------------------------------------------------------------------------------</div><div class="line">   2     0  &gt;   ASSIGN                                                   !0, 0</div><div class="line">         1  &gt;   IS_SMALLER                                       ~1      !0, 10</div><div class="line">         2    &gt; JMPZNZ                                        6          ~1, -&gt;15</div><div class="line">         3  &gt;   POST_INC                                         ~2      !0</div><div class="line">         4      FREE                                                     ~2</div><div class="line">         5    &gt; JMP                                                      -&gt;1</div><div class="line">   3     6  &gt;   MOD                                              ~3      !0, 2</div><div class="line">         7      IS_IDENTICAL                                     ~4      ~3, 0</div><div class="line">         8    &gt; JMPZ                                                     ~4, -&gt;11</div><div class="line">   4     9  &gt;   ECHO                                                     &apos;Pair+%3A+&apos;</div><div class="line">   5    10    &gt; JMP                                                      -&gt;12</div><div class="line">   7    11  &gt;   ECHO                                                     &apos;Impair+%3A+&apos;</div><div class="line">   9    12  &gt;   ECHO                                                     !0</div><div class="line">        13      ECHO                                                     &apos;%0A&apos;</div><div class="line">  10    14    &gt; JMP                                                      -&gt;3</div><div class="line">  11    15  &gt; &gt; RETURN                                                   1</div><div class="line"> </div><div class="line">branch: #  0; line:     2-    2; sop:     0; eop:     0; out1:   1</div><div class="line">branch: #  1; line:     2-    2; sop:     1; eop:     2; out1:  15; out2:   6</div><div class="line">branch: #  3; line:     2-    2; sop:     3; eop:     5; out1:   1</div><div class="line">branch: #  6; line:     3-    3; sop:     6; eop:     8; out1:   9; out2:  11</div><div class="line">branch: #  9; line:     4-    5; sop:     9; eop:    10; out1:  12</div><div class="line">branch: # 11; line:     7-    9; sop:    11; eop:    11; out1:  12</div><div class="line">branch: # 12; line:     9-   10; sop:    12; eop:    14; out1:   3</div><div class="line">branch: # 15; line:    11-   11; sop:    15; eop:    15</div><div class="line">path #1: 0, 1, 15, </div><div class="line">path #2: 0, 1, 6, 9, 12, 3, 1, 15, </div><div class="line">path #3: 0, 1, 6, 11, 12, 3, 1, 15,</div></pre></td></tr></table></figure>
+<h2 id="如何阅读"><a href="#如何阅读" class="headerlink" title="如何阅读"></a>如何阅读</h2><p>在表格上面有两行   </p>
+<ul>
+<li>操作执行的数量:有多少opcode操作将会被执行，这里是16  </li>
+<li>编译的变量:php变量和它的opcode version，这里$i被表示成!0</li>
+</ul>
+<h2 id="其他方式"><a href="#其他方式" class="headerlink" title="其他方式"></a>其他方式</h2><p>只翻译了部分，其他的不翻译了，因为我喜欢编译安装，所以vld也是编译安装<br>根据<a href="http://pecl.php.net/package/vld" target="_blank" rel="external">下载地址</a>中的version，安装适合自己php的vld版本<br>可以使用<code>php -v</code>查看自己php的版本号<br>下载好后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$tar zxvf vld-0.12.0.tgz #解压</div><div class="line">$cd vld-0.12.0/</div><div class="line">$/usr/local/php/bin/phpize  #根据自己的phpize实际位置使用</div><div class="line">$./configure --with-php-config=/usr/local/php/bin/php-config --enable-vld</div><div class="line">$sudo make </div><div class="line">$sudo make install</div></pre></td></tr></table></figure>
+<p>这样就安装完成了，然后在php.ini中添加<br><code>extension=vld.so</code><br>一般编译安装的php.ini 放在php目录下的lib目录中<br>可以使用<code>php -i |grep vld</code>查看是否安装成功</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2015/08/10/php_opcache/" data-title="read-phps-opcode | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/08/10/php_03/" title="按照权重随机">
+  <strong>上一篇：</strong><br/>
+  <span>
+  按照权重随机</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/08/10/php_01/"  title="生成N个不重复的随机数">
+ <strong>下一篇：</strong><br/> 
+ <span>生成N个不重复的随机数
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Vulcan-Logic-Disassembler"><span class="toc-number">1.</span> <span class="toc-text">Vulcan Logic Disassembler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何使用"><span class="toc-number">2.</span> <span class="toc-text">如何使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何阅读"><span class="toc-number">3.</span> <span class="toc-text">如何阅读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他方式"><span class="toc-number">4.</span> <span class="toc-text">其他方式</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

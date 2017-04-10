@@ -1,0 +1,1483 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+<meta property="og:type" content="website">
+<meta property="og:title" content="艾瑞克">
+<meta property="og:url" content="http://magnetoeric.github.io/page/2/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="艾瑞克">
+<meta name="twitter:description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/18/shell/" title="shell 编程之语法基础" itemprop="url">shell 编程之语法基础</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-18T01:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://liwei.life/2016/05/16/69/" target="_blank" rel="external">SHELL编程之语法基础</a></p>
+<p>微博ID：<strong>orroz</strong></p>
+<p>微信公众号：<strong>Linux系统技术</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在此需要特别注明一下，本文叫做shell编程其实并不准确，更准确的说法是bash编程。考虑到bash的流行程度，姑且将bash编程硬说成shell编程也应没什么不可，但是请大家一定要清楚，shell编程绝不仅仅只是bash编程。</p>
+<p>通过本文可以帮你解决以下问题：</p>
+<ul>
+<li>if后面的中括号[]是语法必须的么？</li>
+<li>为什么bash编程中有时[]里面要加空格，有时不用加？如if [ -e /etc/passwd ]或ls [abc].sh。</li>
+<li>为什么有人写的脚本这样写：if [ x$test = x”string” ]？</li>
+<li>如何用*号作为通配符对目录树递归匹配？</li>
+<li>为什么在for循环中引用ls命令的输出是可能有问题的？就是说：for i in $(ls /)这样用有问题？</li>
+</ul>
+<p>除了以上知识点以外，本文还试图帮助大家用一个全新的角度对bash编程的知识进行体系化。介绍shell编程传统的做法一般是要先说明什么是shell？什么是bash？这是种脚本语言，那么什么是脚本语言？不过这些内容真的太无聊了，我们快速掠过，此处省略3万字……作为一个实践性非常强的内容，我们直接开始讲语法。所以，这并不是一个入门内容，我们的要求是在看本文之前，大家至少要学会Linux的基本操作，并知道bash的一些基础知识。</p>
+<h2 id="if分支结构"><a href="#if分支结构" class="headerlink" title="if分支结构"></a>if分支结构</h2><p>组成一个语言的必要两种语法结构之一就是分支结构，另一种是循环结构。作为一个编程语言，bash也给我们提供了分支结构，其中最常用的就是if。用来进行程序的分支逻辑判断。其原型声明为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">if list; then list; elif list; then list; ... else list; fi</div></pre></td></tr></table></figure>
+<p>bash在解析字符的时候，对待“;”跟看见回车是一样的行为，所以这个语法也可以写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">if list</div><div class="line">then</div><div class="line">    list</div><div class="line">elif list</div><div class="line">then</div><div class="line">    list</div><div class="line">...</div><div class="line">else</div><div class="line">    list</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>对于这个语法结构，需要重点说明的是list。对于绝大多数其他语言，if关键字后面一般跟的是一个表达式，比如C语言或类似语言的语法，if后面都是跟一个括号将表达式括起来，如：if (a &gt; 0)。这种认识会对学习bash编程造成一些误会，很多初学者都认为bash编程的if语法结构是：if [ ];then…，但实际上这里的中括号[]并不是C语言中小括号()语法结构的类似的关键字。这里的中括号其实就是个shell命令，是test命令的另一种写法。严谨的叙述，if后面跟的就应该是个list。那么什么是bash中的list呢？根据bash的定义，list就是若干个使用管道，；，&amp;，&amp;&amp;，||这些符号串联起来的shell命令序列，结尾可以；，&amp;或换行结束。这个定义可能比较复杂，如果暂时不能理解，大家直接可以认为，if后面跟的就是个shell命令。换个角度说，bash编程仍然贯彻了C程序的设计哲学，即：一切皆表达式。</p>
+<p>一切皆表达式这个设计原则，确定了shell在执行任何东西（注意是任何东西，不仅是命令）的时候都会有一个返回值，因为根据表达式的定义，任何表达式都必须有一个值。在bash编程中，这个返回值也限定了取值范围：0-255。跟C语言含义相反，bash中0为真（true），非0为假（false）。这就意味着，任何给bash之行的东西，都会反回一个值，在bash中，我们可以使用关键字$?来查看上一个执行命令的返回值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ ls /tmp/</div><div class="line">plugtmp  systemd-private-bfcfdcf97a4142e58da7d823b7015a1f-colord.service-312yQe  systemd-private-bfcfdcf97a4142e58da7d823b7015a1f-systemd-timesyncd.service-zWuWs0  tracker-extract-files.1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">0</div><div class="line">[zorro@zorrozou-pc0 ~]$ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">2</div></pre></td></tr></table></figure>
+<p>可以看到，ls /tmp命令执行的返回值为0，即为真，说明命令执行成功，而ls /123时文件不存在，反回值为2，命令执行失败。我们再来看个更极端的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ abcdef</div><div class="line">bash: abcdef: command not found</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">127</div></pre></td></tr></table></figure>
+<p>我们让bash执行一个根本不存在的命令abcdef。反回值为127，依然为假，命令执行失败。复杂一点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ ls /123|wc -l</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">0</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
+<p>这是一个list的执行，其实就是两个命令简单的用管道串起来。我们发现，这时shell会将整个list看作一个执行体，所以整个list就是一个表达式，那么最后只返回一个值0，这个值是整个list中最后一个命令的返回值，第一个命令执行失败并不影响后面的wc统计行数，所以逻辑上这个list执行成功，返回值为真。</p>
+<p>理解清楚这一层意思，我们才能真正理解bash的语法结构中if后面到底可以判断什么？事实是，判断什么都可以，因为bash无非就是把if后面的无论什么当成命令去执行，并判断其起返回值是真还是假？如果是真则进入一个分支，为假则进入另一个。基于这个认识，我们可以来思考以下这个程序两种写法的区别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">DIR=&quot;/etc&quot;</div><div class="line">＃第一种写法</div><div class="line">ls -l $DIR &amp;&gt; /dev/null</div><div class="line">ret=$?</div><div class="line"></div><div class="line">if [ $ret -eq 0 ]</div><div class="line">then</div><div class="line">        echo &quot;$DIR is exist!&quot; </div><div class="line">else</div><div class="line">        echo &quot;$DIR is not exist!&quot;</div><div class="line">fi</div><div class="line"></div><div class="line">#第二种写法</div><div class="line">if ls -l $DIR &amp;&gt; /dev/null</div><div class="line">then</div><div class="line">        echo &quot;$DIR is exist!&quot; </div><div class="line">else</div><div class="line">        echo &quot;$DIR is not exist!&quot;</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>我曾经在无数的脚本中看到这里的第一种写法，先执行某个命令，然后记录其返回值，再使用[]进行分支判断。我想，这样写的人应该都是没有真正理解if语法的语义，导致做出了很多脱了裤子再放屁的事情。当然，if语法中后面最常用的命令就是[]。请注意我的描述中就是说[]是一个命令，而不是别的。实际上这也是bash编程新手容易犯错的地方之一，尤其是有其他编程经验的人，在一开始接触bash编程的时候都是将[]当成if语句的语法结构，于是经常在写[]的时候里面不写空格，即：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#正确的写法</div><div class="line">if [ $ret -eq 0 ]</div><div class="line">＃错误的写法</div><div class="line">if [$ret -eq 0]</div></pre></td></tr></table></figure>
+<p>同样的，当我们理解清楚了[]本质上是一个shell命令的时候，大家就知道这个错误是为什么了：命令加参数要用空格分隔。我们可以用type命令去检查一个命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ type [</div><div class="line">[ is a shell builtin</div></pre></td></tr></table></figure>
+<p>所以，实际上[]是一个内建命令，等同于test命令。所以上面的if语句也可以写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">if test $ret -eq 0</div></pre></td></tr></table></figure>
+<p>这样看，形式上就跟第二种写法类似了。至于if分支怎么使用的其它例子就不再这废话了。重要的再强调一遍：if后面是一个命令(严格来说是list)，并且记住一个原则：一切皆表达式。</p>
+<h2 id="“当”、“直到”循环结构"><a href="#“当”、“直到”循环结构" class="headerlink" title="“当”、“直到”循环结构"></a>“当”、“直到”循环结构</h2><p>一般角度的讲解都会在讲完if分支结构之后讲其它分支结构，但是从执行特性和快速上手的角度来看，我认为先把跟if特性类似的while和until交代清楚更加合理。从字面上可以理解，while就是“当”型循环，指的是当条件成立时执行循环。，而until是直到型循环，其实跟while并没有实质上的区别，只是条件取非，逻辑变成循环到条件成立，或者说条件不成立时执行循环体。他们的语法结构是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">while list-1; do list-2; done</div><div class="line">until list-1; do list-2; done</div></pre></td></tr></table></figure>
+<p>同样，分号可以理解为回车，于是常见写法是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">while list-1</div><div class="line">do</div><div class="line">    list-2</div><div class="line">done</div><div class="line"></div><div class="line">until list-1</div><div class="line">do</div><div class="line">    list-2</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>还是跟if语句一样，我们应该明白对与while和until的条件的含义，仍然是list。其判断条件是list，其执行结构也是list。理解了上面if的讲解，我想这里应该不用复述了。我们用while和unitl来产生一个0-99的数字序列：<br>while版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">count=0</div><div class="line"></div><div class="line">while [ $count -le 100 ]</div><div class="line">do</div><div class="line">    echo $count</div><div class="line">    count=$[$count+1]</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>until版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">count=0</div><div class="line"></div><div class="line">until ! [ $count -le 100 ]</div><div class="line">do</div><div class="line">    echo $count</div><div class="line">    count=$[$count+1]</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>我们通过这两个程序可以再次对比一下while和until到底有什么不一样？其实它们从形式上完全一样。这里另外说明两个知识点：</p>
+<ul>
+<li><p>在bash中，叹号（!）代表对命令(表达式)的返回值取反。就是说如果一个命令或list或其它什么东西如果返回值为真，<br>加了叹号之后就是假，如果是假，加了叹号就是真。</p>
+</li>
+<li><p>在bash中，使用$[]可以得到一个算数运算的值。可以支持常用的5则运算（+-*/%）。<br>用法就是$[3+7]类似这样，而且要注意，这里的$[]里面没有空格分隔，因为它并不是个shell命令，而是特殊字符。</p>
+</li>
+</ul>
+<p>常见运算例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213+456]</div><div class="line">669</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213+456+789]</div><div class="line">1458</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213*456]</div><div class="line">97128</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213/456]</div><div class="line">0</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[9/3]</div><div class="line">3</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[9/2]</div><div class="line">4</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[9%2]</div><div class="line">1</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[144%7]</div><div class="line">4</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[7-10]</div><div class="line">-3</div></pre></td></tr></table></figure>
+<p>注意这个运算只支持整数，并且对与小数只娶其整数部分（没有四舍五入，小数全舍）。这个计算方法是bash提供的基础计算方法，如果想要实现更高级的计算可以使用let命令。如果想要实现浮点数运算，我一般使用awk来处理。</p>
+<p>上面的例子中仍然使用[]命令（test）来作为检查条件，我们再试一个别的。假设我们想写一个脚本检查一台服务器是否能ping通？如果能ping通，则每隔一秒再看一次，如果发现ping不通了，就报警。如果什么时候恢复了，就再报告恢复。就是说这个脚本会一直检查服务器状态，ping失败则触发报警，ping恢复则通告恢复。脚本内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">IPADDR=&apos;10.0.0.1&apos;</div><div class="line">INTERVAL=1</div><div class="line"></div><div class="line">while true</div><div class="line">do</div><div class="line">    while ping -c 1 $IPADDR &amp;&gt; /dev/null</div><div class="line">    do</div><div class="line">        sleep $INTERVAL</div><div class="line">    done</div><div class="line"></div><div class="line">    echo &quot;$IPADDR ping error! &quot; 1&gt;&amp;2</div><div class="line"></div><div class="line">    until ping -c 1 $IPADDR &amp;&gt; /dev/null</div><div class="line">    do</div><div class="line">        sleep $INTERVAL</div><div class="line">    done</div><div class="line"></div><div class="line">    echo &quot;$IPADDR ping ok!&quot;</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>这里关于输出重定向的知识我就先不讲解了，后续会有别的文章专门针对这个主题做出说明。以上就是if分支结构和while、until循环结构。掌握了这两种结构之后，我们就可以写出几乎所有功能的bash脚本程序了。这两种语法结构的共同特点是，使用list作为“判断条件”，这种“风味”的语法特点是“一切皆表达式”。bash为了使用方便，还给我们提供了另外一些“风味”的语法。下面我们继续看：</p>
+<h2 id="case分支结构和for循环结构"><a href="#case分支结构和for循环结构" class="headerlink" title="case分支结构和for循环结构"></a>case分支结构和for循环结构</h2><p>我们之所以把case分支和for循环放在一起讨论，主要是因为它们所判断的不再是“表达式”是否为真，而是去匹配字符串。我们还是通过其语法和例子来理解一下。case分支的语法结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">case word in [ [(] pattern [ | pattern ] ... ) list ;; ] ... esac</div></pre></td></tr></table></figure>
+<p>与if语句是以fi标记结束思路相仿，case语句是以esac标记结束。其常见的换行版本是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">case $1 in</div><div class="line">        pattern)</div><div class="line">        list</div><div class="line">        ;;</div><div class="line">        pattern)</div><div class="line">        list</div><div class="line">        ;;</div><div class="line">        pattern)</div><div class="line">        list</div><div class="line">        ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>举几个几个简单的例子，并且它们实际上是一样的：</p>
+<p>例1:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1 in</div><div class="line">    (zorro)</div><div class="line">    echo &quot;hello zorro!&quot;</div><div class="line">    ;;</div><div class="line">    (jerry)</div><div class="line">    echo &quot;hello jerry!&quot;</div><div class="line">    ;;</div><div class="line">    (*)</div><div class="line">    echo &quot;get out!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>例2:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1 in</div><div class="line">    zorro)</div><div class="line">    echo &quot;hello zorro!&quot;</div><div class="line">    ;;</div><div class="line">    jerry)</div><div class="line">    echo &quot;hello jerry!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;get out!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>例3:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1 in</div><div class="line">    zorro|jerry)</div><div class="line">    echo &quot;hello $1!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;get out!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>这些程序的执行结果都是一样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./case.sh zorro</div><div class="line">hello zorro!</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./case.sh jerry</div><div class="line">hello jerry!</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./case.sh xxxxxx</div><div class="line">get out!</div></pre></td></tr></table></figure>
+<p>这些程序应该不难理解，无非就是几个语法的不一样之处，大家自己可以看到哪些可以省略，哪些不能省略。这里需要介绍一下的有两个概念：</p>
+<ul>
+<li>$1在脚本中表示传递给脚本命令的第一个参数。关于这个变量以及其相关系列变量的使用，我们会在后续其它文章中介绍。</li>
+<li>pattern就是bash中“通配符”的概念。常用的bash通配符包括星号(*)、问号(?)和其它一些字符。相信如果对bash有一定了解的话，对这些符号并不陌生，我们在此简单说明一下。</li>
+</ul>
+<p>最常见的通配符有三个：</p>
+<p>? 表示任意一个字符。这个没什么可说的。</p>
+<ul>
+<li>表示任意长度任意字符，包括空字符。在bash4.0以上版本中，如果bash环境开启了globstar设置，那么两个连续的**可以用来递归匹配某目录下所有的文件名。我们通过一个实验测试一下：</li>
+</ul>
+<p>一个目录的结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ tree test/</div><div class="line">test/</div><div class="line">├── 1</div><div class="line">├── 2</div><div class="line">├── 3</div><div class="line">├── 4</div><div class="line">├── a</div><div class="line">│   ├── 1</div><div class="line">│   ├── 2</div><div class="line">│   ├── 3</div><div class="line">│   └── 4</div><div class="line">├── a.conf</div><div class="line">├── b</div><div class="line">│   ├── 1</div><div class="line">│   ├── 2</div><div class="line">│   ├── 3</div><div class="line">│   └── 4</div><div class="line">├── b.conf</div><div class="line">├── c</div><div class="line">│   ├── 5</div><div class="line">│   ├── 6</div><div class="line">│   ├── 7</div><div class="line">│   └── 8</div><div class="line">└── d</div><div class="line">    ├── 1.conf</div><div class="line">    └── 2.conf</div><div class="line"></div><div class="line">4 directories, 20 files</div></pre></td></tr></table></figure>
+<p>使用通配符进行文件名匹配：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/*</div><div class="line">test/1 test/2 test/3 test/4 test/a test/a.conf test/b test/b.conf test/c test/d</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/*.conf</div><div class="line">test/a.conf test/b.conf</div></pre></td></tr></table></figure>
+<p>这个结果大家应该都熟悉。我们再来看看下面：<br>查看当前globstar状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ shopt globstar</div><div class="line">globstar        off</div></pre></td></tr></table></figure>
+<p>打开globstar：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ shopt -s globstar</div><div class="line">[zorro@zorrozou-pc0 bash]$ shopt globstar</div><div class="line">globstar        on</div></pre></td></tr></table></figure>
+<p>使用**匹配：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**</div><div class="line">test/ test/1 test/2 test/3 test/4 test/a test/a/1 test/a/2 test/a/3 test/a/4 test/a.conf test/b test/b/1 test/b/2 test/b/3 test/b/4 test/b.conf test/c test/c/5 test/c/6 test/c/7 test/c/8 test/d test/d/1.conf test/d/2.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**/*.conf</div><div class="line">test/a.conf test/b.conf test/d/1.conf test/d/2.conf</div></pre></td></tr></table></figure>
+<p>关闭globstart并再次测试**：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ shopt -u globstar</div><div class="line">[zorro@zorrozou-pc0 bash]$ shopt  globstar</div><div class="line">globstar        off</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**/*.conf</div><div class="line">test/d/1.conf test/d/2.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ </div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**</div><div class="line">test/1 test/2 test/3 test/4 test/a test/a.conf test/b test/b.conf test/c test/d</div></pre></td></tr></table></figure>
+<p>[…] 表示这个范围中的任意一个字符。比如[abcd]，表示a或b或c或d。当然这也可以写成[a-d]。[a-z]表示任意一个小些字母。还是刚才的test目录，我们再来试试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls test/[123]</div><div class="line">test/1  test/2  test/3</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls test/[abc]</div><div class="line">test/a:</div><div class="line">1  2  3  4</div><div class="line"></div><div class="line">test/b:</div><div class="line">1  2  3  4</div><div class="line"></div><div class="line">test/c:</div><div class="line">5  6  7  8</div></pre></td></tr></table></figure>
+<p>以上就是简单的三个通配符的说明。当然，关于通配符以及shopt命令还有很多相关知识。我们还是会在后续的文章中单独把相关知识点拿出来讲，再这里大家先理解这几个。另外需要强调一点，千万不要把bash的通配符和正则表达式搞混了，它们完全没有关系！</p>
+<p>简要理解了pattern的概念之后，我们就可以更加灵活的使用case了，它不仅仅可以匹配一个固定的字符串，还可以利用pattern做到一定程度的模糊匹配。但是无论怎样，case都是去比较字符串是否一样，这跟使用if语句有本质的不同，if是判断表达式。当然，我们在if中使用test命令同样可以做到case的效果，区别仅仅是程序代码多少的区别。还是举个例子说明一下，我们想写一个身份验证程序，大家都知道，一个身份验证程序要判断用户名及其密码是否都匹配某一个字符串，如果两个都匹配，就通过验证，如果有一个不匹配就不能通过验证。分别用if和case来实现这两个验证程序内容如下：</p>
+<p>if版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">if [ $1 = &quot;zorro&quot; ] &amp;&amp; [ $2 = &quot;zorro&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">elif [ $1$2 = &quot;jerryjerry&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">else</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>case版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1$2 in</div><div class="line">    zorrozorro|jerryjerry)</div><div class="line">    echo &quot;ok!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>两个程序一对比，直观看起来case版的要少些代码，表达力也更强一些。但是，这两个程序都有bug，如果case版程序给的两个参数是zorro zorro可以报ok。如果是zorroz orro是不是也可以报ok？如果只给一个参数zorrozorro，另一个参数为空，是不是也可以报ok？同样，if版的jerry判断也有类似问题。当你的程序要跟用户或其它程序交互的时候，一定要谨慎仔细的检查输入，一般写程序很大工作量都在做各种异常检查上，尤其是需要跟人交互的时候。我们看似用一个合并字符串变量的技巧，将两个判断给合并成了一个，但是这个技巧却使程序编写出了错误。对于这个现象，我的意见是，如果不是必要，请不要在编程中玩什么“技巧”，重剑无锋，大巧不工。当然，这个bug可以通过如下方式解决：</p>
+<p>if版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">if [ $1 = &quot;zorro&quot; ] &amp;&amp; [ $2 = &quot;zorro&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">elif [ $1:$2 = &quot;jerry:jerry&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">else</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>case版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1x$2 in</div><div class="line">    zorro:zorro|jerry:jerry)</div><div class="line">    echo &quot;ok!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>我加的是个:字符，当然，也可以加其他字符，原则是这个字符不要再输入中能出现。我们在其他人写的程序里也经常能看到类似这样的判断处理：</p>
+<p>if [ x$1 = x”zorro” ] &amp;&amp; [ x$2 = x”zorro” ]</p>
+<p>相信你也能明白为什么要这么处理了。仅对某一个判断来说这似乎没什么必要，但是如果你养成了这样的习惯，那么就能让你避免很多可能出问题的环节。这就是编程经验和编程习惯的重要性。当然，很多人只有“经验”，却也不知道这个经验是怎么来的，那也并不可取。</p>
+<h2 id="for循环结构"><a href="#for循环结构" class="headerlink" title="for循环结构"></a>for循环结构</h2><p>bash提供了两种for循环，一种是类似C语言的for循环，另一种是让某变量在一系列字符串中做循环。在此，我们先说后者。其语法结构是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">for name [ [ in [ word ... ] ] ; ] do list ; done</div></pre></td></tr></table></figure>
+<p>其中name一般是一个变量名，后面的word …是我们要让这个变量分别赋值的字符串列表。这个循环将分别将name变量每次赋值一个word，并执行循环体，直到所有word被遍历之后退出循环。这是一个非常有用的循环结构，其使用频率可能远高于while、until循环。我们来看看例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in 1 2 3 4 5;do echo $i;done</div><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td></tr></table></figure>
+<p>再看另外一个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in aaa bbb ccc ddd eee;do echo $i;done</div><div class="line">aaa</div><div class="line">bbb</div><div class="line">ccc</div><div class="line">ddd</div><div class="line">eee</div></pre></td></tr></table></figure>
+<p>再看一个：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in /etc/* ;do echo $i;done</div><div class="line">/etc/adjtime</div><div class="line">/etc/adobe</div><div class="line">/etc/appstream.conf</div><div class="line">/etc/arch-release</div><div class="line">/etc/asound.conf</div><div class="line">/etc/avahi</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>这种例子举不胜举，可以用for遍历的东西真的很多，大家可以自己发挥想象力。这里要提醒大家注意的是当你学会了“或$()这个符号之后，for的范围就更大了。于是很多然喜欢这样搞：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in `ls`;do echo $i;done</div><div class="line">auth_case.sh</div><div class="line">auth_if.sh</div><div class="line">case.sh</div><div class="line">if_1.sh</div><div class="line">ping.sh</div><div class="line">test</div><div class="line">until.sh</div><div class="line">while.sh</div></pre></td></tr></table></figure>
+<p>乍看起来这好像跟使用*没啥区别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in *;do echo $i;done</div><div class="line">auth_case.sh</div><div class="line">auth_if.sh</div><div class="line">case.sh</div><div class="line">if_1.sh</div><div class="line">ping.sh</div><div class="line">test</div><div class="line">until.sh</div><div class="line">while.sh</div></pre></td></tr></table></figure>
+<p>但可惜的是并不总是这样，请对比如下两个测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in `ls /etc`;do echo $i;done</div><div class="line">adjtime</div><div class="line">adobe</div><div class="line">appstream.conf</div><div class="line">arch-release</div><div class="line">asound.conf</div><div class="line">avahi</div><div class="line">bash.bash_logout</div><div class="line">bash.bashrc</div><div class="line">bind.keys</div><div class="line">binfmt.d</div><div class="line">......</div><div class="line"></div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ for i in /etc/*;do echo $i;done</div><div class="line">/etc/adjtime</div><div class="line">/etc/adobe</div><div class="line">/etc/appstream.conf</div><div class="line">/etc/arch-release</div><div class="line">/etc/asound.conf</div><div class="line">/etc/avahi</div><div class="line">/etc/bash.bash_logout</div><div class="line">/etc/bash.bashrc</div><div class="line">/etc/bind.keys</div><div class="line">/etc/binfmt.d</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>看到差别了么？</p>
+<p>其实这里还会隐含很多其它问题，像ls这样的命令很多时候是设计给人用的，它的很多显示是有特殊设定的，可能并不是纯文本。比如可能包含一些格式化字符，也可能包含可以让终端显示出颜色的标记字符等等。当我们在程序里面使用类似这样的命令的时候要格外小心，说不定什么时候在什么不同环境配置的系统上，你的程序就会有意想不到的异常出现，到时候排查起来非常麻烦。所以这里我们应该尽量避免使用ls这样的命令来做类似的行为，用通配符可能更好。当然，如果你要操作的是多层目录文件的话，那么ls就更不能帮你的忙了，它遇到目录之后显示成这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/*</div><div class="line">/etc/adobe:</div><div class="line">mms.cfg</div><div class="line"></div><div class="line">/etc/avahi:</div><div class="line">avahi-autoipd.action  avahi-daemon.conf  avahi-dnsconfd.action  hosts  services</div><div class="line"></div><div class="line">/etc/binfmt.d:</div><div class="line"></div><div class="line">/etc/bluetooth:</div><div class="line">main.conf</div><div class="line"></div><div class="line">/etc/ca-certificates:</div><div class="line">extracted  trust-source</div></pre></td></tr></table></figure>
+<p>所以遍历一个目录还是要用刚才说到的**，如果不是bash 4.0之后的版本的话，可以使用find。我推荐用find，因为它更通用。有时候你会发现，使用find之后，绝大多数原来需要写脚本解决的问题可能都用不着了，一个find命令解决很多问题。</p>
+<h2 id="select和第二种for循环"><a href="#select和第二种for循环" class="headerlink" title="select和第二种for循环"></a>select和第二种for循环</h2><p>我之所以把这两种语法放到一起讲，主要是这两种语法结构在bash编程中使用的几率可能较小。这里的第二种for循环是相对于上面讲的第一种for循环来说的。实际上这种for循环就是C语言中for循环的翻版，其语义基本一致，区别是括号()变成了双括号(())，循环标记开始和结束也是bash风味的do和done，其语法结构为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">for (( expr1 ; expr2 ; expr3 )) ; do list ; done</div></pre></td></tr></table></figure>
+<p>看一个产生0-99数字的循环例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">for ((count=0;count&lt;100;count++))</div><div class="line">do</div><div class="line">    echo $count</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>我们可以理解为，bash为了对数学运算作为条件的循环方便我们使用，专门扩展了一个for循环来给我们使用。跟C语言一样，这个循环本质上也只是一个while循环，只是把变量初始化，变量比较和循环体中的变量操作给放到了同一个(())语句中。这里不再废话。</p>
+<p>最后是select循环，实际上select提供给了我们一个构建交互式菜单程序的方式，如果没有select的话，我们在shell中写交互的菜单程序是比较麻烦的。它的语法结构是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select name [ in word ] ; do list ; done</div></pre></td></tr></table></figure>
+<p>还是来看看例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">select i in a b c d</div><div class="line">do</div><div class="line">    echo $i</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>这个程序执行的效果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./select.sh </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#?</div></pre></td></tr></table></figure>
+<p>你会发现select给你构造了一个交互菜单，索引为1，2，3，4。对应的名字就是程序中的a，b，c，d。之后我们就可以在后面输入相应的数字索引，选择要echo的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./select.sh </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#? 1</div><div class="line">a</div><div class="line">#? 2</div><div class="line">b</div><div class="line">#? 3</div><div class="line">c</div><div class="line">#? 4</div><div class="line">d</div><div class="line">#? 6</div><div class="line"></div><div class="line">#? </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#? </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#?</div></pre></td></tr></table></figure>
+<p>如果输入的不是菜单描述的范围就会echo一个空行，如果直接输入回车，就会再显示一遍菜单本身。当然我们会发现这样一个菜单程序似乎没有什么意义，实际程序中，select大多数情况是跟case配合使用的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">select i in a b c d</div><div class="line">do</div><div class="line">    case $i in</div><div class="line">        a)</div><div class="line">        echo &quot;Your choice is a&quot;</div><div class="line">        ;;</div><div class="line">        b)</div><div class="line">        echo &quot;Your choice is b&quot;</div><div class="line">        ;;</div><div class="line">        c)</div><div class="line">        echo &quot;Your choice is c&quot;</div><div class="line">        ;;</div><div class="line">        d)</div><div class="line">        echo &quot;Your choice is d&quot;</div><div class="line">        ;;</div><div class="line">        *)</div><div class="line">        echo &quot;Wrong choice! exit!&quot;</div><div class="line">        exit</div><div class="line">        ;;</div><div class="line">    esac</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>执行结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./select.sh </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#? 1</div><div class="line">Your choice is a</div><div class="line">#? 2</div><div class="line">Your choice is b</div><div class="line">#? 3</div><div class="line">Your choice is c</div><div class="line">#? 4</div><div class="line">Your choice is d</div><div class="line">#? 5</div><div class="line">Wrong choice! exit!</div></pre></td></tr></table></figure>
+<p>这就是select的常见用法。</p>
+<h2 id="continue和break"><a href="#continue和break" class="headerlink" title="continue和break"></a>continue和break</h2><p>对于bash的实现来说，continue和break实际上并不是语法的关键字，而是被作为内建命令来实现的。不过我们从习惯上依然把它们看作是bash的语法。在bash中，break和continue可以用来跳出和金星下一次for，while，until和select循环。<br>最后</p>
+<p>我们在本文中介绍了bash编程的常用语法结构：if、while、until、case、两种for和select。我们在详细分析它们语法的特点的过程中，也简单说明了使用时需要注意的问题。希望这些知识和经验对大家以后在bash编程上有帮助。</p>
+<p>通过bash编程语法的入门，我们也能发现，bash编程是一个上手容易，但是精通困难的编程语言。任何人想要写个简单的脚本，掌握几个语法结构和几个shell命令基本就可以干活了，但是想写出高质量的代码确没那么容易。通过语法的入门，我们可以管中窥豹的发现，讲述的过程中有无数个可以深入探讨的细节知识点，比如通配符、正则表达式、bash的特殊字符、bash的特殊属性和很多shell命令的使用。我们的后续文章会给大家分块整理这些知识点，如果你有兴趣，请持续关注。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/11/php-glob/" title="php glob" itemprop="url">php glob</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-11T06:13:00.000Z" itemprop="datePublished"> 发表于 2016-05-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="php查找符合某些规则的文件"><a href="#php查找符合某些规则的文件" class="headerlink" title="php查找符合某些规则的文件"></a>php查找符合某些规则的文件</h2><p>通常实现查找目录下某些规则的文件，用shell实现起来很容易，但是php呢,个人想到的是遍历目录下所有文件并再用正则筛选.<br>然而php有现成的函数已经为我们做好了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">说明</div><div class="line">array glob ( string $pattern [, int $flags = 0 ] )</div><div class="line"></div><div class="line">glob() 函数依照 libc glob() 函数使用的规则寻找所有与 pattern 匹配的文件路径，类似于一般 shells 所用的规则一样。不进行缩写扩展或参数替代。</div><div class="line">参数</div><div class="line"></div><div class="line">pattern</div><div class="line"></div><div class="line">    The pattern. No tilde expansion or parameter substitution is done.</div><div class="line">flags</div><div class="line"></div><div class="line">    有效标记有：</div><div class="line"></div><div class="line">        GLOB_MARK - 在每个返回的项目中加一个斜线</div><div class="line">        GLOB_NOSORT - 按照文件在目录中出现的原始顺序返回（不排序）</div><div class="line">        GLOB_NOCHECK - 如果没有文件匹配则返回用于搜索的模式</div><div class="line">        GLOB_NOESCAPE - 反斜线不转义元字符</div><div class="line">        GLOB_BRACE - 扩充 &#123;a,b,c&#125; 来匹配 &apos;a&apos;，&apos;b&apos; 或 &apos;c&apos;</div><div class="line">        GLOB_ONLYDIR - 仅返回与模式匹配的目录项</div><div class="line">        GLOB_ERR - 停止并读取错误信息（比如说不可读的目录），默认的情况下忽略所有错误</div><div class="line"></div><div class="line">返回值</div><div class="line"></div><div class="line">返回一个包含有匹配文件／目录的数组。如果出错返回 FALSE。</div><div class="line"></div><div class="line">    Note:</div><div class="line"></div><div class="line">    On some systems it is impossible to distinguish between empty match and an error.</div></pre></td></tr></table></figure>
+<p>比如查找某目录下的txt文件并显示其大小<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">&lt;?php</div><div class="line">foreach (glob(&quot;*.txt&quot;) as $filename) &#123;</div><div class="line">    echo &quot;$filename size &quot; . filesize($filename) . &quot;\n&quot;;</div><div class="line">&#125;</div><div class="line">?&gt;</div></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/09/php-curl-file-get-contents比较/" title="php curl file_get_contents比较" itemprop="url">php curl file_get_contents比较</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-09T12:32:00.000Z" itemprop="datePublished"> 发表于 2016-05-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>最近发布系统出现了一些速度问题，而且时好时坏，网络非常不稳定，查了一下，发现代码里出现很多file_get_contents函数</p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>写两个简单的例子吧<br>curl </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$i= 0;</div><div class="line">do&#123;</div><div class="line">    $t1 = microtime();</div><div class="line">    $url = &quot;http://www.anjuke.com&quot;;</div><div class="line">    file_get_contents($url);</div><div class="line">    $t2 = microtime();</div><div class="line">    echo (($t2-$t1)&lt;0?($t2-$t1)+1:($t2-$t1)).PHP_EOL;</div><div class="line">&#125;while($i++&lt;2);</div></pre></td></tr></table></figure>
+<p>file_get_contents</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$i= 0;</div><div class="line">do&#123;</div><div class="line">    $t1 = microtime();</div><div class="line">    $url = &quot;http://www.anjuke.com&quot;;</div><div class="line">    file_get_contents($url);</div><div class="line">    $t2 = microtime();</div><div class="line">    echo (($t2-$t1)&lt;0?($t2-$t1)+1:($t2-$t1)).PHP_EOL;</div><div class="line">&#125;while($i++&lt;20);</div></pre></td></tr></table></figure>
+<p>测试了一下，速度相差一个数量级,为何相差如此悬殊，查了些资料，原来file_get_contents会刷新dns缓存。<br>使用strace 追踪,发现其会读取/etc/hosts 和/etc/resolv.conf 文件,找到dns server,而curl不会。</p>
+<p>此外，curl相对自由一些，file_get_contents不支持post请求等等</p>
+<p>相关参考 :</p>
+<p><a href="http://www.nowamagic.net/academy/detail/12220248" target="_blank" rel="external">fsockopen/curl/file_get_contents效率比较</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/04/mysql/" title="MySQL索引背后的数据结构及算法原理" itemprop="url">MySQL索引背后的数据结构及算法原理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-04T02:48:37.000Z" itemprop="datePublished"> 发表于 2016-05-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://blog.codinglabs.org/articles/theory-of-mysql-index.html" target="_blank" rel="external">MySQL索引背后的数据结构及算法原理</a><br>一些代码和图片没有原文做的好，如果原文没有失效的话请选择访问原文链接</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>本文以MySQL数据库为研究对象，讨论与数据库索引相关的一些话题。特别需要说明的是，MySQL支持诸多存储引擎，而各种存储引擎对索引的支持也各不相同，因此MySQL数据库支持多种索引类型，如BTree索引，哈希索引，全文索引等等。为了避免混乱，本文将只关注于BTree索引，因为这是平常使用MySQL时主要打交道的索引，至于哈希索引和全文索引本文暂不讨论。</p>
+<p>文章主要内容分为三个部分。</p>
+<p>第一部分主要从数据结构及算法理论层面讨论MySQL数据库索引的数理基础。</p>
+<p>第二部分结合MySQL数据库中MyISAM和InnoDB数据存储引擎中索引的架构实现讨论聚集索引、非聚集索引及覆盖索引等话题。</p>
+<p>第三部分根据上面的理论基础，讨论MySQL中高性能使用索引的策略。</p>
+<h1 id="数据结构及算法基础"><a href="#数据结构及算法基础" class="headerlink" title="数据结构及算法基础"></a>数据结构及算法基础</h1><h2 id="索引的本质"><a href="#索引的本质" class="headerlink" title="索引的本质"></a>索引的本质</h2><p>MySQL官方对索引的定义为：索引（Index）是帮助MySQL高效获取数据的数据结构。提取句子主干，就可以得到索引的本质：索引是数据结构。</p>
+<p>我们知道，数据库查询是数据库的最主要功能之一。我们都希望查询数据的速度能尽可能的快，因此数据库系统的设计者会从查询算法的角度进行优化。最基本的查询算法当然是顺序查找（linear search），这种复杂度为O(n)的算法在数据量很大时显然是糟糕的，好在计算机科学的发展提供了很多更优秀的查找算法，例如二分查找（binary search）、二叉树查找（binary tree search）等。如果稍微分析一下会发现，每种查找算法都只能应用于特定的数据结构之上，例如二分查找要求被检索数据有序，而二叉树查找只能应用于二叉查找树上，但是数据本身的组织结构不可能完全满足各种数据结构（例如，理论上不可能同时将两列都按顺序进行组织），所以，在数据之外，数据库系统还维护着满足特定查找算法的数据结构，这些数据结构以某种方式引用（指向）数据，这样就可以在这些数据结构上实现高级查找算法。这种数据结构，就是索引。<br>看一个例子：<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/1.png" alt="图一"><br>图1展示了一种可能的索引方式。左边是数据表，一共有两列七条记录，最左边的是数据记录的物理地址（注意逻辑上相邻的记录在磁盘上也并不是一定物理相邻的）。为了加快Col2的查找，可以维护一个右边所示的二叉查找树，每个节点分别包含索引键值和一个指向对应数据记录物理地址的指针，这样就可以运用二叉查找在O(log2n)<br>Olog2n<br>的复杂度内获取到相应数据。</p>
+<p>虽然这是一个货真价实的索引，但是实际的数据库系统几乎没有使用二叉查找树或其进化品种红黑树（red-black tree）实现的，原因会在下文介绍。</p>
+<h2 id="B-Tree和B-Tree"><a href="#B-Tree和B-Tree" class="headerlink" title="B-Tree和B+Tree"></a>B-Tree和B+Tree</h2><p>目前大部分数据库系统及文件系统都采用B-Tree或其变种B+Tree作为索引结构，在本文的下一节会结合存储器原理及计算机存取原理讨论为什么B-Tree和B+Tree在被如此广泛用于索引，这一节先单纯从数据结构角度描述它们。</p>
+<h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B-Tree"></a>B-Tree</h3><p>为了描述B-Tree，首先定义一条数据记录为一个二元组[key, data]，key为记录的键值，对于不同数据记录，key是互不相同的；data为数据记录除key外的数据。那么B-Tree是满足下列条件的数据结构：</p>
+<ul>
+<li><p>d为大于1的一个正整数，称为B-Tree的度。</p>
+</li>
+<li><p>h为一个正整数，称为B-Tree的高度。</p>
+</li>
+<li><p>每个非叶子节点由n-1个key和n个指针组成，其中d&lt;=n&lt;=2d。</p>
+</li>
+<li><p>每个叶子节点最少包含一个key和两个指针，最多包含2d-1个key和2d个指针，叶节点的指针均为null 。</p>
+</li>
+<li><p>所有叶节点具有相同的深度，等于树高h。</p>
+</li>
+<li><p>key和指针互相间隔，节点两端是指针。</p>
+</li>
+<li><p>一个节点中的key从左到右非递减排列。</p>
+</li>
+<li><p>所有节点组成树结构。</p>
+</li>
+<li><p>每个指针要么为null，要么指向另外一个节点。</p>
+</li>
+<li><p>如果某个指针在节点node最左边且不为null，则其指向节点的所有key小于v(key1)，其中v(key1)为node的第一个key的值。</p>
+</li>
+<li><p>如果某个指针在节点node最右边且不为null，则其指向节点的所有key大于v(keym)，其中v(keym)为node的最后一个key的值。</p>
+</li>
+<li><p>如果某个指针在节点node的左右相邻key分别是keyi和keyi+1且不为null，则其指向节点的所有key小于v(keyi+1)且大于v(keyi)</p>
+</li>
+</ul>
+<p>图2是一个d=2的B-Tree示意图。<br><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/2.png" alt="图2"></p>
+<p>由于B-Tree的特性，在B-Tree中按key检索数据的算法非常直观：首先从根节点进行二分查找，如果找到则返回对应节点的data，否则对相应区间的指针指向的节点递归进行查找，直到找到节点或找到null指针，前者查找成功，后者查找失败。B-Tree上查找算法的伪代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">BTree_Search(node, key) &#123;</div><div class="line">    if(node == null) return null;</div><div class="line">    foreach(node.key)</div><div class="line">    &#123;</div><div class="line">        if(node.key[i] == key) return node.data[i];</div><div class="line">            if(node.key[i] &gt; key) return BTree_Search(point[i]-&gt;node);</div><div class="line">    &#125;</div><div class="line">    return BTree_Search(point[i+1]-&gt;node);</div><div class="line">&#125;</div><div class="line">data = BTree_Search(root, my_key);</div></pre></td></tr></table></figure></p>
+<p>关于B-Tree有一系列有趣的性质，例如一个度为d的B-Tree，设其索引N个key，则其树高h的上限为logd((N+1)/2)，检索一个key，其查找节点个数的渐进复杂度为O(logdN)。从这点可以看出，B-Tree是一个非常有效率的索引数据结构。<br>另外，由于插入删除新的数据记录会破坏B-Tree的性质，因此在插入删除时，需要对树进行一个分裂、合并、转移等操作以保持B-Tree性质，本文不打算完整讨论B-Tree这些内容，因为已经有许多资料详细说明了B-Tree的数学性质及插入删除算法，有兴趣的朋友可以在本文末的参考文献一栏找到相应的资料进行阅读。</p>
+<h2 id="B-Tree-1"><a href="#B-Tree-1" class="headerlink" title="B+Tree"></a>B+Tree</h2><p>B-Tree有许多变种，其中最常见的是B+Tree，例如MySQL就普遍使用B+Tree实现其索引结构。</p>
+<p>与B-Tree相比，B+Tree有以下不同点：</p>
+<p>每个节点的指针上限为2d而不是2d+1。</p>
+<p>内节点不存储data，只存储key；叶子节点不存储指针。</p>
+<p>图3是一个简单的B+Tree示意。</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/3.png" alt="图三"></p>
+<p>由于并不是所有节点都具有相同的域，因此B+Tree中叶节点和内节点一般大小不同。这点与B-Tree不同，虽然B-Tree中不同节点存放的key和指针可能数量不一致，但是每个节点的域和上限是一致的，所以在实现中B-Tree往往对每个节点申请同等大小的空间。</p>
+<p>一般来说，B+Tree比B-Tree更适合实现外存储索引结构，具体原因与外存储器原理及计算机存取原理有关，将在下面讨论。</p>
+<h2 id="带有顺序访问指针的B-Tree"><a href="#带有顺序访问指针的B-Tree" class="headerlink" title="带有顺序访问指针的B+Tree"></a>带有顺序访问指针的B+Tree</h2><p>一般在数据库系统或文件系统中使用的B+Tree结构都在经典B+Tree的基础上进行了优化，增加了顺序访问指针。</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/4.png" alt="图4"></p>
+<p>如图4所示，在B+Tree的每个叶子节点增加一个指向相邻叶子节点的指针，就形成了带有顺序访问指针的B+Tree。做这个优化的目的是为了提高区间访问的性能，例如图4中如果要查询key为从18到49的所有数据记录，当找到18后，只需顺着节点和指针顺序遍历就可以一次性访问到所有数据节点，极大提到了区间查询效率。<br>这一节对B-Tree和B+Tree进行了一个简单的介绍，下一节结合存储器存取原理介绍为什么目前B+Tree是数据库系统实现索引的首选数据结构。</p>
+<h1 id="为什么使用B-Tree（B-Tree）"><a href="#为什么使用B-Tree（B-Tree）" class="headerlink" title="为什么使用B-Tree（B+Tree）"></a>为什么使用B-Tree（B+Tree）</h1><p>上文说过，红黑树等数据结构也可以用来实现索引，但是文件系统及数据库系统普遍采用B-/+Tree作为索引结构，这一节将结合计算机组成原理相关知识讨论B-/+Tree作为索引的理论基础。</p>
+<p>一般来说，索引本身也很大，不可能全部存储在内存中，因此索引往往以索引文件的形式存储的磁盘上。这样的话，索引查找过程中就要产生磁盘I/O消耗，相对于内存存取，I/O存取的消耗要高几个数量级，所以评价一个数据结构作为索引的优劣最重要的指标就是在查找过程中磁盘I/O操作次数的渐进复杂度。换句话说，索引的结构组织要尽量减少查找过程中磁盘I/O的存取次数。下面先介绍内存和磁盘存取原理，然后再结合这些原理分析B-/+Tree作为索引的效率。</p>
+<h2 id="主存存取原理"><a href="#主存存取原理" class="headerlink" title="主存存取原理"></a>主存存取原理</h2><p>目前计算机使用的主存基本都是随机读写存储器（RAM），现代RAM的结构和存取原理比较复杂，这里本文抛却具体差别，抽象出一个十分简单的存取模型来说明RAM的工作原理。</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/5.png" alt="图5"></p>
+<p>从抽象角度看，主存是一系列的存储单元组成的矩阵，每个存储单元存储固定大小的数据。每个存储单元有唯一的地址，现代主存的编址规则比较复杂，这里将其简化成一个二维地址：通过一个行地址和一个列地址可以唯一定位到一个存储单元。图5展示了一个4 x 4的主存模型。</p>
+<p>主存的存取过程如下：</p>
+<p>当系统需要读取主存时，则将地址信号放到地址总线上传给主存，主存读到地址信号后，解析信号并定位到指定存储单元，然后将此存储单元数据放到数据总线上，供其它部件读取。</p>
+<p>写主存的过程类似，系统将要写入单元地址和数据分别放在地址总线和数据总线上，主存读取两个总线的内容，做相应的写操作。</p>
+<p>这里可以看出，主存存取的时间仅与存取次数呈线性关系，因为不存在机械操作，两次存取的数据的“距离”不会对时间有任何影响，例如，先取A0再取A1和先取A0再取D3的时间消耗是一样的。</p>
+<h3 id="磁盘存取原理"><a href="#磁盘存取原理" class="headerlink" title="磁盘存取原理"></a>磁盘存取原理</h3><p>上文说过，索引一般以文件形式存储在磁盘上，索引检索需要磁盘I/O操作。与主存不同，磁盘I/O存在机械运动耗费，因此磁盘I/O的时间消耗是巨大的。</p>
+<p>图6是磁盘的整体结构示意图。</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/6.png" alt="图6"></p>
+<p>一个磁盘由大小相同且同轴的圆形盘片组成，磁盘可以转动（各个磁盘必须同步转动）。在磁盘的一侧有磁头支架，磁头支架固定了一组磁头，每个磁头负责存取一个磁盘的内容。磁头不能转动，但是可以沿磁盘半径方向运动（实际是斜切向运动），每个磁头同一时刻也必须是同轴的，即从正上方向下看，所有磁头任何时候都是重叠的（不过目前已经有多磁头独立技术，可不受此限制）。</p>
+<p>图7是磁盘结构的示意图。</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/7.png" alt="图7"></p>
+<p>盘片被划分成一系列同心环，圆心是盘片中心，每个同心环叫做一个磁道，所有半径相同的磁道组成一个柱面。磁道被沿半径线划分成一个个小的段，每个段叫做一个扇区，每个扇区是磁盘的最小存储单元。为了简单起见，我们下面假设磁盘只有一个盘片和一个磁头。</p>
+<p>当需要从磁盘读取数据时，系统会将数据逻辑地址传给磁盘，磁盘的控制电路按照寻址逻辑将逻辑地址翻译成物理地址，即确定要读的数据在哪个磁道，哪个扇区。为了读取这个扇区的数据，需要将磁头放到这个扇区上方，为了实现这一点，磁头需要移动对准相应磁道，这个过程叫做寻道，所耗费时间叫做寻道时间，然后磁盘旋转将目标扇区旋转到磁头下，这个过程耗费的时间叫做旋转时间。</p>
+<h3 id="局部性原理与磁盘预读"><a href="#局部性原理与磁盘预读" class="headerlink" title="局部性原理与磁盘预读"></a>局部性原理与磁盘预读</h3><p>由于存储介质的特性，磁盘本身存取就比主存慢很多，再加上机械运动耗费，磁盘的存取速度往往是主存的几百分分之一，因此为了提高效率，要尽量减少磁盘I/O。为了达到这个目的，磁盘往往不是严格按需读取，而是每次都会预读，即使只需要一个字节，磁盘也会从这个位置开始，顺序向后读取一定长度的数据放入内存。这样做的理论依据是计算机科学中著名的局部性原理：</p>
+<p>当一个数据被用到时，其附近的数据也通常会马上被使用。</p>
+<p>程序运行期间所需要的数据通常比较集中。</p>
+<p>由于磁盘顺序读取的效率很高（不需要寻道时间，只需很少的旋转时间），因此对于具有局部性的程序来说，预读可以提高I/O效率。</p>
+<p>预读的长度一般为页（page）的整倍数。页是计算机管理存储器的逻辑块，硬件及操作系统往往将主存和磁盘存储区分割为连续的大小相等的块，每个存储块称为一页（在许多操作系统中，页得大小通常为4k），主存和磁盘以页为单位交换数据。当程序要读取的数据不在主存中时，会触发一个缺页异常，此时系统会向磁盘发出读盘信号，磁盘会找到数据的起始位置并向后连续读取一页或几页载入内存中，然后异常返回，程序继续运行。</p>
+<h3 id="B-Tree索引的性能分析"><a href="#B-Tree索引的性能分析" class="headerlink" title="B-/+Tree索引的性能分析"></a>B-/+Tree索引的性能分析</h3><p>到这里终于可以分析B-/+Tree索引的性能了。</p>
+<p>上文说过一般使用磁盘I/O次数评价索引结构的优劣。先从B-Tree分析，根据B-Tree的定义，可知检索一次最多需要访问h个节点。数据库系统的设计者巧妙利用了磁盘预读原理，将一个节点的大小设为等于一个页，这样每个节点只需要一次I/O就可以完全载入。为了达到这个目的，在实际实现B-Tree还需要使用如下技巧：</p>
+<p>每次新建节点时，直接申请一个页的空间，这样就保证一个节点物理上也存储在一个页里，加之计算机存储分配都是按页对齐的，就实现了一个node只需一次I/O。</p>
+<p>B-Tree中一次检索最多需要h-1次I/O（根节点常驻内存），渐进复杂度为O(h)=O(logdN)。一般实际应用中，出度d是非常大的数字，通常超过100，因此h非常小（通常不超过3）。</p>
+<p>综上所述，用B-Tree作为索引结构效率是非常高的。</p>
+<p>而红黑树这种结构，h明显要深的多。由于逻辑上很近的节点（父子）物理上可能很远，无法利用局部性，所以红黑树的I/O渐进复杂度也为O(h)，效率明显比B-Tree差很多。</p>
+<p>上文还说过，B+Tree更适合外存索引，原因和内节点出度d有关。从上面分析可以看到，d越大索引的性能越好，而出度的上限取决于节点内key和data的大小：<br>dmax=floor(pagesize/(keysize+datasize+pointsize))</p>
+<p>floor表示向下取整。由于B+Tree内节点去掉了data域，因此可以拥有更大的出度，拥有更好的性能。</p>
+<p>这一章从理论角度讨论了与索引相关的数据结构与算法问题，下一章将讨论B+Tree是如何具体实现为MySQL中索引，同时将结合MyISAM和InnDB存储引擎介绍非聚集索引和聚集索引两种不同的索引实现形式。</p>
+<h1 id="MySQL索引实现"><a href="#MySQL索引实现" class="headerlink" title="MySQL索引实现"></a>MySQL索引实现</h1><p>在MySQL中，索引属于存储引擎级别的概念，不同存储引擎对索引的实现方式是不同的，本文主要讨论MyISAM和InnoDB两个存储引擎的索引实现方式。</p>
+<h2 id="MyISAM索引实现"><a href="#MyISAM索引实现" class="headerlink" title="MyISAM索引实现"></a>MyISAM索引实现</h2><p>MyISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是数据记录的地址。下图是MyISAM索引的原理图：</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/8.png" alt="图8"></p>
+<p>这里设表一共有三列，假设我们以Col1为主键，则图8是一个MyISAM表的主索引（Primary key）示意。可以看出MyISAM的索引文件仅仅保存数据记录的地址。在MyISAM中，主索引和辅助索引（Secondary key）在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。如果我们在Col2上建立一个辅助索引，则此索引的结构如下图所示：</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/9.png" alt="图9"></p>
+<p>同样也是一颗B+Tree，data域保存数据记录的地址。因此，MyISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</p>
+<p>MyISAM的索引方式也叫做“非聚集”的，之所以这么称呼是为了与InnoDB的聚集索引区分。</p>
+<h3 id="InnoDB索引实现"><a href="#InnoDB索引实现" class="headerlink" title="InnoDB索引实现"></a>InnoDB索引实现</h3><p>虽然InnoDB也使用B+Tree作为索引结构，但具体实现方式却与MyISAM截然不同。</p>
+<p>第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/10.png" alt="图10"></p>
+<p>图10是InnoDB主索引（同时也是数据文件）的示意图，可以看到叶节点包含了完整的数据记录。这种索引叫做聚集索引。因为InnoDB的数据文件本身要按主键聚集，所以InnoDB要求表必须有主键（MyISAM可以没有），如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。</p>
+<p>第二个与MyISAM索引的不同是InnoDB的辅助索引data域存储相应记录主键的值而不是地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。例如，图11为定义在Col3上的一个辅助索引：</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/11.png" alt="图11"></p>
+<p>这里以英文字符的ASCII码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
+<p>了解不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了InnoDB的索引实现后，就很容易明白为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。再例如，用非单调的字段作为主键在InnoDB中不是个好主意，因为InnoDB数据文件本身是一颗B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持B+Tree的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。</p>
+<p>下一章将具体讨论这些与索引有关的优化策略。</p>
+<h1 id="索引使用策略及优化"><a href="#索引使用策略及优化" class="headerlink" title="索引使用策略及优化"></a>索引使用策略及优化</h1><p>MySQL的优化主要分为结构优化（Scheme optimization）和查询优化（Query optimization）。本章讨论的高性能索引策略主要属于结构优化范畴。本章的内容完全基于上文的理论基础，实际上一旦理解了索引背后的机制，那么选择高性能的策略就变成了纯粹的推理，并且可以理解这些策略背后的逻辑</p>
+<h2 id="示例数据库"><a href="#示例数据库" class="headerlink" title="示例数据库"></a>示例数据库</h2><p>为了讨论索引策略，需要一个数据量不算小的数据库作为示例。本文选用MySQL官方文档中提供的示例数据库之一：employees。这个数据库关系复杂度适中，且数据量较大。下图是这个数据库的E-R关系图（引用自MySQL官方手册）：</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/12.png" alt=""></p>
+<p>MySQL官方文档中关于此数据库的页面为<a href="http://dev.mysql.com/doc/employee/en/employee.html。" target="_blank" rel="external">http://dev.mysql.com/doc/employee/en/employee.html。</a><br>里面详细介绍了此数据库，并提供了下载地址和导入方法，如果有兴趣导入此数据库到自己的MySQL可以参考文中内容。</p>
+<h2 id="最左前缀原理与相关优化"><a href="#最左前缀原理与相关优化" class="headerlink" title="最左前缀原理与相关优化"></a>最左前缀原理与相关优化</h2><p>高效使用索引的首要条件是知道什么样的查询会使用到索引，这个问题和B+Tree中的“最左前缀原理”有关，下面通过例子说明最左前缀原理。</p>
+<p>这里先说一下联合索引的概念。在上文中，我们都是假设索引只引用了单个的列，实际上，MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引，一般的，一个联合索引是一个有序元组<a1, a2,="" …,="" an="">，其中各个元素均为数据表的一列，实际上要严格定义索引需要用到关系代数，但是这里我不想讨论太多关系代数的话题，因为那样会显得很枯燥，所以这里就不再做严格定义。另外，单列索引可以看成联合索引元素数为1的特例。</a1,></p>
+<p>以employees.titles表为例，下面先查看其上都有哪些索引：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">SHOW INDEX FROM employees.titles;</div><div class="line">+--------+------------+----------+--------------+-------------+-----------+-------------+------+------------+</div><div class="line">| Table  | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Null | Index_type |</div><div class="line">+--------+------------+----------+--------------+-------------+-----------+-------------+------+------------+</div><div class="line">| titles |          0 | PRIMARY  |            1 | emp_no      | A         |        NULL |      | BTREE      |</div><div class="line">| titles |          0 | PRIMARY  |            2 | title       | A         |        NULL |      | BTREE      |</div><div class="line">| titles |          0 | PRIMARY  |            3 | from_date   | A         |      443308 |      | BTREE      |</div><div class="line">| titles |          1 | emp_no   |            1 | emp_no      | A         |      443308 |      | BTREE      |</div><div class="line">+--------+------------+----------+--------------+-------------+-----------+-------------+------+------------+</div></pre></td></tr></table></figure></p>
+<p>从结果中可以到titles表的主索引为<emp_no, title,="" from_date="">，还有一个辅助索引<emp_no>。为了避免多个索引使事情变复杂（MySQL的SQL优化器在多索引时行为比较复杂），这里我们将辅助索引drop掉：</emp_no></emp_no,></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ALTER TABLE employees.titles DROP INDEX emp_no;</div><div class="line">这样就可以专心分析索引PRIMARY的行为了。</div></pre></td></tr></table></figure>
+<p>情况一：全列匹配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos; AND title=&apos;Senior Engineer&apos; AND from_date=&apos;1986-06-26&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+-------------------+------+-------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref               | rows | Extra |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+-------------------+------+-------+</div><div class="line">|  1 | SIMPLE      | titles | const | PRIMARY       | PRIMARY | 59      | const,const,const |    1 |       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+-------------------+------+-------+</div></pre></td></tr></table></figure>
+<p>很明显，当按照索引中所有列进行精确匹配（这里精确匹配指“=”或“IN”匹配）时，索引可以被用到。这里有一点需要注意，理论上索引对顺序是敏感的，但是由于MySQL的查询优化器会自动调整where子句的条件顺序以使用适合的索引，例如我们将where中的条件顺序颠倒：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE from_date=&apos;1986-06-26&apos; AND emp_no=&apos;10001&apos; AND title=&apos;Senior Engineer&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+-------------------+------+-------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref               | rows | Extra |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+-------------------+------+-------+</div><div class="line">|  1 | SIMPLE      | titles | const | PRIMARY       | PRIMARY | 59      | const,const,const |    1 |       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+-------------------+------+-------+</div></pre></td></tr></table></figure>
+<p>效果是一样的。</p>
+<p>情况二：最左前缀匹配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos;;</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------+</div><div class="line">| id | select_type | table  | type | possible_keys | key     | key_len | ref   | rows | Extra |</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------+</div><div class="line">|  1 | SIMPLE      | titles | ref  | PRIMARY       | PRIMARY | 4       | const |    1 |       |</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------+</div></pre></td></tr></table></figure>
+<p>当查询条件精确匹配索引的左边连续一个或几个列时，如<emp_no>或<emp_no, title="">，所以可以被用到，但是只能用到一部分，即条件所组成的最左前缀。上面的查询从分析结果看用到了PRIMARY索引，但是key_len为4，说明只用到了索引的第一列前缀。</emp_no,></emp_no></p>
+<p>情况三：查询条件用到了索引中列的精确匹配，但是中间某个条件未提供。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos; AND from_date=&apos;1986-06-26&apos;;</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------------+</div><div class="line">| id | select_type | table  | type | possible_keys | key     | key_len | ref   | rows | Extra       |</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | ref  | PRIMARY       | PRIMARY | 4       | const |    1 | Using where |</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------------+</div></pre></td></tr></table></figure>
+<p>此时索引使用情况和情况二相同，因为title未提供，所以查询只用到了索引的第一列，而后面的from_date虽然也在索引中，但是由于title不存在而无法和左前缀连接，因此需要对结果进行扫描过滤from_date（这里由于emp_no唯一，所以不存在扫描）。如果想让from_date也使用索引而不是where过滤，可以增加一个辅助索引<emp_no, from_date="">，此时上面的查询会使用这个索引。除此之外，还可以使用一种称之为“隔离列”的优化方法，将emp_no与from_date之间的“坑”填上。</emp_no,></p>
+<p>首先我们看下title一共有几种不同的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">SELECT DISTINCT(title) FROM employees.titles;</div><div class="line">+--------------------+</div><div class="line">| title              |</div><div class="line">+--------------------+</div><div class="line">| Senior Engineer    |</div><div class="line">| Staff              |</div><div class="line">| Engineer           |</div><div class="line">| Senior Staff       |</div><div class="line">| Assistant Engineer |</div><div class="line">| Technique Leader   |</div><div class="line">| Manager            |</div><div class="line">+--------------------+</div></pre></td></tr></table></figure>
+<p>只有7种。在这种成为“坑”的列值比较少的情况下，可以考虑用“IN”来填补这个“坑”从而形成最左前缀：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles</div><div class="line">WHERE emp_no=&apos;10001&apos;</div><div class="line">AND title IN (&apos;Senior Engineer&apos;, &apos;Staff&apos;, &apos;Engineer&apos;, &apos;Senior Staff&apos;, &apos;Assistant Engineer&apos;, &apos;Technique Leader&apos;, &apos;Manager&apos;)</div><div class="line">AND from_date=&apos;1986-06-26&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref  | rows | Extra       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | range | PRIMARY       | PRIMARY | 59      | NULL |    7 | Using where |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div></pre></td></tr></table></figure>
+<p>这次key_len为59，说明索引被用全了，但是从type和rows看出IN实际上执行了一个range查询，这里检查了7个key。看下两种查询的性能比较：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">SHOW PROFILES;</div><div class="line">+----------+------------+-------------------------------------------------------------------------------+</div><div class="line">| Query_ID | Duration   | Query                                                                         |</div><div class="line">+----------+------------+-------------------------------------------------------------------------------+</div><div class="line">|       10 | 0.00058000 | SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos; AND from_date=&apos;1986-06-26&apos;|</div><div class="line">|       11 | 0.00052500 | SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos; AND title IN ...          |</div><div class="line">+----------+------------+-------------------------------------------------------------------------------+</div></pre></td></tr></table></figure>
+<p>“填坑”后性能提升了一点。如果经过emp_no筛选后余下很多数据，则后者性能优势会更加明显。当然，如果title的值很多，用填坑就不合适了，必须建立辅助索引。</p>
+<p>情况四：查询条件没有指定索引第一列。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE from_date=&apos;1986-06-26&apos;;</div><div class="line">+----+-------------+--------+------+---------------+------+---------+------+--------+-------------+</div><div class="line">| id | select_type | table  | type | possible_keys | key  | key_len | ref  | rows   | Extra       |</div><div class="line">+----+-------------+--------+------+---------------+------+---------+------+--------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | ALL  | NULL          | NULL | NULL    | NULL | 443308 | Using where |</div><div class="line">+----+-------------+--------+------+---------------+------+---------+------+--------+-------------+</div></pre></td></tr></table></figure>
+<p>由于不是最左前缀，索引这样的查询显然用不到索引。</p>
+<p>情况五：匹配某列的前缀字符串。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos; AND title LIKE &apos;Senior%&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref  | rows | Extra       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | range | PRIMARY       | PRIMARY | 56      | NULL |    1 | Using where |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div></pre></td></tr></table></figure>
+<p>此时可以用到索引，但是如果通配符不是只出现在末尾，则无法使用索引。（原文表述有误，如果通配符%不出现在开头，则可以用到索引，但根据具体情况不同可能只会用其中一个前缀）</p>
+<p>情况六：范围查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no &lt; &apos;10010&apos; and title=&apos;Senior Engineer&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref  | rows | Extra       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | range | PRIMARY       | PRIMARY | 4       | NULL |   16 | Using where |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div></pre></td></tr></table></figure>
+<p>范围列可以用到索引（必须是最左前缀），但是范围列后面的列无法用到索引。同时，索引最多用于一个范围列，因此如果查询条件中有两个范围列则无法全用到索引。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">EXPLAIN SELECT * FROM employees.titles</div><div class="line">WHERE emp_no &lt; &apos;10010&apos;</div><div class="line">AND title=&apos;Senior Engineer&apos;</div><div class="line">AND from_date BETWEEN &apos;1986-01-01&apos; AND &apos;1986-12-31&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref  | rows | Extra       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | range | PRIMARY       | PRIMARY | 4       | NULL |   16 | Using where |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div></pre></td></tr></table></figure>
+<p>可以看到索引对第二个范围索引无能为力。这里特别要说明MySQL一个有意思的地方，那就是仅用explain可能无法区分范围索引和多值匹配，因为在type中这两者都显示为range。同时，用了“between”并不意味着就是范围查询，例如下面的查询：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles</div><div class="line">WHERE emp_no BETWEEN &apos;10001&apos; AND &apos;10010&apos;</div><div class="line">AND title=&apos;Senior Engineer&apos;</div><div class="line">AND from_date BETWEEN &apos;1986-01-01&apos; AND &apos;1986-12-31&apos;;</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">| id | select_type | table  | type  | possible_keys | key     | key_len | ref  | rows | Extra       |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | range | PRIMARY       | PRIMARY | 59      | NULL |   16 | Using where |</div><div class="line">+----+-------------+--------+-------+---------------+---------+---------+------+------+-------------+</div></pre></td></tr></table></figure>
+<p>看起来是用了两个范围查询，但作用于emp_no上的“BETWEEN”实际上相当于“IN”，也就是说emp_no实际是多值精确匹配。可以看到这个查询用到了索引全部三个列。因此在MySQL中要谨慎地区分多值匹配和范围匹配，否则会对MySQL的行为产生困惑。</p>
+<p>情况七：查询条件中含有函数或表达式。</p>
+<p>很不幸，如果查询条件中含有函数或表达式，则MySQL不会为这列使用索引（虽然某些在数学意义上可以使用）。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no=&apos;10001&apos; AND left(title, 6)=&apos;Senior&apos;;</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------------+</div><div class="line">| id | select_type | table  | type | possible_keys | key     | key_len | ref   | rows | Extra       |</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | ref  | PRIMARY       | PRIMARY | 4       | const |    1 | Using where |</div><div class="line">+----+-------------+--------+------+---------------+---------+---------+-------+------+-------------+</div></pre></td></tr></table></figure>
+<p>虽然这个查询和情况五中功能相同，但是由于使用了函数left，则无法为title列应用索引，而情况五中用LIKE则可以。再如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.titles WHERE emp_no - 1=&apos;10000&apos;;</div><div class="line">+----+-------------+--------+------+---------------+------+---------+------+--------+-------------+</div><div class="line">| id | select_type | table  | type | possible_keys | key  | key_len | ref  | rows   | Extra       |</div><div class="line">+----+-------------+--------+------+---------------+------+---------+------+--------+-------------+</div><div class="line">|  1 | SIMPLE      | titles | ALL  | NULL          | NULL | NULL    | NULL | 443308 | Using where |</div><div class="line">+----+-------------+--------+------+---------------+------+---------+------+--------+-------------+</div></pre></td></tr></table></figure>
+<p>显然这个查询等价于查询emp_no为10001的函数，但是由于查询条件是一个表达式，MySQL无法为其使用索引。看来MySQL还没有智能到自动优化常量表达式的程度，因此在写查询语句时尽量避免表达式出现在查询中，而是先手工私下代数运算，转换为无表达式的查询语句。</p>
+<h1 id="索引选择性与前缀索引"><a href="#索引选择性与前缀索引" class="headerlink" title="索引选择性与前缀索引"></a>索引选择性与前缀索引</h1><p>既然索引可以加快查询速度，那么是不是只要是查询语句需要，就建上索引？答案是否定的。因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担，另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。一般两种情况下不建议建索引。</p>
+<p>第一种情况是表记录比较少，例如一两千条甚至只有几百条记录的表，没必要建索引，让查询做全表扫描就好了。至于多少条记录才算多，这个个人有个人的看法，我个人的经验是以2000作为分界线，记录数不超过 2000可以考虑不建索引，超过2000条可以酌情考虑索引。</p>
+<p>另一种不建议建索引的情况是索引的选择性较低。所谓索引的选择性（Selectivity），是指不重复的索引值（也叫基数，Cardinality）与表记录数（#T）的比值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Index Selectivity = Cardinality / #T</div></pre></td></tr></table></figure>
+<p>显然选择性的取值范围为(0, 1]，选择性越高的索引价值越大，这是由B+Tree的性质决定的。例如，上文用到的employees.titles表，如果title字段经常被单独查询，是否需要建索引，我们看一下它的选择性：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">SELECT count(DISTINCT(title))/count(*) AS Selectivity FROM employees.titles;</div><div class="line">+-------------+</div><div class="line">| Selectivity |</div><div class="line">+-------------+</div><div class="line">|      0.0000 |</div><div class="line">+-------------+</div></pre></td></tr></table></figure>
+<p>title的选择性不足0.0001（精确值为0.00001579），所以实在没有什么必要为其单独建索引。</p>
+<p>有一种与索引选择性有关的索引优化策略叫做前缀索引，就是用列的前缀代替整个列作为索引key，当前缀长度合适时，可以做到既使得前缀索引的选择性接近全列索引，同时因为索引key变短而减少了索引文件的大小和维护开销。下面以employees.employees表为例介绍前缀索引的选择和使用。</p>
+<p>从图12可以看到employees表只有一个索引<emp_no>，那么如果我们想按名字搜索一个人，就只能全表扫描了：</emp_no></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">EXPLAIN SELECT * FROM employees.employees WHERE first_name=&apos;Eric&apos; AND last_name=&apos;Anido&apos;;</div><div class="line">+----+-------------+-----------+------+---------------+------+---------+------+--------+-------------+</div><div class="line">| id | select_type | table     | type | possible_keys | key  | key_len | ref  | rows   | Extra       |</div><div class="line">+----+-------------+-----------+------+---------------+------+---------+------+--------+-------------+</div><div class="line">|  1 | SIMPLE      | employees | ALL  | NULL          | NULL | NULL    | NULL | 300024 | Using where |</div><div class="line">+----+-------------+-----------+------+---------------+------+---------+------+--------+-------------+</div></pre></td></tr></table></figure>
+<p>如果频繁按名字搜索员工，这样显然效率很低，因此我们可以考虑建索引。有两种选择，建<first_name>或<first_name, last_name="">，看下两个索引的选择性：</first_name,></first_name></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">SELECT count(DISTINCT(first_name))/count(*) AS Selectivity FROM employees.employees;</div><div class="line">+-------------+</div><div class="line">| Selectivity |</div><div class="line">+-------------+</div><div class="line">|      0.0042 |</div><div class="line">+-------------+</div><div class="line">SELECT count(DISTINCT(concat(first_name, last_name)))/count(*) AS Selectivity FROM employees.employees;</div><div class="line">+-------------+</div><div class="line">| Selectivity |</div><div class="line">+-------------+</div><div class="line">|      0.9313 |</div><div class="line">+-------------+</div></pre></td></tr></table></figure>
+<p><first_name>显然选择性太低，<first_name, last_name="">选择性很好，但是first_name和last_name加起来长度为30，有没有兼顾长度和选择性的办法？可以考虑用first_name和last_name的前几个字符建立索引，例如<first_name, left(last_name,="" 3)="">，看看其选择性：</first_name,></first_name,></first_name></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">SELECT count(DISTINCT(concat(first_name, left(last_name, 3))))/count(*) AS Selectivity FROM employees.employees;</div><div class="line">+-------------+</div><div class="line">| Selectivity |</div><div class="line">+-------------+</div><div class="line">|      0.7879 |</div><div class="line">+-------------+</div></pre></td></tr></table></figure>
+<p>选择性还不错，但离0.9313还是有点距离，那么把last_name前缀加到4：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">SELECT count(DISTINCT(concat(first_name, left(last_name, 4))))/count(*) AS Selectivity FROM employees.employees;</div><div class="line">+-------------+</div><div class="line">| Selectivity |</div><div class="line">+-------------+</div><div class="line">|      0.9007 |</div><div class="line">+-------------+</div></pre></td></tr></table></figure>
+<p>这时选择性已经很理想了，而这个索引的长度只有18，比<first_name, last_name="">短了接近一半，我们把这个前缀索引 建上：</first_name,></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">ALTER TABLE employees.employees</div><div class="line">ADD INDEX `first_name_last_name4` (first_name, last_name(4));</div><div class="line">此时再执行一遍按名字查询，比较分析一下与建索引前的结果：</div><div class="line"></div><div class="line">SHOW PROFILES;</div><div class="line">+----------+------------+---------------------------------------------------------------------------------+</div><div class="line">| Query_ID | Duration   | Query                                                                           |</div><div class="line">+----------+------------+---------------------------------------------------------------------------------+</div><div class="line">|       87 | 0.11941700 | SELECT * FROM employees.employees WHERE first_name=&apos;Eric&apos; AND last_name=&apos;Anido&apos; |</div><div class="line">|       90 | 0.00092400 | SELECT * FROM employees.employees WHERE first_name=&apos;Eric&apos; AND last_name=&apos;Anido&apos; |</div><div class="line">+----------+------------+---------------------------------------------------------------------------------+</div></pre></td></tr></table></figure>
+<p>性能的提升是显著的，查询速度提高了120多倍。</p>
+<p>前缀索引兼顾索引大小和查询速度，但是其缺点是不能用于ORDER BY和GROUP BY操作，也不能用于Covering index（即当索引本身包含查询所需全部数据时，不再访问数据文件本身）。</p>
+<p>InnoDB的主键选择与插入优化</p>
+<p>在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。</p>
+<p>经常看到有帖子或博客讨论主键选择问题，有人建议使用业务无关的自增主键，有人觉得没有必要，完全可以使用如学号或身份证号这种唯一字段作为主键。不论支持哪种论点，大多数论据都是业务层面的。如果从数据库索引优化角度看，使用InnoDB引擎而不使用自增主键绝对是一个糟糕的主意。</p>
+<p>上文讨论过InnoDB的索引实现，InnoDB使用聚集索引，数据记录本身被存于主索引（一颗B+Tree）的叶子节点上。这就要求同一个叶子节点内（大小为一个内存页或磁盘页）的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子（InnoDB默认为15/16），则开辟一个新的页（节点）。</p>
+<p>如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下图所示：</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/13.png" alt="图13"></p>
+<p>这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。</p>
+<p>如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置：</p>
+<p><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/14.png" alt="图14"></p>
+<p>此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。</p>
+<p>因此，只要可以，请尽量在InnoDB上采用自增字段做主键。</p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>这篇文章断断续续写了半个月，主要内容就是上面这些了。不可否认，这篇文章在一定程度上有纸上谈兵之嫌，因为我本人对MySQL的使用属于菜鸟级别，更没有太多数据库调优的经验，在这里大谈数据库索引调优有点大言不惭。就当是我个人的一篇学习笔记了。</p>
+<p>其实数据库索引调优是一项技术活，不能仅仅靠理论，因为实际情况千变万化，而且MySQL本身存在很复杂的机制，如查询优化策略和各种引擎的实现差异等都会使情况变得更加复杂。但同时这些理论是索引调优的基础，只有在明白理论的基础上，才能对调优策略进行合理推断并了解其背后的机制，然后结合实践中不断的实验和摸索，从而真正达到高效使用MySQL索引的目的。</p>
+<p>另外，MySQL索引及其优化涵盖范围非常广，本文只是涉及到其中一部分。如与排序（ORDER BY）相关的索引优化及覆盖索引（Covering index）的话题本文并未涉及，同时除B-Tree索引外MySQL还根据不同引擎支持的哈希索引、全文索引等等本文也并未涉及。如果有机会，希望再对本文未涉及的部分进行补充吧。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>[1] Baron Scbwartz等 著，王小东等 译；高性能MySQL（High Performance MySQL）；电子工业出版社，2010</p>
+<p>[2] Michael Kofler 著，杨晓云等 译；MySQL5权威指南（The Definitive Guide to MySQL5）；人民邮电出版社，2006</p>
+<p>[3] 姜承尧 著；MySQL技术内幕-InnoDB存储引擎；机械工业出版社，2011</p>
+<p>[4] D Comer, Ubiquitous B-tree; ACM Computing Surveys (CSUR), 1979</p>
+<p>[5] Codd, E. F. (1970). “A relational model of data for large shared data banks”. Communications of the ACM, , Vol. 13, No. 6, pp. 377-387</p>
+<p>[6] MySQL5.1参考手册 - <a href="http://dev.mysql.com/doc/refman/5.1/zh/index.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.1/zh/index.html</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/23/ps/" title="linux ps 的几个tips" itemprop="url">linux ps 的几个tips</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-23T15:47:00.000Z" itemprop="datePublished"> 发表于 2016-04-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>1.有时候查看某些运行中的进程时常常这样(比如nginx)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  ~ ps aux |grep nginx</div><div class="line">root            13617   0.0  0.0  2463900    448   ??  Ss   11:48下午   0:00.00 nginx: master process nginx</div><div class="line">eric            13624   0.0  0.0  2434840    744 s001  R+   11:48下午   0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn nginx</div><div class="line">eric            13618   0.0  0.0  2464120   1000   ??  S    11:48下午   0:00.00 nginx: worker process</div></pre></td></tr></table></figure></p>
+<p>问题就是，我想对这些pid做些操作，但是会多出来一个ps进程产生的一行，一直以来也不知道如何去掉这行，反正也不碍事。前些天看到一篇微博里给出了方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  ~ ps aux |grep \[n]ginx</div><div class="line">eric            13618   0.0  0.0  2464120   1000   ??  S    11:48下午   0:00.00 nginx: worker process</div><div class="line">root            13617   0.0  0.0  2463900    448   ??  Ss   11:48下午   0:00.00 nginx: master process nginx</div><div class="line">➜  ~</div></pre></td></tr></table></figure></p>
+<p>2.有时候需要展示进程之间的父子关系，虽然有父进程的pid，但是并不直观，可以用<code>ps aux --forest</code><br>3.批量杀掉进程,可以借助xargs<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps aux |grep \[n]ginx |awk &apos;&#123;print $2&#125;&apos; |xargs sudo kill -9</div></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/23/memcache-超详细介绍/" title="memcache 超详细介绍" itemprop="url">memcache 超详细介绍</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-23T15:43:10.000Z" itemprop="datePublished"> 发表于 2016-04-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Memcache"><a href="#Memcache" class="headerlink" title="Memcache"></a>Memcache</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="MemCache是什么"><a href="#MemCache是什么" class="headerlink" title="MemCache是什么"></a>MemCache是什么</h3><p><a href="http://memcached.org/" target="_blank" rel="external">MemCache</a>是一个自由、源码开放、高性能、分布式的分布式内存对象缓存系统，用于动态Web应用以减轻数据库的负载。它通过在内存中缓存数据和对象来减少读取数据库的次数，从而提高了网站访问的速度。MemCaChe是一个存储键值对的HashMap，在内存中对任意的数据（比如字符串、对象等）所使用的key-value存储，数据可以来自数据库调用、API调用，或者页面渲染的结果。MemCache设计理念就是小而强大，它简单的设计促进了快速部署、易于开发并解决面对大规模的数据缓存的许多难题，而所开放的API使得MemCache能用于Java、C/C++/C#、Perl、Python、PHP、Ruby等大部分流行的程序语言。</p>
+<h3 id="Memcache-和Memcached"><a href="#Memcache-和Memcached" class="headerlink" title="Memcache 和Memcached"></a>Memcache 和Memcached</h3><ul>
+<li><p>MemCache是项目的名称</p>
+</li>
+<li><p>MemCached是MemCache服务器端可以执行文件的名称</p>
+</li>
+</ul>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
+<li>无容灾考虑，纯内存缓存，重启后所有数据丢失。存取数据比硬盘快，当内存达到上限后，通过LRU算法自动删除缓存。</li>
+<li>基于libevent开发。将Linux的epoll、BSD类操作系统的kqueue(多路复用io模型)等事件处理功能封装成统一的接口,因此memcached在多种操作系统上都可以发挥较好的性能，即使服务器的连接数增加，也能发挥O(1)的性能(<a href="http://www.kegel.com/c10k.html" target="_blank" rel="external">C10k问题</a>)</li>
+<li>协议基于文本行，直接通过telnet在memcached服务器上可进行存取数据操作</li>
+<li>分布式，memcache算不上是一个真正的分布式系统，因为各个memcached之间并不会“感知“，不会互相通信。分布式部署取决于memcache客户端。</li>
+</ul>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="路由算法"><a href="#路由算法" class="headerlink" title="路由算法"></a>路由算法</h3><p>前面说到memcached服务之间并不能互相通信，所以对服务的“选择”落在了客户端上，所以路由算法决定了客户端对哪台memcached进行数据存取。<br>先来看一个简单的路由算法</p>
+<h4 id="余数算法"><a href="#余数算法" class="headerlink" title="余数算法"></a>余数算法</h4><p>比方说，字符串str对应的HashCode是50、服务器的数目是3，取余数得到2，str对应节点Node2，所以路由算法把str路由到Node2服务器上。由于HashCode随机性比较强，所以使用余数Hash路由算法就可以保证缓存数据在整个MemCache服务器集群中有比较均衡的分布。</p>
+<p>如果不考虑服务器集群的伸缩性(集群中新加入节点或者某节点down掉)，那么余数Hash算法几乎可以满足绝大多数的缓存路由需求。</p>
+<p>就假设MemCache服务器集群由3台变为4台，更改服务器列表，仍然使用余数Hash，50对4的余数是2，对应Node2，但是str原来是存在Node1上的，这就导致了缓存没有命中。如果这么说不够明白，那么不妨举个例子，原来有HashCode为0~19的20个数据，那么：</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/memcache/1.png" alt="原始hash"></p>
+<p>现在我扩容到4台，加粗标红的表示命中：</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/memcache/2.png" alt="扩容后"></p>
+<p>如果我扩容到20+的台数，只有前三个HashCode对应的Key是命中的，也就是15%。当然这只是个简单例子，现实情况肯定比这个复杂得多，不过足以说明，使用余数Hash的路由算法，在扩容的时候会造成大量的数据无法正确命中（其实不仅仅是无法命中，那些大量的无法命中的数据还在原缓存中在被移除前占据着内存）。这个结果显然是无法接受的，在网站业务中，大部分的业务数据度操作请求上事实上是通过缓存获取的，只有少量读操作会访问数据库，因此数据库的负载能力是以有缓存为前提而设计的。当大部分被缓存了的数据因为服务器扩容而不能正确读取时，这些数据访问的压力就落在了数据库的身上，这将大大超过数据库的负载能力，严重的可能会导致数据库宕机。</p>
+<h4 id="一致性Hash算法"><a href="#一致性Hash算法" class="headerlink" title="一致性Hash算法"></a>一致性Hash算法</h4><p>一致性Hash算法通过一个叫做一致性Hash环的数据结构实现Key到缓存服务器的Hash映射</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/memcache/3.png" alt="一致性hash"></p>
+<p>具体算法过程为：先构造一个长度为2^32 的整数环（这个环被称为一致性Hash环），根据节点名称的Hash值（其分布为[0, 2^32 -1]）将缓存服务器节点放置在这个Hash环上，然后根据需要缓存的数据的Key值计算得到其Hash值（其分布也为[0, 2^32 -1]），然后在Hash环上顺时针查找距离这个Key值的Hash值最近的服务器节点，完成Key到服务器的映射查找。</p>
+<p>就如同图上所示，三个Node点分别位于Hash环上的三个位置，然后Key值根据其HashCode，在Hash环上有一个固定位置，位置固定下之后，Key就会顺时针去寻找离它最近的一个Node，把数据存储在这个Node的MemCache服务器中。使用Hash环如果加了一个节点会怎么样，看一下：</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/memcache/4.png" alt="新增节点后"></p>
+<p>加了一个Node4节点，只影响到了一个Key值的数据，本来这个Key值应该是在Node1服务器上的，现在要去Node4了。采用一致性Hash算法，的确也会影响到整个集群，但是影响的只是加粗的那一段而已，相比余数Hash算法影响了远超一半的影响率，这种影响要小得多。更重要的是，集群中缓存服务器节点越多，增加节点带来的影响越小，很好理解。换句话说，随着集群规模的增大，继续命中原有缓存数据的概率会越来越大，虽然仍然有小部分数据缓存在服务器中不能被读到，但是这个比例足够小，即使访问数据库，也不会对数据库造成致命的负载压力。</p>
+<p>至于具体应用，这个长度为2^32 的一致性Hash环通常使用二叉查找树实现。</p>
+<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><p>前面说到memcache是内存缓存，不会持久化数据，而且也会受到机器位数的限制，32位最多只有2G，64位可以认为没有上限。</p>
+<h3 id="内存分配"><a href="#内存分配" class="headerlink" title="内存分配"></a>内存分配</h3><p>下面说下内存分配，传统的内存管理方式是，使用完通过malloc分配的内存后通过free来回收内存，这种方式容易产生内存碎片并降低操作系统对内存的管理效率，所以memcache采用的是固定空间分配，MemCache的这种内存分配的方式称为allocator。</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/memcache/5.png" alt="内存分配方式"></p>
+<p>这张图片里面涉及了slab_class、slab、page、chunk四个概念，它们之间的关系是：</p>
+<p>＊ MemCache将内存空间分为一组slab</p>
+<p>＊ 每个slab下又有若干个page，每个page默认是1M，如果一个slab占用100M内存的话，那么这个slab下应该有100个page，page一旦分配，就不会被回收</p>
+<p>＊ 每个page里面包含一组chunk，chunk是真正存放数据的地方，同一个slab里面的chunk的大小是固定的</p>
+<p>＊ 有相同大小chunk的slab被组织在一起，称为slab_class</p>
+<p>slab的数量是有限的，几个、十几个或者几十个，这个和启动参数的配置相关。</p>
+<p>MemCache中的item存放的地方是由item的大小决定的，item总是会被存放到与chunk大小最接近的一个slab中，比如slab[1]的chunk大小为80字节、slab[2]的chunk大小为100字节、slab[3]的chunk大小为128字节（相邻slab内的chunk基本以1.25为比例进行增长，MemCache启动时可以用-f指定这个比例），那么过来一个88字节的item，这个item将被放到2号slab中。放slab的时候，首先slab要申请内存，申请内存是以page为单位的，所以在放入第一个数据的时候，无论大小为多少，都会有1M大小的page被分配给该slab。申请到page后，slab会将这个page的内存按chunk的大小进行切分，这样就变成了一个chunk数组，最后从这个chunk数组中选择一个用于存储数据。</p>
+<p>如果这个slab中没有chunk可以分配了怎么办，如果MemCache启动没有追加-M（禁止LRU，这种情况下内存不够会报Out Of Memory错误），那么MemCache会把这个slab中最近最少使用的chunk中的数据清理掉，然后放上最新的数据。<br>这种内存分配方式的特点避免了管理内存碎片问题，同时也带来了内存浪费的问题，如88字节的item分配在128字节（紧接着大的用）的chunk中，就损失了40字节。</p>
+<h3 id="缓存策略"><a href="#缓存策略" class="headerlink" title="缓存策略"></a>缓存策略</h3><p>Memcached的缓存策略是LRU（最近最少使用）加上延迟删除策略</p>
+<p>延迟删除是指memcache并不会监视和清理过期数据，而是在客户端get时检查。比如设置某个key存活30s，到了30s后，memcache并不会主动清理它，而是有get请求发现它后才会设置为过期方便以后优先利用，还有一种情况就是lru。<br>删除操作只会将chunk置为删除状态，这样下次申请的时候可以优先利用。<br>flush操作只会使所有的item失效。<br>这种删除方式，可以提高memcache的效率，因为不必每时每刻检查过期item,从而提高CPU工作效率。<br>LRU只是针对slab内的，并不是全局的，因为不同的slab的chunk不同。</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><h3 id="使用telnet操作memcache"><a href="#使用telnet操作memcache" class="headerlink" title="使用telnet操作memcache"></a>使用telnet操作memcache</h3><ul>
+<li>set 和 get</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  ~ telnet localhost 11211</div><div class="line">Trying 127.0.0.1...</div><div class="line">Connected to localhost.</div><div class="line">Escape character is &apos;^]&apos;.</div><div class="line">set foo 0 0 6</div><div class="line">123456</div><div class="line">STORED</div><div class="line">get foo</div><div class="line">VALUE foo 0 6</div><div class="line">123456</div><div class="line">END</div></pre></td></tr></table></figure>
+<ul>
+<li>查看memcache状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">➜  ~ telnet localhost 11211</div><div class="line">Trying 127.0.0.1...</div><div class="line">Connected to localhost.</div><div class="line">Escape character is &apos;^]&apos;.</div><div class="line">stats</div><div class="line">STAT pid 1</div><div class="line">STAT uptime 275</div><div class="line">STAT time 1463557642</div><div class="line">STAT version 1.4.25</div><div class="line">STAT libevent 2.0.21-stable</div><div class="line">STAT pointer_size 64</div><div class="line">...</div><div class="line">STAT evictions 0</div><div class="line">STAT reclaimed 0</div><div class="line">STAT crawler_reclaimed 0</div><div class="line">STAT crawler_items_checked 0</div><div class="line">STAT lrutail_reflocked 0</div><div class="line">END</div></pre></td></tr></table></figure>
+<ul>
+<li>查看各个slab使用状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">➜  ~ telnet localhost 11211</div><div class="line">Trying 127.0.0.1...</div><div class="line">Connected to localhost.</div><div class="line">Escape character is &apos;^]&apos;.</div><div class="line">stats slabs</div><div class="line">STAT 1:chunk_size 96</div><div class="line">STAT 1:chunks_per_page 10922</div><div class="line">STAT 1:total_pages 1</div><div class="line">STAT 1:total_chunks 10922</div><div class="line">STAT 1:used_chunks 1</div><div class="line">STAT 1:free_chunks 10921</div><div class="line">STAT 1:free_chunks_end 0</div><div class="line">STAT 1:mem_requested 74</div><div class="line">STAT 1:get_hits 1</div><div class="line">STAT 1:cmd_set 1</div><div class="line">STAT 1:delete_hits 0</div><div class="line">STAT 1:incr_hits 0</div><div class="line">STAT 1:decr_hits 0</div><div class="line">STAT 1:cas_hits 0</div><div class="line">STAT 1:cas_badval 0</div><div class="line">STAT 1:touch_hits 0</div><div class="line">STAT active_slabs 1</div><div class="line">STAT total_malloced 1048512</div><div class="line">END</div></pre></td></tr></table></figure>
+<ul>
+<li>简易监控<br>telnet是一个交互的工具，并不适合在监控脚本中使用，可以用netcat</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">➜  ~ (echo stats;sleep 1)|nc 127.0.0.1 11211</div><div class="line">STAT pid 1</div><div class="line">STAT uptime 1995</div><div class="line">STAT time 1463559362</div><div class="line">STAT version 1.4.25</div><div class="line">STAT libevent 2.0.21-stable</div><div class="line">STAT pointer_size 64</div><div class="line">STAT rusage_user 0.048000</div><div class="line">STAT rusage_system 0.048000</div><div class="line">....</div></pre></td></tr></table></figure>
+<h3 id="php中的一些应用"><a href="#php中的一些应用" class="headerlink" title="php中的一些应用"></a>php中的一些应用</h3><p>memcache常常作为数据缓存，来缓解mysql的压力。<br>当item不存在时，memcache会返回false，可以根据memcache的返回结果。<br>注意判断只能使用 ===<br>当设置一个key为false时，memcache会返回一个空字符串。</p>
+<ul>
+<li>一个简单的缓存</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">function getFoo($id,$cleanCache)&#123;</div><div class="line">	$memcache =  CacheFactory:getInstance()-&gt;getMemcache(&quot;&quot;);</div><div class="line">    $prefix = &quot;foo_&quot;;</div><div class="line">	$key = $prefix.$id;</div><div class="line">	$value = $memcache-&gt;get($key);</div><div class="line">	if($value === false || $cleanCache)&#123;</div><div class="line">		$value = DaoFactory::get();</div><div class="line">		...</div><div class="line">		memcache-&gt;set($key,$value,0,self::$expireTime);</div><div class="line">	&#125;</div><div class="line">	return $value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>分布式会话管理</li>
+</ul>
+<p>登陆信息等。</p>
+<ul>
+<li>memcache cas<br>memcache的每一个命令都是原子操作的,比如get，set，但是针对同一个key的多次get，set请求并不是原子的，是串行化的。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">$m = new Memcached();</div><div class="line">$m-&gt;addServer(&apos;localhost&apos;, 11211);</div><div class="line"></div><div class="line">do &#123;</div><div class="line">    /* 获取ip列表以及它的标记 */</div><div class="line">    $ips = $m-&gt;get(&apos;ip_block&apos;, null, $cas);</div><div class="line">    /* 如果列表不存在， 创建并进行一个原子添加（如果其他客户端已经添加， 这里就返回false）*/</div><div class="line">    if ($m-&gt;getResultCode() == Memcached::RES_NOTFOUND) &#123;</div><div class="line">        $ips = array($_SERVER[&apos;REMOTE_ADDR&apos;]);</div><div class="line">        $m-&gt;add(&apos;ip_block&apos;, $ips);</div><div class="line">    /* 其他情况下，添加ip到列表中， 并以cas方式去存储， 这样当其他客户端修改过， 则返回false */</div><div class="line">    &#125; else &#123; </div><div class="line">        $ips[] = $_SERVER[&apos;REMOTE_ADDR&apos;];</div><div class="line">        $m-&gt;cas($cas, &apos;ip_block&apos;, $ips);</div><div class="line">    &#125;   </div><div class="line">&#125; while ($m-&gt;getResultCode() != Memcached::RES_SUCCESS);</div><div class="line"></div><div class="line">?&gt;</div></pre></td></tr></table></figure>
+<p>有兴趣的可以看一下这篇文章:<a href="http://blog.csdn.net/jiangbo_hit/article/details/6211704" target="_blank" rel="external">memcached 原子性操作 CAS模式</a></p>
+<ul>
+<li>socket 操作memcache<br>一般都不会这么用，除非没有安装memcache扩展</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//connect</div><div class="line">$socket = fsockopen(&apos;10.207.26.234&apos;,11211);</div><div class="line"></div><div class="line">//set</div><div class="line">fwrite($socket,&quot;set a 0 0 1\r\n1\r\n&quot;);</div><div class="line">$response = fgets($socket);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($response);</div><div class="line">//get</div><div class="line">fwrite($socket,&quot;get a\r\n&quot;);</div><div class="line">$response = fread($socket,1024);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($response);</div></pre></td></tr></table></figure>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>适用的场景</p>
+<ul>
+<li>对于mysql读&gt;&gt;写的场景，memcached可以显著地提高运行效率</li>
+<li>一些很小但是频繁访问的文件</li>
+<li>session数据</li>
+<li>计算量很大，可以用memcache缓存结果</li>
+</ul>
+<p>不适用的场景</p>
+<ul>
+<li>需要获取所有key</li>
+<li>key的长度超过250字符</li>
+<li>item过大</li>
+<li>实时性要求高的场景</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><ul>
+<li>安全</li>
+<li>其他缓存系统，redis，mongodb，hbase等等</li>
+<li>缓存一致性问题</li>
+<li>缓存雪崩</li>
+<li>缓存预热</li>
+<li>缓存无底洞</li>
+<li>(twemproxy)nutcraker</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://www.cnblogs.com/xrq730/p/4948707.html?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="external">MemCache超详细解读</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/21/other_03/" title="无题" itemprop="url">无题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-21T13:31:21.000Z" itemprop="datePublished"> 发表于 2016-04-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>年后没怎么写博客，老大不小了，得考虑未来的去处了，择一城终老，上海的限购政策也是坑死单身狗，身边也有朋友渐渐离开，一方面也是因为离家远。最终做了个决定，离开上海，3月离职，国内转了半个月，一路吃到北京。开始找工作，面了5家拿了3家offer，拿到了链家offer，很想去链家和牛人们一起交流学习，但是经济原因和路程原因，放弃了链家。也不想去什么创业公司，图个稳定，好好的呆满5年</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/20/git-hook/" title="git hook" itemprop="url">git hook</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-20T08:13:00.000Z" itemprop="datePublished"> 发表于 2016-04-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="hook"><a href="#hook" class="headerlink" title="hook"></a>hook</h2><p>使用了很久git了，但是hook用的很少，今天研究一下<br>git的hook放在GIT_DIR/.git/hooks目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  hooks git:(master) ls -al</div><div class="line">总用量 48</div><div class="line">drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .</div><div class="line">drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..</div><div class="line">-rwxrwxr-x 1 eric eric  452  4月 20 16:18 applypatch-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  896  4月 20 16:18 commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  189  4月 20 16:18 post-update.sample</div><div class="line">-rwxrwxr-x 1 eric eric  398  4月 20 16:18 pre-applypatch.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1642  4月 20 16:18 pre-commit.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1239  4月 20 16:18 prepare-commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1352  4月 20 16:18 pre-push.sample</div><div class="line">-rwxrwxr-x 1 eric eric 4898  4月 20 16:18 pre-rebase.sample</div><div class="line">-rwxrwxr-x 1 eric eric 3611  4月 20 16:18 update.sample</div></pre></td></tr></table></figure></p>
+<p>可以看到该目录下有很多以sample结尾的文件<br>这里尝试几个简单的吧</p>
+<h2 id="客户端钩子"><a href="#客户端钩子" class="headerlink" title="客户端钩子"></a>客户端钩子</h2><h3 id="commit-msg"><a href="#commit-msg" class="headerlink" title="commit-msg"></a>commit-msg</h3><p>将commit-msg.sample 重命名commit-msg<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">mv commit-msg.sample commit-msg</div><div class="line">➜  hooks git:(master) cat commit-msg </div><div class="line">#!/bin/sh</div><div class="line">#</div><div class="line"># An example hook script to check the commit log message.</div><div class="line"># Called by &quot;git commit&quot; with one argument, the name of the file</div><div class="line"># that has the commit message.  The hook should exit with non-zero</div><div class="line"># status after issuing an appropriate message if it wants to stop the</div><div class="line"># commit.  The hook is allowed to edit the commit message file.</div><div class="line">#</div><div class="line"># To enable this hook, rename this file to &quot;commit-msg&quot;.</div><div class="line"></div><div class="line"># Uncomment the below to add a Signed-off-by line to the message.</div><div class="line"># Doing this in a hook is a bad idea in general, but the prepare-commit-msg</div><div class="line"># hook is more suited to it.</div><div class="line">#</div><div class="line"># SOB=$(git var GIT_AUTHOR_IDENT | sed -n &apos;s/^\(.*&gt;\).*$/Signed-off-by: \1/p&apos;)</div><div class="line"># grep -qs &quot;^$SOB&quot; &quot;$1&quot; || echo &quot;$SOB&quot; &gt;&gt; &quot;$1&quot;</div><div class="line"></div><div class="line"># This example catches duplicate Signed-off-by lines.</div><div class="line"></div><div class="line">test &quot;&quot; = &quot;$(grep &apos;^Signed-off-by: &apos; &quot;$1&quot; |</div><div class="line">	 sort | uniq -c | sed -e &apos;/^[ 	]*1[ 	]/d&apos;)&quot; || &#123;</div><div class="line">	echo &gt;&amp;2 Duplicate Signed-off-by lines.</div><div class="line">	exit 1</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看介绍，应该是在git commit 命令时检查log message的脚本，有一个参数，存放commit message的文件名<br>在最后加上判断log message低于3个时不得提交的脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">words=$(cat $1 |wc -w)</div><div class="line">if test $words -lt 3</div><div class="line"> then  echo &quot;commit message should larger than 3 words&quot;</div><div class="line">       exit 1</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p>然后添加一个文件,提交。无法提交，原因是message单词数没有超过3个，过于简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  git-hooks git:(master) ✗ echo 1111&gt;aaa</div><div class="line">➜  git-hooks git:(master) ✗ git add .</div><div class="line">➜  git-hooks git:(master) ✗ git commit -m &apos;add aaa&apos;</div><div class="line">commit message should larger than 3 words</div></pre></td></tr></table></figure></p>
+<h3 id="pre-commit"><a href="#pre-commit" class="headerlink" title="pre-commit"></a>pre-commit</h3><p>git commit 触发  先于commit-msg，不接收参数</p>
+<h3 id="prepare-commit-msg"><a href="#prepare-commit-msg" class="headerlink" title="prepare-commit-msg"></a>prepare-commit-msg</h3><p>效果与pre-commit类似，先于pre-commit执行</p>
+<h2 id="服务器钩子"><a href="#服务器钩子" class="headerlink" title="服务器钩子"></a>服务器钩子</h2><h3 id="pre-receive"><a href="#pre-receive" class="headerlink" title="pre-receive"></a>pre-receive</h3><p>在客户端推送时最先执行，可以用它来拒绝客户端的推送。<br>我能想到的，可以做语法检查，拼写等等</p>
+<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>与 pre-receive 类似，但会在每个分支都执行一次。</p>
+<h3 id="post-receive"><a href="#post-receive" class="headerlink" title="post-receive"></a>post-receive</h3><p>在客户端推送完成后执行</p>
+<h2 id="使用gitlab的webhook"><a href="#使用gitlab的webhook" class="headerlink" title="使用gitlab的webhook"></a>使用gitlab的webhook</h2><p>现在很多版本控制都是使用git，gitlab来管理git项目仓库，其提供了方便的web管理，用户访问及权限，是搭建私人git仓库的推荐选择。<br>具体安装可以参考官方的wiki，因为gitlab比较吃内存，，所以我不想把它安装到机器上，所以就用docker来操作吧。<br>创建一个名为gitlab的容器，并将其80端口映射到苏主机的8088端口<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -itd -p 8088:80 --name gitlab gitlab/gitlab-ce</div></pre></td></tr></table></figure></p>
+<p>等待一段时间，就可以访问本机的8088端口，进入到gitlab的web管理界面了，初次使用要设置root的密码，然后就可以登录了，默认管理员帐号是root，密码是初次进入时设置的。<br>登录后点击 new project创建一个git项目,就叫做testHook把<br>接下来再启动一个docker 容器来作为git的客户端<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -it --link=gitlab ubuntu:14.04 /bin/bash</div></pre></td></tr></table></figure></p>
+<p>启动后安装git<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~# apt-get update &amp;&amp; apt-get install git</div></pre></td></tr></table></figure></p>
+<p>生成sshkey<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen</div></pre></td></tr></table></figure></p>
+<p>一直回车就可以了，在~/.ssh/下就生成了2个文件，私钥和公钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
+<p>把公钥设置到gitlab里，搜索框里搜索sshkey，把公钥复制到key中，title可以随意设置，gitlab也会自动生成<br>接下来把git项目clone到客户端中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~#git clone git@b9a4402e85aa:root/testhook.git</div></pre></td></tr></table></figure></p>
+<p>home目录下就会有一个空的git项目testHook，</p>
+<p>接下来设置webhook,可以为每个项目设置webhook，比如我创建的这个git项目，在<a href="http://localhost:8088/root/testhook/hooks" target="_blank" rel="external">http://localhost:8088/root/testhook/hooks</a> 中设置<br>这里我只添加push event，这个钩子作用应该类似post-receive，url是钩子触发时，需要向“谁”报告,这里我只在本机上启动了一个swoole-server,url请求swoole来看看gitlab钩子触发时具体发了些什么信息<br>swoole的代码就直接粘贴到这里了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">// Server</div><div class="line">class Server</div><div class="line">&#123;</div><div class="line">    private $serv;</div><div class="line"></div><div class="line">    public function __construct() &#123;</div><div class="line">        $this-&gt;serv = new swoole_server(&quot;0.0.0.0&quot;, 9501);</div><div class="line">        $this-&gt;serv-&gt;set(array(</div><div class="line">            &apos;worker_num&apos; =&gt; 8,</div><div class="line">            &apos;daemonize&apos; =&gt; false,</div><div class="line">            &apos;max_request&apos; =&gt; 10000,</div><div class="line">            &apos;dispatch_mode&apos; =&gt; 2,</div><div class="line">            &apos;debug_mode&apos;=&gt; 1</div><div class="line">        ));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;on(&apos;Start&apos;, array($this, &apos;onStart&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Connect&apos;, array($this, &apos;onConnect&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Receive&apos;, array($this, &apos;onReceive&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Close&apos;, array($this, &apos;onClose&apos;));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onStart( $serv ) &#123;</div><div class="line">        echo &quot;Start\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onConnect( $serv, $fd, $from_id ) &#123;</div><div class="line">        $serv-&gt;send( $fd, &quot;Hello &#123;$fd&#125;!,this is swoole server &quot; );</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onReceive( swoole_server $serv, $fd, $from_id, $data ) &#123;</div><div class="line">        echo &quot;Get Message From Client &#123;$fd&#125;:&#123;$data&#125;\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onClose( $serv, $fd, $from_id ) &#123;</div><div class="line">        echo &quot;Client &#123;$fd&#125; close connection\n&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">// 启动服务器</div><div class="line">$server = new Server();</div></pre></td></tr></table></figure></p>
+<p>启动swooleserver</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php swoole-server.php</div></pre></td></tr></table></figure>
+<p>然后来操作下客户端，需要设置git的user.name 和user.email不然不能commit<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# echo 1&gt;test</div><div class="line">root@ed6dd236d56b:~/testhook# git add test</div><div class="line">root@ed6dd236d56b:~/testhook# git commit -m &apos;add test&apos;</div><div class="line">[master 7923a94] add test</div><div class="line">1 file changed, 1 insertion(+)</div><div class="line">create mode 100644 test</div></pre></td></tr></table></figure></p>
+<p>接下来push，让gitlab产生一个触发<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# git push origin master</div><div class="line">Counting objects: 4, done.</div><div class="line">Delta compression using up to 4 threads.</div><div class="line">Compressing objects: 100% (2/2), done.</div><div class="line">Writing objects: 100% (3/3), 256 bytes | 0 bytes/s, done.</div><div class="line">Total 3 (delta 0), reused 0 (delta 0)</div><div class="line">To git@b9a4402e85aa:root/testhook.git</div><div class="line">79a7567..7923a94  master -&gt; master</div></pre></td></tr></table></figure></p>
+<p>可以看到swoole产生的日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  php swoole-server.php</div><div class="line">Start</div><div class="line">Get Message From Client 1:POST /swoole/swoole-client.php HTTP/1.1</div><div class="line">Content-Type: application/json</div><div class="line">X-Gitlab-Event: Push Hook</div><div class="line">Connection: close</div><div class="line">Host: 10.207.26.234:9501</div><div class="line">Content-Length: 1532</div><div class="line"></div><div class="line"></div><div class="line">Get Message From Client 1:&#123;&quot;object_kind&quot;:&quot;push&quot;,&quot;before&quot;:&quot;79a7567c469738a689d38510f9cfc6b5132eda02&quot;,&quot;after&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;ref&quot;:&quot;refs/heads/master&quot;,&quot;checkout_sha&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:null,&quot;user_id&quot;:1,&quot;user_name&quot;:&quot;Administrator&quot;,&quot;user_email&quot;:&quot;admin@example.com&quot;,&quot;user_avatar&quot;:&quot;http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon&quot;,&quot;project_id&quot;:1,&quot;project&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;description&quot;:&quot;&quot;,&quot;web_url&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;avatar_url&quot;:null,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;namespace&quot;:&quot;root&quot;,&quot;visibility_level&quot;:20,&quot;path_with_namespace&quot;:&quot;root/testhook&quot;,&quot;default_branch&quot;:&quot;master&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;&#125;,&quot;commits&quot;:[&#123;&quot;id&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:&quot;add test\n&quot;,&quot;timestamp&quot;:&quot;2016-05-12T03:36:03+00:00&quot;,&quot;url&quot;:&quot;http://b9a4402e85aa/root/testhook/commit/7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;author&quot;:&#123;&quot;name&quot;:&quot;ericwang&quot;,&quot;email&quot;:&quot;ericwang@leju.com&quot;&#125;,&quot;added&quot;:[&quot;test&quot;],&quot;modified&quot;:[],&quot;removed&quot;:[]&#125;],&quot;total_commits_count&quot;:1,&quot;repository&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;description&quot;:&quot;&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;visibility_level&quot;:20&#125;&#125;</div></pre></td></tr></table></figure></p>
+<p>关于webhook具体的细节，在gitlab搜索框中搜索webhook也可以查阅</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>   [1] <a href="https://www.kernel.org/pub/software/scm/git/docs/githooks.html" target="_blank" rel="external">https://www.kernel.org/pub/software/scm/git/docs/githooks.html</a><br>   [2] <a href="https://www.atlassian.com/git/tutorials/git-hooks/local-hooks" target="_blank" rel="external">https://www.atlassian.com/git/tutorials/git-hooks/local-hooks</a><br>   [3] <a href="http://www.ituring.com.cn/article/206985" target="_blank" rel="external">http://www.ituring.com.cn/article/206985</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/git/">git</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/git/">git</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/20/rabbitmq-搭建/" title="rabbitmq 环境搭建" itemprop="url">rabbitmq 环境搭建</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-20T06:44:36.000Z" itemprop="datePublished"> 发表于 2016-04-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="erlang-安装"><a href="#erlang-安装" class="headerlink" title="erlang 安装"></a>erlang 安装</h2><p>关于erlang 的下载，可以到官网找最新版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">wget http://erlang.org/download/otp_src_18.3.tar.gz</div><div class="line">tar zxvf otp_src_18.3.tar.gz</div><div class="line">cd otp_src_18.3</div><div class="line">./configure</div><div class="line">sudo make</div><div class="line">sudo make install</div></pre></td></tr></table></figure></p>
+<p>erlang编译会依赖一些环境，这里就不一一列举了<br>缺省情况下需要libncurses5-dev  libssl-dev 以及java环境<br>因为本人用的zsh,在编译的时候提示/bin/sh javac not found，原因大概是javac并没有在/bin/sh的path的环境变量中，暴力了一点,直接在/usr/local/bin下做了javac,jar的软连接,解决了</p>
+<h2 id="rabbitmq"><a href="#rabbitmq" class="headerlink" title="rabbitmq"></a>rabbitmq</h2><p>下载地址:<a href="http://www.rabbitmq.com/download.html" target="_blank" rel="external">http://www.rabbitmq.com/download.html</a><br>选择binary安装包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget www.rabbitmq.com/releases/rabbitmq-server/v3.6.1/rabbitmq-server-generic-unix-3.6.1.tar.xz</div><div class="line">xz -d rabbitmq-server-generic-unix-3.6.1.tar.xz</div><div class="line">tar xvf rabbitmq-server-generic-unix-3.6.1.tar</div><div class="line">mv rabbitmq_server-3.6.1 /usr</div><div class="line">mv rabbitmq_server-3.6.1 /usr/local/rabbitmq</div></pre></td></tr></table></figure></p>
+<p>下载的是二进制包，所以可以直接使用<br>启动rabbitmq </p>
+<pre><code>/usr/local/rabbitmq/sbin/rabbitmq-server
+</code></pre>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/15/linux_11/" title="探索linux系统下proc文件系统内容" itemprop="url">探索linux系统下proc文件系统内容</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-15T06:46:00.000Z" itemprop="datePublished"> 发表于 2016-02-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>以下部分参考自<a href="http://www.cnblogs.com/cute/archive/2011/04/20/2022280.html" target="_blank" rel="external">深入理解linux系统下proc文件系统内容</a><br>Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。 </p>
+<p>基于/proc文件系统如上所述的特殊性，其内的文件也常被称作虚拟文件，并具有一些独特的特点。例如，其中有些文件虽然使用查看命令查看时会返回大量信息，但文件本身的大小却会显示为0字节。此外，这些特殊文件中大多数文件的时间及日期属性通常为当前系统时间和日期，这跟它们随时会被刷新（存储于RAM中）有关。 </p>
+<p>为了查看及使用上的方便，这些文件通常会按照相关性进行分类存储于不同的目录甚至子目录中，如/proc/scsi目录中存储的就是当前系统上所有SCSI设备的相关信息，/proc/N中存储的则是系统当前正在运行的进程的相关信息，其中N为正在运行的进程（可以想象得到，在某进程结束后其相关目录则会消失）。 </p>
+<p>大多数虚拟文件可以使用文件查看命令如cat、more或者less进行查看，有些文件信息表述的内容可以一目了然，但也有文件的信息却不怎么具有可读性。不过，这些可读性较差的文件在使用一些命令如apm、free、lspci或top查看时却可以有着不错的表现。 </p>
+<h3 id="进程目录中的常见文件介绍"><a href="#进程目录中的常见文件介绍" class="headerlink" title="进程目录中的常见文件介绍"></a>进程目录中的常见文件介绍</h3><p>/proc目录中包含许多以数字命名的子目录，这些数字表示系统当前正在运行进程的进程号，里面包含对应进程相关的多个信息文件。<br>以下实验都是在基于docker的nginx容器里进行的，部分内容可能会与真实系统有些区别（用docker的原因是进程比较少，可以直接使用<code>docker run -it nginx:1.7 /bin/bash</code>创建一个nginx的容器并进入容器内部)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@cdb3d33f6cb4:/# ls /bin/</div><div class="line">bash   cp    dir	    egrep    gunzip    ln     mknod	  mv		 pwd	   run-parts   ss     tar	uname	      zcat    zforce</div><div class="line">cat    dash  dmesg	    false    gzexe     login  mktemp	  nisdomainname  rbash	   sed	       stty   tempfile	uncompress    zcmp    zgrep</div><div class="line">chgrp  date  dnsdomainname  fgrep    gzip      ls     more	  pidof		 readlink  sh	       su     touch	vdir	      zdiff   zless</div><div class="line">chmod  dd    domainname     findmnt  hostname  lsblk  mount	  ping		 rm	   sh.distrib  sync   true	which	      zegrep  zmore</div><div class="line">chown  df    echo	    grep     ip        mkdir  mountpoint  ping6		 rmdir	   sleep       tailf  umount	ypdomainname  fgrep  znew</div></pre></td></tr></table></figure>
+<p>容器中可用的命令少之又少，都是些基本的命令，但是有这些命令，可以做很多事情了，虽然很多命令我也不懂。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/# cd proc/</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1	   bus	      consoles	diskstats    fb		  iomem     kcore      kpagecount  meminfo  mtrr	  scsi	    stat	   sysvipc	tty	     vmstat</div><div class="line">15	   cgroups    cpuinfo	dma	     filesystems  ioports   key-users  kpageflags  misc     net		  self	    swaps	   thread-self	uptime	     zoneinfo</div><div class="line">acpi	   cmdline    crypto	driver	     fs		  irq	    keys       loadavg	   modules  pagetypeinfo  slabinfo  sys		   timer_list	version</div><div class="line">buddyinfo  config.gz  devices	execdomains  interrupts   kallsyms  kmsg       locks	   mounts   partitions	  softirqs  sysrq-trigger  timer_stats	vmallocinfo</div></pre></td></tr></table></figure>
+<p>上面列出的是/proc目录中一些进程相关的目录，每个目录中是当程本身相关信息的文件。<br>下面我们来启动一个nginx，看看会发生什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# nginx</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1   acpi       cmdline	  crypto     driver	  fs	      irq	 keys	     loadavg  modules  pagetypeinfo  slabinfo  sys	      timer_list   version</div><div class="line">17  buddyinfo  config.gz  devices    execdomains  interrupts  kallsyms	 kmsg	     locks    mounts   partitions    softirqs  sysrq-trigger  timer_stats  vmallocinfo</div><div class="line">18  bus        consoles   diskstats  fb		  iomem       kcore	 kpagecount  meminfo  mtrr     scsi	     stat      sysvipc	      tty	   vmstat</div><div class="line">19  cgroups    cpuinfo	  dma	     filesystems  ioports     key-users  kpageflags  misc     net      self	     swaps     thread-self    uptime	   zoneinfo</div></pre></td></tr></table></figure>
+<p>嗯？ 多出来3个数字命名的目录，对就是pid 为17，18，19的进程。再次ls，发现19小时，没错19应该是运行ls产生的进程，运行完成就消失了，猜测17，18一个是nginx master，另一个应该是worker<br>查看以下pid为18的进程，属组和用户都是nginx，更加确定它就是nginx的worker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 18</div><div class="line">ls: cannot read symbolic link 18/cwd: Permission denied</div><div class="line">ls: cannot read symbolic link 18/root: Permission denied</div><div class="line">ls: cannot read symbolic link 18/exe: Permission denied</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 nginx nginx 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root  root  0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 nginx nginx 0 Feb 15 02:17 attr</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 autogroup</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 auxv</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cgroup</div><div class="line">--w-------   1 nginx nginx 0 Feb 15 02:17 clear_refs</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cmdline</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 comm</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 coredump_filter</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cpuset</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 cwd</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 environ</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 exe</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fd</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fdinfo</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 gid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 limits</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 map_files</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 maps</div><div class="line">-rw-------   1 nginx nginx 0 Feb 15 02:17 mem</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mountinfo</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mounts</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 mountstats</div><div class="line">dr-xr-xr-x   7 nginx nginx 0 Feb 15 02:17 net</div><div class="line">dr-x--x--x   2 nginx nginx 0 Feb 15 02:17 ns</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_adj</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score_adj</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 pagemap</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 personality</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 projid_map</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 root</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 setgroups</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 smaps</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 stack</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 stat</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 statm</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 status</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 syscall</div><div class="line">dr-xr-xr-x   3 nginx nginx 0 Feb 15 02:17 task</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 timers</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 uid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 wchar</div></pre></td></tr></table></figure>
+<p>有些文件没有权限，还是看nginx的master吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 17/</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 root root 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root root 0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 root root 0 Feb 15 02:19 attr</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 autogroup</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 auxv</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cgroup</div><div class="line">--w-------   1 root root 0 Feb 15 02:19 clear_refs</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cmdline</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 comm</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 coredump_filter</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cpuset</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 cwd -&gt; /proc</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 environ</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fd</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fdinfo</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 gid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 limits</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 map_files</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 maps</div><div class="line">-rw-------   1 root root 0 Feb 15 02:19 mem</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mountinfo</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mounts</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 mountstats</div><div class="line">dr-xr-xr-x   7 root root 0 Feb 15 02:19 net</div><div class="line">dr-x--x--x   2 root root 0 Feb 15 02:19 ns</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_adj</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 oom_score</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_score_adj</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 pagemap</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 personality</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 projid_map</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 root -&gt; /</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 setgroups</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 smaps</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 stack</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 stat</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 statm</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 status</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 syscall</div><div class="line">dr-xr-xr-x   3 root root 0 Feb 15 02:19 task</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 timers</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 uid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 wchan</div></pre></td></tr></table></figure>
+<p>接下来看看各个文件都是干吗用的吧</p>
+<ul>
+<li>cmdline — 启动当前进程的完整命令，但僵尸进程目录中的此文件不包含任何信息;</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cd 17</div><div class="line">root@c27f523688ea:/proc/17# more cmdline</div><div class="line">nginx: master process nginx</div></pre></td></tr></table></figure>
+<ul>
+<li><p>cwd 指向当前进程运行目录的一个符号链接； </p>
+</li>
+<li><p>environ 当前进程的环境变量列表，彼此间用空字符（NULL）隔开；变量用大写字母表示，其值用小写字母表示；</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# more environ</div><div class="line"> master process nginx</div></pre></td></tr></table></figure>
+<ul>
+<li>exe 指向启动当前进程的可执行文件（完整路径）的符号链接，通过/proc/N/exe可以启动当前进程的一个拷贝； </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ls -al exe</div><div class="line">lrwxrwxrwx 1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div></pre></td></tr></table></figure>
+<p>实际的可执行文件就是/usr/sbin/nginx</p>
+<ul>
+<li><p>fd 这是个目录，包含当前进程打开的每一个文件的文件描述符（file descriptor），这些文件描述符是指向实际文件的一个符号链接;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# ls -al fd</div><div class="line">total 0</div><div class="line">dr-x------ 2 root root  0 Feb 15 02:19 .</div><div class="line">dr-xr-xr-x 9 root root  0 Feb 15 02:13 ..</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 0 -&gt; /dev/null</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 1 -&gt; /dev/null</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 2 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 3 -&gt; socket:[63800]</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 4 -&gt; /1</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 5 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 6 -&gt; socket:[63798]</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 7 -&gt; socket:[63801]</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>limits 当前进程所使用的每一个受限资源的软限制、硬限制和管理单元；此文件仅可由实际启动当前进程的UID用户读取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat limits</div><div class="line">Limit                     Soft Limit           Hard Limit           Units</div><div class="line">Max cpu time              unlimited            unlimited            seconds</div><div class="line">Max file size             unlimited            unlimited            bytes</div><div class="line">Max data size             unlimited            unlimited            bytes</div><div class="line">Max stack size            8388608              unlimited            bytes</div><div class="line">Max core file size        0                    unlimited            bytes</div><div class="line">Max resident set          unlimited            unlimited            bytes</div><div class="line">Max processes             1048576              1048576              processes</div><div class="line">Max open files            1048576              1048576              files</div><div class="line">Max locked memory         65536                65536                bytes</div><div class="line">Max address space         unlimited            unlimited            bytes</div><div class="line">Max file locks            unlimited            unlimited            locks</div><div class="line">Max pending signals       3867                 3867                 signals</div><div class="line">Max msgqueue size         819200               819200               bytes</div><div class="line">Max nice priority         0                    0</div><div class="line">Max realtime priority     0                    0</div><div class="line">Max realtime timeout      unlimited            unlimited            us</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>再运行 ulimit ，因为用户都是root，所以 ulimit应该和这个limits表示的内容是相同的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ulimit -a</div><div class="line">core file size          (blocks, -c) 0</div><div class="line">data seg size           (kbytes, -d) unlimited</div><div class="line">scheduling priority             (-e) 0</div><div class="line">file size               (blocks, -f) unlimited</div><div class="line">pending signals                 (-i) 3867</div><div class="line">max locked memory       (kbytes, -l) 64</div><div class="line">max memory size         (kbytes, -m) unlimited</div><div class="line">open files                      (-n) 1048576</div><div class="line">pipe size            (512 bytes, -p) 8</div><div class="line">POSIX message queues     (bytes, -q) 819200</div><div class="line">real-time priority              (-r) 0</div><div class="line">stack size              (kbytes, -s) 8192</div><div class="line">cpu time               (seconds, -t) unlimited</div><div class="line">max user processes              (-u) 1048576</div><div class="line">virtual memory          (kbytes, -v) unlimited</div><div class="line">file locks                      (-x) unlimited</div></pre></td></tr></table></figure>
+<ul>
+<li>maps — 当前进程关联到的每个可执行文件和库文件在内存中的映射区域及其访问权限所组成的列表;<br>看不懂 先过了</li>
+</ul>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat maps</div><div class="line">00400000-004c1000 r-xp 00000000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c0000-006c1000 r--p 000c0000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c1000-006d7000 rw-p 000c1000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006d7000-006e6000 rw-p 00000000 00:00 0</div><div class="line">01c28000-01c85000 rw-p 00000000 00:00 0                                  [heap]</div><div class="line">7fb1c3d4f000-7fb1c3d5a000 r-xp 00000000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3d5a000-7fb1c3f59000 ---p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f59000-7fb1c3f5a000 r--p 0000a000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5a000-7fb1c3f5b000 rw-p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5b000-7fb1c3f65000 r-xp 00000000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c3f65000-7fb1c4164000 ---p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4164000-7fb1c4165000 r--p 00009000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4165000-7fb1c4166000 rw-p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4166000-7fb1c417b000 r-xp 00000000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c417b000-7fb1c437a000 ---p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437a000-7fb1c437b000 r--p 00014000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437b000-7fb1c437c000 rw-p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437c000-7fb1c437e000 rw-p 00000000 00:00 0</div><div class="line">7fb1c437e000-7fb1c4385000 r-xp 00000000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4385000-7fb1c4584000 ---p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4584000-7fb1c4585000 r--p 00006000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4585000-7fb1c4586000 rw-p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4586000-7fb1c4588000 r-xp 00000000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4588000-7fb1c4788000 ---p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4788000-7fb1c4789000 r--p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4789000-7fb1c478a000 rw-p 00003000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c478a000-7fb1c490b000 r-xp 00000000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c490b000-7fb1c4b0b000 ---p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0b000-7fb1c4b0f000 r--p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0f000-7fb1c4b10000 rw-p 00185000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b10000-7fb1c4b15000 rw-p 00000000 00:00 0</div><div class="line">7fb1c4b15000-7fb1c4b2b000 r-xp 00000000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4b2b000-7fb1c4d2a000 ---p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2a000-7fb1c4d2b000 r--p 00015000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2b000-7fb1c4d2c000 rw-p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2c000-7fb1c4ef6000 r-xp 00000000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c4ef6000-7fb1c50f6000 ---p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c50f6000-7fb1c5111000 r--p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5111000-7fb1c5120000 rw-p 001e5000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5120000-7fb1c5124000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5124000-7fb1c517a000 r-xp 00000000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c517a000-7fb1c537a000 ---p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537a000-7fb1c537d000 r--p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537d000-7fb1c5384000 rw-p 00059000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c5384000-7fb1c53c0000 r-xp 00000000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c53c0000-7fb1c55c0000 ---p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c0000-7fb1c55c1000 rw-p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c1000-7fb1c55c9000 r-xp 00000000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c55c9000-7fb1c57c8000 ---p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c8000-7fb1c57c9000 r--p 00007000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c9000-7fb1c57ca000 rw-p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57ca000-7fb1c57f8000 rw-p 00000000 00:00 0</div><div class="line">7fb1c57f8000-7fb1c580f000 r-xp 00000000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c580f000-7fb1c5a0e000 ---p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0e000-7fb1c5a0f000 r--p 00016000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0f000-7fb1c5a10000 rw-p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a10000-7fb1c5a14000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5a14000-7fb1c5a34000 r-xp 00000000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c2a000-7fb1c5c2f000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c30000-7fb1c5c31000 rw-s 00000000 00:01 63799                      /dev/zero (deleted)</div><div class="line">7fb1c5c31000-7fb1c5c33000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c33000-7fb1c5c34000 r--p 0001f000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c34000-7fb1c5c35000 rw-p 00020000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c35000-7fb1c5c36000 rw-p 00000000 00:00 0</div><div class="line">7ffe5a572000-7ffe5a593000 rw-p 00000000 00:00 0                          [stack]</div><div class="line">7ffe5a5e3000-7ffe5a5e5000 r--p 00000000 00:00 0                          [vvar]</div><div class="line">7ffe5a5e5000-7ffe5a5e7000 r-xp 00000000 00:00 0                          [vdso]</div><div class="line">ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]</div></pre></td></tr></table></figure>
+<ul>
+<li>mem 当前进程所占用的内存空间，由open、read和lseek等系统调用使用，不能被用户读取；</li>
+<li>root 指向当前进程运行根目录的符号链接；在Unix和Linux系统上，通常采用chroot命令使每个进程运行于独立的根目录；</li>
+<li><p>stat 当前进程的状态信息，包含一系统格式化后的数据列，可读性差，通常由ps命令使用； </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more stat</div><div class="line">17 (nginx) S 1 17 17 0 -1 4218944 49 0 0 0 0 0 0 0 20 0 1 0 5428469 31825920 195 18446744073709551615 4194304 4982492 140730414209264 140730414208128 140401482384618 0 0 1073745920</div><div class="line">402745863 0 0 0 17 0 0 0 0 0 0 7081352 7168288 29523968 140730414214953 140730414214959 140730414214959 140730414215144 0</div></pre></td></tr></table></figure>
+</li>
+<li><p>status 与stat所提供信息类似，但可读性较好，如下所示，每行表示一个属性信息；其详细介绍请参见 proc的man手册页;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more status</div><div class="line">Name:	nginx</div><div class="line">State:	S (sleeping)</div><div class="line">Tgid:	17</div><div class="line">Ngid:	0</div><div class="line">Pid:	17</div><div class="line">PPid:	1</div><div class="line">TracerPid:	0</div><div class="line">Uid:	0	0	0	0</div><div class="line">Gid:	0	0	0	0</div><div class="line">FDSize:	64</div><div class="line">Groups:</div><div class="line">NStgid:	17</div><div class="line">NSpid:	17</div><div class="line">NSpgid:	17</div><div class="line">NSsid:	17</div><div class="line">VmPeak:	   31080 kB</div><div class="line">VmSize:	   31080 kB</div><div class="line">VmLck:	       0 kB</div><div class="line">VmPin:	       0 kB</div><div class="line">VmHWM:	     780 kB</div><div class="line">VmRSS:	     780 kB</div><div class="line">VmData:	     724 kB</div><div class="line">VmStk:	     136 kB</div><div class="line">VmExe:	     772 kB</div><div class="line">VmLib:	    4500 kB</div><div class="line">VmPTE:	      76 kB</div><div class="line">VmPMD:	      12 kB</div><div class="line">VmSwap:	       0 kB</div><div class="line">Threads:	1</div><div class="line">SigQ:	0/3867</div><div class="line">SigPnd:	0000000000000000</div><div class="line">ShdPnd:	0000000000000000</div><div class="line">SigBlk:	0000000000000000</div><div class="line">SigIgn:	0000000040001000</div><div class="line">SigCgt:	0000000198016a07</div><div class="line">CapInh:	00000000a80425fb</div><div class="line">CapPrm:	00000000a80425fb</div><div class="line">CapEff:	00000000a80425fb</div><div class="line">CapBnd:	00000000a80425fb</div><div class="line">Seccomp:	0</div><div class="line">Cpus_allowed:	1</div><div class="line">Cpus_allowed_list:	0</div><div class="line">Mems_allowed:	1</div><div class="line">Mems_allowed_list:	0</div><div class="line">voluntary_ctxt_switches:	1</div><div class="line">--More--(0%)</div></pre></td></tr></table></figure>
+</li>
+<li><p>task 目录文件，包含由当前进程所运行的每一个线程的相关信息，每个线程的相关信息文件均保存在一个由线程号（tid）命名的目录中，这类似于其内容类似于每个进程目录中的内容</p>
+</li>
+</ul>
+<h3 id="proc目录下常见的文件介绍"><a href="#proc目录下常见的文件介绍" class="headerlink" title="/proc目录下常见的文件介绍"></a>/proc目录下常见的文件介绍</h3><ul>
+<li>/proc/apm 高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用(容器中没有)</li>
+<li>/proc/buddyinfo 用于诊断内存碎片问题的相关信息文件(容器中没有)</li>
+<li>/proc/cmdline 在启动时传递至内核的相关参数信息，这些信息通常由lilo或grub等启动管理工具进行传递</li>
+<li>/proc/cpuinfo 处理器的相关信息的文件</li>
+<li>/proc/crypto 系统上已安装的内核使用的密码算法及每个算法的详细信息列表</li>
+<li>/proc/devices 系统已经加载的所有块设备和字符设备的信息，包含主设备号和设备组（与主设备号对应的设备类型）名</li>
+<li>/proc/diskstats 每块磁盘设备的磁盘I/O统计信息列表</li>
+<li>/proc/dma 每个正在使用且注册的ISA DMA通道的信息列表</li>
+<li>/proc/execdomains 内核当前支持的执行域（每种操作系统独特“个性”）信息列表</li>
+<li>/proc/fb 帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息；</li>
+<li>/proc/filesystems 当前被内核支持的文件系统类型列表文件，被标示为nodev的文件系统表示不需要块设备的支持；通常mount一个设备时，如果没有指定文件系统类型将通过此文件来决定其所需文件系统的类型</li>
+<li>/proc/interrupts X86或X86_64体系架构系统上每个IRQ相关的中断号列表；多路处理器平台上每个CPU对于每个I/O设备均有自己的中断号</li>
+<li>/proc/iomem 每个物理设备上的记忆体（RAM或者ROM）在系统内存中的映射信息</li>
+<li>/proc/ioports 当前正在使用且已经注册过的与物理设备进行通讯的输入-输出端口范围信息列表；如下面所示，第一列表示注册的I/O端口范围，其后表示相关的设备</li>
+<li>/proc/kallsyms 模块管理工具用来动态链接或绑定可装载模块的符号定义，由内核输出;通常这个文件中的信息量相当大；</li>
+<li>/proc/kcore 系统使用的物理内存，以ELF核心文件（core file）格式存储，其文件大小为已使用的物理内存（RAM）加上4KB；这个文件用来检查内核数据结构的当前状态，因此，通常由GDB通常调试工具使用，但不能使用文件查看命令打开此文件</li>
+<li>/proc/kmsg 此文件用来保存由内核输出的信息，通常由/sbin/klogd或/bin/dmsg等程序使用，不要试图使用查看命令打开此文件</li>
+<li>/proc/locks 保存当前由内核锁定的文件的相关信息，包含内核内部的调试数据；每个锁定占据一行，且具有一个惟一的编号；如下输出信息中每行的第二列表示当前锁定使用的锁定类别，POSIX表示目前较新类型的文件锁，由lockf系统调用产生，FLOCK是传统的UNIX文件锁，由flock系统调用产生；第三列也通常由两种类型，ADVISORY表示不允许其他用户锁定此文件，但允许读取，MANDATORY表示此文件锁定期间不允许其他用户任何形式的访问；  </li>
+<li><p>/proc/meminfo 系统中关于当前内存的利用状况等的信息，常由free命令使用；可以使用文件查看命令直接读取此文件，其内容显示为两列，前者为统计属性，后者为对应的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat meminfo</div><div class="line">MemTotal:        1020096 kB</div><div class="line">MemFree:          746572 kB</div><div class="line">MemAvailable:     802920 kB</div><div class="line">Buffers:           41512 kB</div><div class="line">Cached:           139888 kB</div><div class="line">SwapCached:            0 kB</div><div class="line">Active:           135888 kB</div><div class="line">Inactive:          92792 kB</div><div class="line">Active(anon):      83496 kB</div><div class="line">Inactive(anon):    90648 kB</div><div class="line">Active(file):      52392 kB</div><div class="line">Inactive(file):     2144 kB</div><div class="line">Unevictable:           0 kB</div><div class="line">Mlocked:               0 kB</div><div class="line">SwapTotal:       1182172 kB</div><div class="line">SwapFree:        1182172 kB</div><div class="line">Dirty:                 8 kB</div><div class="line">Writeback:             0 kB</div><div class="line">AnonPages:         47276 kB</div><div class="line">Mapped:            29256 kB</div><div class="line">Shmem:            126868 kB</div><div class="line">Slab:              28464 kB</div><div class="line">SReclaimable:      16392 kB</div><div class="line">SUnreclaim:        12072 kB</div><div class="line">KernelStack:        2432 kB</div><div class="line">PageTables:         1616 kB</div><div class="line">NFS_Unstable:          0 kB</div><div class="line">Bounce:                0 kB</div><div class="line">WritebackTmp:          0 kB</div><div class="line">CommitLimit:     1692220 kB</div><div class="line">Committed_AS:     371556 kB</div><div class="line">VmallocTotal:   34359738367 kB</div><div class="line">VmallocUsed:        8908 kB</div><div class="line">VmallocChunk:   34359699820 kB</div><div class="line">AnonHugePages:     32768 kB</div><div class="line">HugePages_Total:       0</div><div class="line">HugePages_Free:        0</div><div class="line">HugePages_Rsvd:        0</div><div class="line">HugePages_Surp:        0</div><div class="line">Hugepagesize:       2048 kB</div><div class="line">DirectMap4k:       47040 kB</div><div class="line">DirectMap2M:     1001472 kB</div></pre></td></tr></table></figure>
+</li>
+<li><p>/proc/mounts 在内核2.4.29版本以前，此文件的内容为系统当前挂载的所有文件系统，在2.4.19以后的内核中引进了每个进程使用独立挂载名称空间的方式，此文件则随之变成了指向/proc/self/mounts（每个进程自身挂载名称空间中的所有挂载点列表）文件的符号链接；/proc/self是一个独特的目录，后文中会对此目录进行介绍</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al mounts</div><div class="line">lrwxrwxrwx 1 root root 11 Feb 15 06:18 mounts -&gt; self/mounts</div></pre></td></tr></table></figure>
+<p>其中第一列表示挂载的设备，第二列表示在当前目录树中的挂载点，第三点表示当前文件系统的类型，第四列表示挂载属性（ro或者rw），第五列和第六列用来匹配/etc/mtab文件中的转储（dump）属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# more mounts</div><div class="line">none / aufs rw,relatime,si=6bfa28fca2bd64f1,dio,dirperm1 0 0</div><div class="line">proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /dev tmpfs rw,nosuid,mode=755 0 0</div><div class="line">devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0</div><div class="line">sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /sys/fs/cgroup tmpfs ro,nosuid,nodev,noexec,relatime,mode=755 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuset cgroup ro,nosuid,nodev,noexec,relatime,cpuset 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpu cgroup ro,nosuid,nodev,noexec,relatime,cpu 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuacct cgroup ro,nosuid,nodev,noexec,relatime,cpuacct 0 0</div><div class="line">cgroup /sys/fs/cgroup/blkio cgroup ro,nosuid,nodev,noexec,relatime,blkio 0 0</div><div class="line">cgroup /sys/fs/cgroup/memory cgroup ro,nosuid,nodev,noexec,relatime,memory 0 0</div><div class="line">cgroup /sys/fs/cgroup/devices cgroup ro,nosuid,nodev,noexec,relatime,devices 0 0</div><div class="line">cgroup /sys/fs/cgroup/freezer cgroup ro,nosuid,nodev,noexec,relatime,freezer 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_cls cgroup ro,nosuid,nodev,noexec,relatime,net_cls 0 0</div><div class="line">cgroup /sys/fs/cgroup/perf_event cgroup ro,nosuid,nodev,noexec,relatime,perf_event 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_prio cgroup ro,nosuid,nodev,noexec,relatime,net_prio 0 0</div><div class="line">cgroup /sys/fs/cgroup/hugetlb cgroup ro,nosuid,nodev,noexec,relatime,hugetlb 0 0</div></pre></td></tr></table></figure>
+<p>可以看到/proc 使用的是proc文件系统,大多数的ubuntu镜像使用的是aufs文件系统，当然可以在启动镜像时的时候指定storage driver</p>
+<ul>
+<li><p>/proc/modules 当前装入内核的所有模块名称列表，可以由lsmod命令使用，也可以直接查看；如下所示，其中第一列表示模块名，第二列表示此模块占用内存空间大小，第三列表示此模块有多少实例被装入，第四列表示此模块依赖于其它哪些模块，第五列表示此模块的装载状态（Live：已经装入；Loading：正在装入；Unloading：正在卸载），第六列表示此模块在内核内存（kernel memory）中的偏移量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat modules</div><div class="line">veth 16384 0 - Live 0xffffffffa0173000</div><div class="line">xt_conntrack 16384 1 - Live 0xffffffffa0152000</div><div class="line">ipt_MASQUERADE 16384 1 - Live 0xffffffffa014d000</div><div class="line">nf_nat_masquerade_ipv4 16384 1 ipt_MASQUERADE, Live 0xffffffffa01a5000</div></pre></td></tr></table></figure>
+</li>
+<li><p>proc/partitions 块设备每个分区的主设备号（major）和次设备号（minor）等信息，同时包括每个分区所包含的块（block）数目（如下面输出中第三列所示)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# more partitions</div><div class="line">major minor  #blocks  name</div><div class="line"></div><div class="line">   1        0      65535 ram0</div><div class="line">   1        1      65535 ram1</div><div class="line">   1        2      65535 ram2</div><div class="line">   1        3      65535 ram3</div><div class="line">   1        4      65535 ram4</div><div class="line">   1        5      65535 ram5</div><div class="line">   1        6      65535 ram6</div><div class="line">   1        7      65535 ram7</div><div class="line"> 250        0     194216 zram0</div><div class="line">  11        0      30720 sr0</div><div class="line">   8        0   20480000 sda</div><div class="line">   8        1   19486845 sda1</div><div class="line">   8        2     987966 sda2</div></pre></td></tr></table></figure>
+</li>
+<li><p>/proc/pci<br>内核初始化时发现的所有PCI设备及其配置信息列表，其配置信息多为某PCI设备相关IRQ信息，可读性不高，可以用“/sbin/lspci –vb”命令获得较易理解的相关信息；在2.6内核以后，此文件已为/proc/bus/pci目录及其下的文件代替</p>
+<ul>
+<li>/proc/slabinfo 在内核中频繁使用的对象（如inode、dentry等）都有自己的cache，即slab pool，而/proc/slabinfo文件列出了这些对象相关slap的信息；详情可以参见内核文档中slapinfo的手册页</li>
+<li><p>/proc/stat<br>实时追踪自系统上次启动以来的多种统计信息；如下所示，其中</p>
+<p>“cpu”行后的八个值分别表示以1/100（jiffies）秒为单位的统计值（包括系统运行于用户模式、低优先级用户模式，运系统模式、空闲模式、I/O等待模式的时间等）</p>
+<p>“intr”行给出中断的信息，第一个为自系统启动以来，发生的所有的中断的次数；然后每个数对应一个特定的中断自系统启动以来所发生的次数； </p>
+<p>“ctxt”给出了自系统启动以来CPU发生的上下文交换的次数。 </p>
+<p>“btime”给出了从系统启动到现在为止的时间，单位为秒； </p>
+<p>“processes (total_forks) 自系统启动以来所创建的任务的个数目； </p>
+<p>“procs_running”：当前运行队列的任务的数目； </p>
+<p>“procs_blocked”：当前被阻塞的任务的数目； </p>
+</li>
+<li>/proc/swaps 当前系统上的交换分区及其空间利用信息，如果有多个交换分区的话，则会每个交换分区的信息分别存储于/proc/swap目录中的单独文件中，而其优先级数字越低，被使用到的可能性越大 </li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat swaps</div><div class="line">Filename				Type		Size	Used	Priority</div><div class="line">/dev/zram0                              partition	194212	0	-1</div><div class="line">/dev/sda2                               partition	987960	0	-2</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/uptime 系统上次启动以来的运行时间,如下所示，其第一个数字表示系统运行时间，第二个数字表示系统空闲时间，单位是秒；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">	root@c27f523688ea:/proc# cat uptime</div><div class="line">70344.11 70304.83</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/version<br>当前系统运行的内核版本号，还会显示系统安装的gcc版本，如下所示；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat version</div><div class="line">Linux version 4.1.13-boot2docker (root@11aafb97cfeb) (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Fri Nov 20 19:05:50 UTC 2015</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/vmstat<br>当前系统虚拟内存的多种统计数据，信息量可能会比较大，这因系统而有所不同，可读性较好</li>
+<li>/proc/zoneinfo 内存区域（zone）的详细信息列表，信息量较大</li>
+</ul>
+<h3 id="proc-sys目录详解"><a href="#proc-sys目录详解" class="headerlink" title="/proc/sys目录详解"></a>/proc/sys目录详解</h3><p>与 /proc下其它文件的“只读”属性不同的是，管理员可对/proc/sys子目录中的许多文件内容进行修改以更改内核的运行特性，事先可以使用“ls -l”命令查看某文件是否“可写入”。写入操作通常使用类似于“echo  DATA &gt; /path/to/your/filename”的格式进行。需要注意的是，即使文件可写，其一般也不可以使用编辑器进行编辑。 </p>
+<ul>
+<li><p>/proc/sys/debug 子目录<br>此目录通常是一空目录； </p>
+</li>
+<li><p>/proc/sys/dev 子目录<br>为系统上特殊设备提供参数信息文件的目录，其不同设备的信息文件分别存储于不同的子目录中，如大多数系统上都会具有的/proc/sys/dev /cdrom和/proc/sys/dev/raid（如果内核编译时开启了支持raid的功能） 目录，其内存储的通常是系统上cdrom和raid的相关参数信息文件。</p>
+</li>
+</ul>
+<p>照着搬过来很多内容，了解了一些，一些还是不懂，写博客的好处，就是可以温故而知新</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

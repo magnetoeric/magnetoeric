@@ -1,0 +1,1097 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+<meta property="og:type" content="website">
+<meta property="og:title" content="艾瑞克">
+<meta property="og:url" content="http://magnetoeric.github.io/page/3/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="艾瑞克">
+<meta name="twitter:description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/07/docker/" title="docker 笔记" itemprop="url">docker 笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-07T06:33:00.000Z" itemprop="datePublished"> 发表于 2016-02-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近找了本docker的书<a href="http://www.salttiger.com/using-docker/" target="_blank" rel="external">Using Docker</a><br>读了大半部分了，整理了一下一些很有用的Docker相关笔记，顺便把以前做的一些问题修改了一下，整套脚本构建放到了<a href="https://github.com/magnetoeric/docker-laravel" target="_blank" rel="external">github</a>上。</p>
+<ul>
+<li>docker rm $(docker ps -aq)<br>可以清除所有停止的docker 容器，运行中的不会被清理，同理，docker rmi $(docker images -aq)也可以清理，但是请谨慎使用，因为会把很多有用的‘基础’容器删除，构建image时还要重新下载。所以这里可以使用–filter 和awk grep等命令协同处理（因为有时候docker产生的无用image太多了）</li>
+<li>尽量不要指定HOST_DIR 挂载，因为这会影响到宿主机的文件<br>如果开发dev环境，可以指定宿主机挂载，注意container的运行权限，尽量不要对挂载目录有写的权限，运行时会产生一些缓存文件，这些缓存目录可以设置成777 并在git config里忽略文件的权限</li>
+<li>CTRL P +CTRL Q<br>这个命令是attach到任何容器后不想退出容器，而是进行detach</li>
+<li>对于简单的复制，可以使用copy 替代 add，add可以对文件进行解压缩，实际上是对流进行操作</li>
+<li>不要使用root运行 因为有时候你可能会使用挂载，而root有权限对挂载目录进行写操作，从而造成一些不必要的问题</li>
+<li>.DOCKERIGNORE 类似gitignore，你可以添加一个 .dockerignore 文件到你的 <code>Dockerfile</code> ， Docker 将会在发送构建上下文到守护进程时忽略在 .dockerignore 中指定的文件和目录</li>
+<li>数据尽量使用单独的image，不要混合使用</li>
+<li>docker save 和 export的区别是save是多layer  export只有一个layer (个人使用较少,export 还会丢失一些环境变量)</li>
+<li>RUN 使用&amp;&amp;减少layer的数量，这样在同一层使用某文件后并删除可以控制image的大小。这也是我的构建脚本从900MB减少的500MB的原因，而且可以继续减少（去除apt安装的一些编译头文件）</li>
+<li>compose 的yml可以使用extends 子yml里的配置会覆盖父yml的配置，links 和 volumes-from 不会被继承(docker-compose 个人不是很喜欢，个人比较喜欢shell，方便可控)</li>
+<li>CMD和ENTRYPOINT的区别<br>CMD和ENTRYPOINT是在运行container 时会运行的指令, 都只能写一条, 如果写了多条, 则最后一条生效.<br>CMD在运行时会被command覆盖, ENTRYPOINT不会被运行时的command覆盖, 但是也可以指定.<a href="http://blog.163.com/digoal@126/blog/static/163877040201410411715832/" target="_blank" rel="external">Docker RUN CMD 和ENTRYPOINT</a> 我对ENTRYPOINT的使用也不是很多</li>
+<li>不要把key放到docker里<br>安全原因,可以把它写到shell里，运行时通过shell添加；也可以通过配置中心获取，比如consul等</li>
+<li>docker 日志输出<br><a href="https://github.com/gliderlabs/logspout" target="_blank" rel="external">logspout</a> 可以将docker 产生的log 输出到任何地方，可以使用elk将这些收集整理 最近闲暇时间也学习了一下elk，也搭建了一套本地elk环境，以后该考虑一下应用到生产环境</li>
+<li>监控docker cpu等信息<pre><code>docker stats $(docker inspect -f {{.Name}} $(docker ps -q))
+</code></pre></li>
+</ul>
+<p>继续说说docker laravel环境遇到的一些问题，因为需要将ecshop的代码迁移到laravel里，也就意味着 php版本也要做相应的升级，问题不少，所以搭建了一套laravel的也搭建了一套ecshop的，但是ecshop的nginx涉及到私有问题，就不传出来了。思想都是一样的。最后说说一个折腾了很久的问题吧，搭建docker的环境，主要是为了分离各服务，也就是所谓的微服务microservice，但是使用时，nginx对php-fpm进行link和volumn，发现端口并不能被转发到PHP－fpm的socket端口，nginx一直报502.由于nginx使用的是官方提供的版本，系统精简到ps，netstat，telnet等一些常用的命令都没有，加大了调试难度，在调试过程中个人也从中学到了很多linux系统的一些知识。最后在php-fpm容器中使用netstat发现Local Address是127.0.0.1:9000,也就是说只会监听本地的端口，遂查看php-fpm的config，将127.0.0.1:9000替换为9000,使其可以被外网访问到，当然容器中才可以这样使用，因为容器本身并没有把端口暴露给外部，而是暴露给使用了link该容器的容器。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/docker/">docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/docker/">docker</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/02/linux_10/" title="服务器TIME_WAIT和CLOSE_WAIT详解" itemprop="url">服务器TIME_WAIT和CLOSE_WAIT详解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-02T03:22:00.000Z" itemprop="datePublished"> 发表于 2016-02-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://www.cnblogs.com/sunxucool/p/3449068.html" target="_blank" rel="external">服务器TIME_WAIT和CLOSE_WAIT详解和解决办法</a><br>在服务器的日常维护过程中，会经常用到下面的命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstat -n | awk &apos;/^tcp/ &#123;++S[$NF]&#125; END &#123;for(a in S) print a, S[a]&#125;&apos;</div></pre></td></tr></table></figure></p>
+<p>它会显示例如下面的信息：<br>TIME_WAIT 814<br>CLOSE_WAIT 1<br>FIN_WAIT1 1<br>ESTABLISHED 634<br>SYN_RECV 2<br>LAST_ACK 1<br>常用的三个状态是：ESTABLISHED 表示正在通信，TIME_WAIT 表示主动关闭，CLOSE_WAIT 表示被动关闭。<br>具体每种状态什么意思，其实无需多说，看看下面这种图就明白了，注意这里提到的服务器应该是业务请求接受处理的一方：<br><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/0_13110767960diZ.png" alt="image"><br>这么多状态不用都记住，只要了解到我上面提到的最常见的三种状态的意义就可以了。一般不到万不得已的情况也不会去查看网络状态，如果服务器出了异常，百分之八九十都是下面两种情况：</p>
+<p>1.服务器保持了大量TIME_WAIT状态<br>2.服务器保持了大量CLOSE_WAIT状态</p>
+<p>因为linux分配给一个用户的文件句柄是有限的（可以参考<a href="http://blog.csdn.net/shootyou/article/details/6579139）" target="_blank" rel="external">这篇文章</a>，而TIME_WAIT和CLOSE_WAIT两种状态如果一直被保持，那么意味着对应数目的通道就一直被占着，而且是“占着茅坑不使劲”，一旦达到句柄数上限，新的请求就无法被处理了，接着就是大量Too Many Open Files异常，tomcat崩溃。。。</p>
+<p>下面来讨论下这两种情况的处理方法，网上有很多资料把这两种情况的处理方法混为一谈，以为优化系统内核参数就可以解决问题，其实是不恰当的，优化系统内核参 数解决TIME_WAIT可能很容易，但是应对CLOSE_WAIT的情况还是需要从程序本身出发。现在来分别说说这两种情况的处理方法：</p>
+<p><strong>1.服务器保持了大量TIME_WAIT状态</strong><br>这种情况比较常见，一些爬虫服务器或者WEB服务器（如果网管在安装的时候没有做内核参数优化的话）上经常会遇到这个问题，这个问题是怎么产生的呢？</p>
+<p>从上面的示意图可以看得出来，TIME_WAIT是主动关闭连接的一方保持的状态，对于爬虫服务器来说他本身就是“客户端”，在完成一个爬取任务之后，他就 会发起主动关闭连接，从而进入TIME_WAIT的状态，然后在保持这个状态2MSL（max segment lifetime,RFC 793中规定MSL为2分钟，实际应用中常用的是30秒，1分钟和2分钟等）时间之后，彻底关闭回收资源。为什么要这么做？明明就已经主动关闭连接了为啥还要保持资源一段时间呢？这个是TCP/IP的设计者规定 的，主要出于以下两个方面的考虑：</p>
+<p>1.防止上一次连接中的包，迷路后重新出现，影响新连接（经过2MSL，上一次连接中所有的重复包都会消失）</p>
+<ol>
+<li>可靠的关闭TCP连接。在主动关闭方发送的最后一个 ack(fin) ，有可能丢失，这时被动方会重新发fin, 如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack。所以主动方要处于 TIME_WAIT 状态，而不能是 CLOSED 。另外这么设计TIME_WAIT 会定时的回收资源，并不会占用很大资源的，除非短时间内接受大量请求或者受到攻击。</li>
+</ol>
+<p>关于MSL引用下面一段话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">MSL 為 一個 TCP Segment (某一塊 TCP 網路封包) 從來源送到目的之間可續存的時間 (也就是一個網路封</div><div class="line">包在網路上傳輸時能存活的時間)，由 於 RFC 793 TCP 傳輸協定是在 1981 年定義的，當時的網路速度不像</div><div class="line">現在的網際網路那樣發達，你可以想像你從瀏覽器輸入網址等到第一 個 byte 出現要等 4 分鐘嗎？在現在的網</div><div class="line">路環境下幾乎不可能有這種事情發生，因此我們大可將 TIME_WAIT 狀態的續存時間大幅調低，好 讓 連線埠 </div><div class="line">(Ports) 能更快空出來給其他連線使用。</div></pre></td></tr></table></figure></p>
+<p>再引用网络资源的一段话：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">值得一说的是，对于基于TCP的HTTP协议，关闭TCP连接的是Server端，这样，Server端会进入TIME_WAIT状</div><div class="line">态，可 想而知，对于访 问量大的Web Server，会存在大量的TIME_WAIT状态，假如server一秒钟接收1000</div><div class="line">个请求，那么就会积压 240*1000=240000个 TIME_WAIT的记录，维护这些状态给Server带来负担。当然现</div><div class="line">代操作系统都会用快速的查找算法来管理这些 TIME_WAIT，所以对于新的 TCP连接请求，判断是否hit中一个</div><div class="line">TIME_WAIT不会太费时间，但是有这么多状态要维护总是不好。  </div><div class="line">HTTP协议1.1版规定default行为是Keep-Alive，也就是会重用TCP连接传输多个 request/response，一</div><div class="line">个主要原因就是发现了这个问题。</div></pre></td></tr></table></figure>
+<p>也就是说HTTP的交互跟上面画的那个图是不一样的，关闭连接的不是客户端，而是服务器，所以web服务器也是会出现大量的TIME_WAIT的情况的。</p>
+<p>现在来说如何来解决这个问题。</p>
+<p>解决思路很简单，就是让服务器能够快速回收和重用那些TIME_WAIT的资源。</p>
+<p>下面来看一下我们网管对/etc/sysctl.conf文件的修改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">#对于一个新建连接，内核要发送多少个 SYN 连接请求才决定放弃,不应该大于255，默认值是5，对应于180秒左右时间   </div><div class="line">net.ipv4.tcp_syn_retries=2  </div><div class="line">#net.ipv4.tcp_synack_retries=2  </div><div class="line">#表示当keepalive起用的时候，TCP发送keepalive消息的频度。缺省是2小时，改为300秒  </div><div class="line">net.ipv4.tcp_keepalive_time=1200  </div><div class="line">net.ipv4.tcp_orphan_retries=3  </div><div class="line">#表示如果套接字由本端要求关闭，这个参数决定了它保持在FIN-WAIT-2状态的时间  </div><div class="line">net.ipv4.tcp_fin_timeout=30    </div><div class="line">#表示SYN队列的长度，默认为1024，加大队列长度为8192，可以容纳更多等待连接的网络连接数。  </div><div class="line">net.ipv4.tcp_max_syn_backlog = 4096  </div><div class="line">#表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭  </div><div class="line">net.ipv4.tcp_syncookies = 1  </div><div class="line">  </div><div class="line">#表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭  </div><div class="line">net.ipv4.tcp_tw_reuse = 1  </div><div class="line">#表示开启TCP连接中TIME-WAIT sockets的快速回收，默认为0，表示关闭  </div><div class="line">net.ipv4.tcp_tw_recycle = 1  </div><div class="line">  </div><div class="line">##减少超时前的探测次数   </div><div class="line">net.ipv4.tcp_keepalive_probes=5   </div><div class="line">##优化网络设备接收队列   </div><div class="line">net.core.netdev_max_backlog=3000</div></pre></td></tr></table></figure>
+<p>修改完之后执行/sbin/sysctl -p让参数生效。</p>
+<p>这里头主要注意到的是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">net.ipv4.tcp_tw_reuse </div><div class="line">net.ipv4.tcp_tw_recycle </div><div class="line">net.ipv4.tcp_fin_timeout </div><div class="line">net.ipv4.tcp_keepalive_*</div></pre></td></tr></table></figure></p>
+<p>这几个参数。<br>net.ipv4.tcp_tw_reuse和net.ipv4.tcp_tw_recycle的开启都是为了回收处于TIME_WAIT状态的资源。<br>net.ipv4.tcp_fin_timeout这个时间可以减少在异常情况下服务器从FIN-WAIT-2转到TIME_WAIT的时间。<br>net.ipv4.tcp<em>keepalive</em>*一系列参数，是用来设置服务器检测连接存活的相关配置。<br>关于keepalive的用途可以参考<a href="http://hi.baidu.com/tantea/blog/item/580b9d0218f981793812bb7b.html" target="_blank" rel="external">这篇</a></p>
+<p> <strong>2.服务器保持了大量CLOSE_WAIT状态</strong><br>休息一下，喘口气，一开始只是打算说说TIME_WAIT和CLOSE_WAIT的区别，没想到越挖越深，这也是写博客总结的好处，总可以有意外的收获。</p>
+<p>TIME_WAIT状态可以通过优化服务器参数得到解决，因为发生TIME_WAIT的情况是服务器自己可控的，要么就是对方连接的异常，要么就是自己没有迅速回收资源，总之不是由于自己程序错误导致的。<br>但<br>是CLOSE_WAIT就不一样了，从上面的图可以看出来，如果一直保持在CLOSE_WAIT状态，那么只有一种情况，就是在对方关闭连接之后服务器程<br>序自己没有进一步发出ack信号。换句话说，就是在对方连接关闭之后，程序里没有检测到，或者程序压根就忘记了这个时候需要关闭连接，于是这个资源就一直<br>被程序占着。个人觉得这种情况，通过服务器内核参数也没办法解决，服务器对于程序抢占的资源没有主动回收的权利，除非终止程序运行。</p>
+<p>如果你使用的是HttpClient并且你遇到了大量CLOSE_WAIT的情况，那么这篇日志也许对你有用：<a href="http://blog.csdn.net/shootyou/article/details/6615051" target="_blank" rel="external">http://blog.csdn.net/shootyou/article/details/6615051</a><br>在那边日志里头我举了个场景，来说明CLOSE_WAIT和TIME_WAIT的区别，这里重新描述一下：<br>服 务器A是一台爬虫服务器，它使用简单的HttpClient去请求资源服务器B上面的apache获取文件资源，正常情况下，如果请求成功，那么在抓取完 资源后，服务器A会主动发出关闭连接的请求，这个时候就是主动关闭连接，服务器A的连接状态我们可以看到是TIME_WAIT。如果一旦发生异常呢？假设 请求的资源服务器B上并不存在，那么这个时候就会由服务器B发出关闭连接的请求，服务器A就是被动的关闭了连接，如果服务器A被动关闭连接之后程序员忘了 让HttpClient释放连接，那就会造成CLOSE_WAIT的状态了。</p>
+<p>所以如果将大量CLOSE_WAIT的解决办法总结为一句话那就是：查代码。因为问题出在服务器程序里头啊。</p>
+<p>参考资料：<br>1.windows下的TIME_WAIT的处理可以参加这位大侠的日志：<a href="http://blog.miniasp.com/post/2010/11/17/How-to-deal-with-TIME_WAIT-problem-under-Windows.aspx" target="_blank" rel="external">http://blog.miniasp.com/post/2010/11/17/How-to-deal-with-TIME_WAIT-problem-under-Windows.aspx</a><br>2.WebSphere的服务器优化有一定参考价值：<a href="http://publib.boulder.ibm.com/infocenter/wasinfo/v6r0/index.jsp?topic=/com.ibm.websphere.express.doc/info/exp/ae/tprf_tunelinux.html" target="_blank" rel="external">http://publib.boulder.ibm.com/infocenter/wasinfo/v6r0/index.jsp?topic=/com.ibm.websphere.express.doc/info/exp/ae/tprf_tunelinux.html</a><br>3.各种内核参数的含义：<a href="http://haka.sharera.com/blog/BlogTopic/32309.htm" target="_blank" rel="external">http://haka.sharera.com/blog/BlogTopic/32309.htm</a><br>4.linux服务器历险之sysctl优化linux网络：<a href="http://blog.csdn.net/chinalinuxzend/article/details/1792184" target="_blank" rel="external">http://blog.csdn.net/chinalinuxzend/article/details/1792184</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/23/linux_09/" title="Linux strace命令" itemprop="url">Linux strace命令</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-23T04:56:00.000Z" itemprop="datePublished"> 发表于 2016-01-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316692.html" target="_blank" rel="external">Linux strace命令</a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><hr>
+<p>strace常用来跟踪进程执行时的系统调用和所接收的信号。 在Linux世界，进程不能直接访问硬件设备，当进程需要访问硬件设备(比如读取磁盘文件，接收网络数据等等)时，必须由用户态模式切换至内核态模式，通 过系统调用访问硬件设备。strace可以跟踪到一个进程产生的系统调用,包括参数，返回值，执行消耗的时间。</p>
+<h2 id="输出参数含义"><a href="#输出参数含义" class="headerlink" title="输出参数含义"></a>输出参数含义</h2><hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">root@ubuntu:/usr# strace cat /dev/null </div><div class="line">execve(&quot;/bin/cat&quot;, [&quot;cat&quot;, &quot;/dev/null&quot;], [/* 22 vars */]) = 0</div><div class="line">brk(0)                                  = 0xab1000</div><div class="line">access(&quot;/etc/ld.so.nohwcap&quot;, F_OK)      = -1 ENOENT (No such file or directory)</div><div class="line">mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f29379a7000</div><div class="line">access(&quot;/etc/ld.so.preload&quot;, R_OK)      = -1 ENOENT (No such file or directory)</div><div class="line">...</div><div class="line">brk(0) = 0xab1000</div><div class="line">brk(0xad2000) = 0xad2000</div><div class="line">fstat(1, &#123;st_mode=S_IFCHR|0620, st_rdev=makedev(136, 0), ...&#125;) = 0</div><div class="line">open(&quot;/dev/null&quot;, O_RDONLY) = 3</div><div class="line">fstat(3, &#123;st_mode=S_IFCHR|0666, st_rdev=makedev(1, 3), ...&#125;) = 0</div><div class="line">read(3, &quot;&quot;, 32768) = 0</div><div class="line">close(3) = 0</div><div class="line">close(1) = 0</div><div class="line">close(2) = 0</div><div class="line">exit_group(0) = ?</div></pre></td></tr></table></figure>
+<p>每一行都是一条系统调用，等号左边是系统调用的函数名及其参数，右边是该调用的返回值。<br>strace 显示这些调用的参数并返回符号形式的值。strace 从内核接收信息，而且不需要以任何特殊的方式来构建内核。</p>
+<p>strace参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">-c 统计每一系统调用的所执行的时间,次数和出错的次数等. </div><div class="line">-d 输出strace关于标准错误的调试信息. </div><div class="line">-f 跟踪由fork调用所产生的子进程. </div><div class="line">-ff 如果提供-o filename,则所有进程的跟踪结果输出到相应的filename.pid中,pid是各进程的进程号. </div><div class="line">-F 尝试跟踪vfork调用.在-f时,vfork不被跟踪. </div><div class="line">-h 输出简要的帮助信息. </div><div class="line">-i 输出系统调用的入口指针. </div><div class="line">-q 禁止输出关于脱离的消息. </div><div class="line">-r 打印出相对时间关于,,每一个系统调用. </div><div class="line">-t 在输出中的每一行前加上时间信息. </div><div class="line">-tt 在输出中的每一行前加上时间信息,微秒级. </div><div class="line">-ttt 微秒级输出,以秒了表示时间. </div><div class="line">-T 显示每一调用所耗的时间. </div><div class="line">-v 输出所有的系统调用.一些调用关于环境变量,状态,输入输出等调用由于使用频繁,默认不输出. </div><div class="line">-V 输出strace的版本信息. </div><div class="line">-x 以十六进制形式输出非标准字符串 </div><div class="line">-xx 所有字符串以十六进制形式输出. </div><div class="line">-a column </div><div class="line">设置返回值的输出位置.默认 为40. </div><div class="line">-e expr </div><div class="line">指定一个表达式,用来控制如何跟踪.格式如下: </div><div class="line">[qualifier=][!]value1[,value2]... </div><div class="line">qualifier只能是 trace,abbrev,verbose,raw,signal,read,write其中之一.value是用来限定的符号或数字.默认的 qualifier是 trace.感叹号是否定符号.例如: </div><div class="line">-eopen等价于 -e trace=open,表示只跟踪open调用.而-etrace!=open表示跟踪除了open以外的其他调用.有两个特殊的符号 all 和 none. </div><div class="line">注意有些shell使用!来执行历史记录里的命令,所以要使用\\. </div><div class="line">-e trace=set </div><div class="line">只跟踪指定的系统 调用.例如:-e trace=open,close,rean,write表示只跟踪这四个系统调用.默认的为set=all. </div><div class="line">-e trace=file </div><div class="line">只跟踪有关文件操作的系统调用. </div><div class="line">-e trace=process </div><div class="line">只跟踪有关进程控制的系统调用. </div><div class="line">-e trace=network </div><div class="line">跟踪与网络有关的所有系统调用. </div><div class="line">-e strace=signal </div><div class="line">跟踪所有与系统信号有关的 系统调用 </div><div class="line">-e trace=ipc </div><div class="line">跟踪所有与进程通讯有关的系统调用 </div><div class="line">-e abbrev=set </div><div class="line">设定 strace输出的系统调用的结果集.-v 等与 abbrev=none.默认为abbrev=all. </div><div class="line">-e raw=set </div><div class="line">将指 定的系统调用的参数以十六进制显示. </div><div class="line">-e signal=set </div><div class="line">指定跟踪的系统信号.默认为all.如 signal=!SIGIO(或者signal=!io),表示不跟踪SIGIO信号. </div><div class="line">-e read=set </div><div class="line">输出从指定文件中读出 的数据.例如: </div><div class="line">-e read=3,5 </div><div class="line">-e write=set </div><div class="line">输出写入到指定文件中的数据. </div><div class="line">-o filename </div><div class="line">将strace的输出写入文件filename </div><div class="line">-p pid </div><div class="line">跟踪指定的进程pid. </div><div class="line">-s strsize </div><div class="line">指定输出的字符串的最大长度.默认为32.文件名一直全部输出. </div><div class="line">-u username </div><div class="line">以username 的UID和GID执行被跟踪的命令</div></pre></td></tr></table></figure></p>
+<h2 id="命令实例"><a href="#命令实例" class="headerlink" title="命令实例"></a>命令实例</h2><hr>
+<p>通用的完整用法：</p>
+<p><code>strace -o output.txt -T -tt -e trace=all -p 28979</code><br>上面的含义是 跟踪28979进程的所有系统调用（-e trace=all），并统计系统调用的花费时间，以及开始时间（并以可视化的时分秒格式显示），最后将记录结果存在output.txt文件里面。</p>
+<h2 id="strace案例"><a href="#strace案例" class="headerlink" title="strace案例"></a>strace案例</h2><hr>
+<p>  <strong>用strace调试程序</strong><br>在理想世界里，每当一个程序不能正常执行一个功能时，它就会给出一个有用的错误提示，告诉你在足够的改正错误的线索。但遗憾的是，我们不是生活在理想世界 里，起码不总是生活在理想世界里。有时候一个程序出现了问题，你无法找到原因。<br>这就是调试程序出现的原因。strace是一个必不可少的 调试工具，strace用来监视系统调用。你不仅可以调试一个新开始的程序，也可以调试一个已经在运行的程序（把strace绑定到一个已有的PID上 面）。<br>首先让我们看一个真实的例子：启动KDE时出现问题<br>前一段时间，我在 启动KDE的时候出了问题，KDE的错误信息无法给我任何有帮助的线索。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">_KDE_IceTransSocketCreateListener: failed to bind listener</div><div class="line">_KDE_IceTransSocketUNIXCreateListener: ...SocketCreateListener() failed</div><div class="line">_KDE_IceTransMakeAllCOTSServerListeners: failed to create listener for local</div></pre></td></tr></table></figure></p>
+<p>Cannot establish any listening sockets DCOPServer self-test failed.<br>对 我来说这个错误信息没有太多意义，只是一个对KDE来说至关重要的负责进程间通信的程序无法启动。我还可以知道这个错误和ICE协议（Inter Client Exchange）有关，除此之外，我不知道什么是KDE启动出错的原因。</p>
+<p>我决定采用strace看一下在启动 dcopserver时到底程序做了什么：</p>
+<p><code>strace -f -F -o ~/dcop-strace.txt dcopserver</code><br>这里 -f -F选项告诉strace同时跟踪fork和vfork出来的进程，-o选项把所有strace输出写到~/dcop-strace.txt里 面，dcopserver是要启动和调试的程序。</p>
+<p>再次出现错误之后，我检查了错误输出文件dcop-strace.txt，文件里有很多 系统调用的记录。在程序运行出错前的有关记录如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">27207 mkdir(&quot;/tmp/.ICE-unix&quot;, 0777) = -1 EEXIST (File exists)</div><div class="line">27207 lstat64(&quot;/tmp/.ICE-unix&quot;, &#123;st_mode=S_IFDIR|S_ISVTX|0755, st_size=4096, ...&#125;) = 0</div><div class="line">27207 unlink(&quot;/tmp/.ICE-unix/dcop27207-1066844596&quot;) = -1 ENOENT (No such file or directory)</div><div class="line">27207 bind(3, &#123;sin_family=AF_UNIX, path=&quot;/tmp/.ICE-unix/dcop27207-1066844596&quot;&#125;, 38) = -1 EACCES (Permission denied) </div><div class="line">27207 write(2, &quot;_KDE_IceTrans&quot;, 13) = 13</div><div class="line">27207 write(2, &quot;SocketCreateListener: failed to &quot;..., 46) = 46</div><div class="line">27207 close(3) = 0 27207 write(2, &quot;_KDE_IceTrans&quot;, 13) = 13</div><div class="line">27207 write(2, &quot;SocketUNIXCreateListener: ...Soc&quot;..., 59) = 59</div><div class="line">27207 umask(0) = 0 27207 write(2, &quot;_KDE_IceTrans&quot;, 13) = 13</div><div class="line">27207 write(2, &quot;MakeAllCOTSServerListeners: fail&quot;..., 64) = 64</div><div class="line">27207 write(2, &quot;Cannot establish any listening s&quot;..., 39) = 39</div></pre></td></tr></table></figure>
+<p>其中第一行显示程序试图创建/tmp/.ICE-unix目录，权限为0777，这个操作因为目录已经存在而失败了。第二个系统调用（lstat64）检查 了目录状态，并显示这个目录的权限是0755，这里出现了第一个程序运行错误的线索：程序试图创建属性为0777的目录，但是已经存在了一个属性为 0755的目录。第三个系统调用（unlink）试图删除一个文件，但是这个文件并不存在。这并不奇怪，因为这个操作只是试图删掉可能存在的老文件。</p>
+<p>但是，第四行确认了错误所在。他试图绑定到/tmp/.ICE-unix/dcop27207-1066844596，但是出现了拒绝访问错误。. ICE_unix目录的用户和组都是root，并且只有所有者具有写权限。一个非root用户无法在这个目录下面建立文件，如果把目录属性改成0777， 则前面的操作有可能可以执行，而这正是第一步错误出现时进行过的操作。</p>
+<p>所以我运行了chmod 0777 /tmp/.ICE-unix之后KDE就可以正常启动了，问题解决了，用strace进行跟踪调试只需要花很短的几分钟时间跟踪程序运行，然后检查并分 析输出文件。</p>
+<p>说明：运行chmod 0777只是一个测试，一般不要把一个目录设置成所有用户可读写，同时不设置粘滞位(sticky bit)。给目录设置粘滞位可以阻止一个用户随意删除可写目录下面其他人的文件。一般你会发现/tmp目录因为这个原因设置了粘滞位。KDE可以正常启动 之后，运行chmod +t /tmp/.ICE-unix给.ICE_unix设置粘滞位。</p>
+<p> <strong>解决库依赖问题</strong><br>starce 的另一个用处是解决和动态库相关的问题。当对一个可执行文件运行ldd时，它会告诉你程序使用的动态库和找到动态库的位置。但是如果你正在使用一个比较老 的glibc版本（2.2或更早），你可能会有一个有bug的ldd程序，它可能会报告在一个目录下发现一个动态库，但是真正运行程序时动态连接程序 （/lib/ld-linux.so.2）却可能到另外一个目录去找动态连接库。这通常因为/etc/ld.so.conf和 /etc/ld.so.cache文件不一致，或者/etc/ld.so.cache被破坏。在glibc 2.3.2版本上这个错误不会出现，可能ld-linux的这个bug已经被解决了。</p>
+<p>尽管这样，ldd并不能把所有程序依赖的动态库列出 来，系统调用dlopen可以在需要的时候自动调入需要的动态库，而这些库可能不会被ldd列出来。作为glibc的一部分的NSS（Name Server Switch）库就是一个典型的例子，NSS的一个作用就是告诉应用程序到哪里去寻找系统帐号数据库。应用程序不会直接连接到NSS库，glibc则会通 过dlopen自动调入NSS库。如果这样的库偶然丢失，你不会被告知存在库依赖问题，但这样的程序就无法通过用户名解析得到用户ID了。让我们看一个例子：<br>whoami程序会给出你自己的用户名，这个程序在一些需要知道运行程序的真正用户的脚本程序里面非常有用，whoami的一个示例 输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ whoami</div><div class="line">root</div></pre></td></tr></table></figure>
+<p>假设因为某种原因在升 级glibc的过程中负责用户名和用户ID转换的库NSS丢失，我们可以通过把nss库改名来模拟这个环境：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ mv /lib/libnss_files.so.2 /lib/libnss_files.so.2.backup </div><div class="line">whoami</div><div class="line">whoami: cannot find username for UID 0</div></pre></td></tr></table></figure>
+<p>这里你可以看到，运行whoami时出现了错误，ldd程序的输出不会提供有用的帮助：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ ldd /usr/bin/whoami</div><div class="line">libc.so.6 =&gt; /lib/libc.so.6 (0x4001f000)</div><div class="line">/lib/ld-linux.so.2 =&gt; /lib/ld-linux.so.2 (0x40000000)</div></pre></td></tr></table></figure></p>
+<p>你只会看到whoami依赖Libc.so.6和ld-linux.so.2，它没有给出运行whoami所必须的其他库。这里时用strace跟踪 whoami时的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">strace -o whoami-strace.txt whoami</div><div class="line"></div><div class="line">open(&quot;/lib/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">open(&quot;/lib/i686/mmx/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib/i686/mmx&quot;, 0xbffff190) = -1 ENOENT (No such file or directory) </div><div class="line">open(&quot;/lib/i686/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib/i686&quot;, 0xbffff190) = -1 ENOENT (No such file or directory)</div><div class="line">open(&quot;/lib/mmx/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib/mmx&quot;, 0xbffff190) = -1 ENOENT (No such file or directory) </div><div class="line">open(&quot;/lib/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib&quot;, &#123;st_mode=S_IFDIR|0755, st_size=2352, ...&#125;) = 0</div><div class="line">open(&quot;/usr/lib/i686/mmx/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/usr/lib/i686/mmx&quot;, 0xbffff190) = -1 ENOENT (No such file or directory) </div><div class="line">open(&quot;/usr/lib/i686/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div></pre></td></tr></table></figure>
+<p>你可以发现在不同目录下面查找libnss.so.2的尝试，但是都失败了。如果没有strace这样的工具，很难发现这个错误是由于缺少动态库造成的。现 在只需要找到libnss.so.2并把它放回到正确的位置就可以了。　</p>
+<h2 id="限制strace只跟踪特定的系统调用"><a href="#限制strace只跟踪特定的系统调用" class="headerlink" title="限制strace只跟踪特定的系统调用"></a>限制strace只跟踪特定的系统调用</h2><hr>
+<p>如果你已经知道你要找什么，你可以让strace只跟踪一些类型的系统调用。例如，你需要看看在configure脚本里面执行的程序，你需要监视的系统调 用就是execve。让strace只记录execve的调用用这个命令：</p>
+<p>strace -f -o configure-strace.txt -e execve ./configure</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/22/linux_08/" title="linux TIME_WAIT" itemprop="url">linux TIME_WAIT</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-21T16:30:00.000Z" itemprop="datePublished"> 发表于 2016-01-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>看到这篇<a href="http://huoding.com/2012/01/19/142" target="_blank" rel="external">记一次TIME_WAIT网络故障</a>,想起之前处理线上故障。<br>当时的情况是公司用的分布式job服务器load过高，杀掉所有的脚本，load就降下去了，但是再启动这些load又上去，重启服务，发现竟然无法启动了，原因是端口被占用了<br>当时也不知道如何去分析，使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">netstat -ant | awk &apos;</div><div class="line">    &#123;++s[$NF]&#125; END &#123;for(k in s) print k,s[k]&#125;</div></pre></td></tr></table></figure></p>
+<p>查看，再查看sysctl net.ipv4.ip_local_port_range=”min max”<br>TIMEWAIT的数量 大约等于max-min，<br>原因很明显，有脚本大量地占用端口，导致端口没有释放，重启服务端口被占用的原因是因为分布式脚本监控服务有一个监听端口，需要，同时也要发送心跳包到服务器上，而其重启时，由于是高端口，导致被占用，无法释放，服务也无法启动了。<br>但是并不知道是哪个脚本产生的问题，当时也不知道strace这类命令，用tcpdump去抓包，发现请求solr的http请求特别多，于是去查看代码，原来是shell一个常驻脚本，调用php脚本去执行查询solr服务，做一些简单逻辑后就退出，这样一直循环，因为启动和结束速度非常快，所以load也会飙升上去了。<br>解决方法，当时也只是在代码层面做了些sleep。系统方面因为不是很熟悉，也没有做优化。如今看了这篇，收货颇丰</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/21/strace/" title="使用strace 诊断问题" itemprop="url">使用strace 诊断问题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-21T14:40:00.000Z" itemprop="datePublished"> 发表于 2016-01-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>这个命令 真是相见恨晚<br><a href="http://huoding.com/2015/10/16/474" target="_blank" rel="external">原文链接</a><br>早些年，如果你知道有个 strace 命令，就很牛了，而现在大家基本都知道 strace 了，如果你遇到性能问题求助别人，十有八九会建议你用 strace 挂上去看看，不过当你挂上去了，看着满屏翻滚的字符，却十有八九看不出个所以然。本文通过一个简单的案例，向你展示一下在用 strace 诊断问题时的一些套路。<br>如下真实案例，如有雷同，实属必然！让我们看一台高负载服务器的 top 结果：<br><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/top.jpg" alt="image"><br>技巧：运行 top 时，按「1」打开 CPU 列表，按「shift+p」以 CPU 排序。</p>
+<p>在本例中大家很容易发现 CPU 主要是被若干个 PHP 进程占用了，同时 PHP 进程占用的比较多的内存，不过系统内存尚有结余，SWAP 也不严重，这并不是问题主因。</p>
+<p>不过在 CPU 列表中能看到 CPU 主要消耗在内核态「sy」，而不是用户态「us」，和我们的经验不符。Linux 操作系统有很多用来跟踪程序行为的工具，内核态的函数调用跟踪用「strace」，用户态的函数调用跟踪用「ltrace」，所以这里我们应该用「strace」：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">shell&gt; strace -p &lt;PID&gt;</div></pre></td></tr></table></figure></p>
+<p>不过如果直接用 strace 跟踪某个进程的话，那么等待你的往往是满屏翻滚的字符，想从这里看出问题的症结并不是一件容易的事情，好在 strace  可以按操作汇总时间：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">shell&gt; strace -cp &lt;PID&gt;</div></pre></td></tr></table></figure></p>
+<p>通过「c」选项用来汇总各个操作的总耗时，运行后的结果大概如下图所示：<br><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/strace1.jpg" alt="image"><br>很明显，我们能看到 CPU 主要被 clone 操作消耗了，还可以单独跟踪一下 clone：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">shell&gt; strace -T -e clone -p &lt;PID&gt;</div></pre></td></tr></table></figure></p>
+<p>通过「T」选项可以获取操作实际消耗的时间，通过「e」选项可以跟踪某个操作：<br><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/strace2.jpg" alt="image"></p>
+<p>很明显，一个 clone 操作需要几百毫秒，至于 clone 的含义，参考 man 文档：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">clone() creates a new process, in a manner similar to fork(2). It is actually a library function layered on top of the underlying clone() system call, hereinafter referred to as sys_clone. A description of sys_clone is given towards the end of this page.</div><div class="line"></div><div class="line">Unlike fork(2), these calls allow the child process to share parts of its execution context with the calling process, such as the memory space, the table of file descriptors, and the table of signal handlers. (Note that on this manual page, “calling process” normally corresponds to “parent process”. But see the description of CLONE_PARENT below.)</div></pre></td></tr></table></figure></p>
+<p>简单来说，就是创建一个新进程。那么在 PHP 里什么时候会出现此类系统调用呢？查询业务代码看到了 exec 函数，通过如下命令验证它确实会导致 clone 系统调用：</p>
+<p>shell&gt; strace -eclone php -r ‘exec(“ls”);’<br>最后再考大家一个题：如果我们用 strace 跟踪一个进程，输出结果很少，是不是说明进程很空闲？其实试试 ltrace，可能会发现别有洞天。记住有内核态和用户态之分。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/16/docker_02/" title="docker laravel dev环境搭建" itemprop="url">docker laravel dev环境搭建</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-16T06:28:00.000Z" itemprop="datePublished"> 发表于 2016-01-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>mbp上搭建了docker环境，就完完整整的写个docker for laravel的dev环境吧<br>(鉴于问题很多  就不贴具体代码了)<br>有docker环境的直接安装应该就可以了。<br>需要配置下本地的laravel目录，这样就可以把laravel目录挂载到docker 里了，就可以在本机里修改代码，docker中也会更新。<br>使用过程也碰到一些坑：</p>
+<ul>
+<li>docker-machine重启vm后，vm内所有的东西全都没了！！这是最坑的，本来已经写好了，结果重启了一下，什么都没了，2天白干了，索性又花了一天时间去重写了一遍，效率还可以。</li>
+<li>docker的挂载有些问题，挂载后的目录在docker里看的怪怪的，比如我挂载了一个/data目录,ls -al /data data的用户竟然是10000，让我很迷茫，后来发现，实际上是docker－machine里docker用户的uid</li>
+<li>默认的ubuntu 14.04里包很少，而我使用的编译安装，所以很多时候会找不到依赖，然后就要重新build。以前写的时候并没有很在意，最近发现，其实是有技巧的，docker是有类似缓存的，只要在dockerfile最下新增内容，实际上之前build成功的地方是有commit的，直接使用cache</li>
+</ul>
+<p>从前并不认为经验很重要，这几天感悟很深，2天写的东西丢失之后，用了仅仅半天就搞定了。由此可见，做过和没做过是有差别的，用心做和做过也是有差别的。<br>这个环境有很多需要改进的地方，比如脚本路径有些问题；docker的基础环境，个人觉得应该是一层一层build出来的，而不是简单的像我这样，一次性安装完；</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/docker/">docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a><a href="/tags/docker/">docker</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/13/books_02/" title="PHP核心技术与最佳实践" itemprop="url">PHP核心技术与最佳实践</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-13T07:17:00.000Z" itemprop="datePublished"> 发表于 2016-01-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>花了点时间看书，收获很大，扩展也是真正从这里开始学习的。<br><a href="http://book.douban.com/subject/20370984/" target="_blank" rel="external">豆瓣读书</a><br><a href="http://pan.baidu.com/s/1gehHaZD" target="_blank" rel="external">mobi格式下载</a><br>这本书的知识面还是很广的，但是深度还是不够，毕竟也不能全部深入介绍。<br>有些地方还有错误，细心去实践时候会发现问题，比如sql优化部分，like %xxx 这类sql是无法优化的，作者竟然还列举了优化方法。。。<br>但是回顾整部书，作为想在php方向突破瓶颈的人，还是值得一看的</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/books/">books</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/12/laravel/" title="laravel 的一些吐槽" itemprop="url">laravel 的一些吐槽</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-12T14:02:00.000Z" itemprop="datePublished"> 发表于 2016-01-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近在做业务项目迁移，把ec的代码迁移到laravel中，<br>为什么选用laravel，我也不知道(也不是我做选型)。其他的框架也没太多接触过，都是跑跑hello world，看的多一点的算是yaf了，不过个人理解，yaf没有orm，完全就是个vc框架，没有model层。需要自己去扩展，但是眼前项目很紧，明显不能这么用。以前用的框架是自己公司内部使用的，虽然思想的都不错，但是随便使用。<br>因为是公司内部物流系统，所以ui直接都是后端人员开发，ui框架选用的semantic，对于我这种不熟悉css，js的人来说也还不错，毕竟有文档，复制粘贴，大体的页面也就出来了。<br>但是开发过程中，还是想吐槽一下laravel。<br>1.最想吐槽的就是它的配置，放到.env里，每行其实就是个键值对，通过config目录下的配置读取，把这些配置替换过去，<br>但是我的项目配置不可能放在项目里啊，这是最基本的需求！因为不能对代码做入侵，所以可以在app初始化的时候，去set到外围目录里。为什么要set到外围目录？很简单，因为配置本就应该和代码分离，这样开发环境就能和线上环境区分出来了。但是这样远远不够，作为配置，很多项目是重复使用同一配置的，那就公用起来，做为每个项目不同的部分，也要区分出来，所以配置就成为了一个配置中心。以前在使用java开发时，比较简单，用的是superdiamond作为配置中心，公用的部分完全可以共用，独立的部分也不会被干扰。但是php显然不行，作为以进程为模型的语言，不可能每处理一个请求的时候就去读一遍配置，而应该是读取本地的某个固定目录的php文件，将配置载入。一旦配置发生改变（比如 redis迁移，mysql迁移，域名变更等）不需要一台一台地去更新配置，而是直接更新发布机的配置文件，直接发布到各机器上，这种方式可以使用ansible去做，Jenkins也可以做。也有自己去实现的，比如在每台机器上安装一个客户端，然后定时去和中心机器上的文件做对比，有不同就更新。想到的也就推模式和拉模式两种方式。<br>2.接下来就是blade模板，关于这个模板，文档实在是太少了，在页面上做变量嵌套的时候总是出问题，也无从查起，只能换种方式去做<br>3.log 这个就不多说了，实用的log并不多,php中的exception和fatal error是俩概念，无从和java的exception比拟。需要一个日志收集系统，去收集log，做分析。elk在这方面应该很强大，zabbix应该也可以。<br>4.分页，虽然可以自己实现，但是想短时间内做一个美观的无错误逻辑的，还是要花时间的。虽然这个在文档上有，但是用下来才发现，是给bootstrap模板使用的！一万个草泥马奔腾而过，然后github上找到了一份，还挺好用，虽然是个简单的实现。代码不贴了，在<a href="https://github.com/Landish/Pagination" target="_blank" rel="external">这里</a>,感谢开源。因为想尽量保证少量的依赖包，所以直接拷贝到文件里了。<br>先吐槽这些吧，吐槽归吐槽，laravel也有很多优点，比如依赖注入，validation，orm等等，很方便，不多说了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a><a href="/tags/laravel/">laravel</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/04/do_while/" title="do{...}while(0)的意义和用法" itemprop="url">do{...}while(0)的意义和用法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-04T13:23:35.000Z" itemprop="datePublished"> 发表于 2016-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在尝试写扩展时，阅读到了这样类似的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#define ZVAL_BOOL(z, b) do &#123;		\</div><div class="line">		zval *__z = (z);			\</div><div class="line">		Z_LVAL_P(__z) = ((b) != 0);	\</div><div class="line">		Z_TYPE_P(__z) = IS_BOOL;	\</div><div class="line">	&#125; while (0)</div></pre></td></tr></table></figure></p>
+<p>好奇怪，明明是只做一次运算，为何要使用do{}while(0)的方式<br>google一下，涨了很多姿势<br>接下来的大部分部分参考<a href="http://www.spongeliu.com/415.html" target="_blank" rel="external">do{…}while(0)的意义和用法</a></p>
+<p>linux内核和其他一些开源的代码中，经常会遇到这样的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">do&#123;</div><div class="line"> ...</div><div class="line">&#125;while(0)</div></pre></td></tr></table></figure></p>
+<p>总结起来这样写主要有以下几点好处：</p>
+<p>1、辅助定义复杂的宏，避免引用的时候出错：</p>
+<p>举例来说，假设你需要定义这样一个宏：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING()\</div><div class="line">               foo1();\</div><div class="line">               foo2()</div></pre></td></tr></table></figure></p>
+<p>这个宏的本意是，当调用DOSOMETHING()时，函数foo1()和foo2()都会被调用。但是如果你在调用的时候这么写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">    DOSOMETHING();</div></pre></td></tr></table></figure></p>
+<p>因为宏在预处理的时候会直接被展开，你实际上写的代码是这个样子的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">    foo1();</div><div class="line">foo2();</div></pre></td></tr></table></figure></p>
+<p>这就出现了问题，因为无论a是否大于0，foo2()都会被执行，导致程序出错。</p>
+<p>那么仅仅使用{}将foo1()和foo2()包起来行么？</p>
+<p>我们在写代码的时候都习惯在语句右面加上分号，如果在宏中使用{}，代码里就相当于这样写了：“{…};”，展开后就是这个样子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">if(a&gt;0)</div><div class="line">&#123;</div><div class="line">    foo1();</div><div class="line">    foo2();</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>所以碰到这种调用宏:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">if (a&gt;0)</div><div class="line">     DOSOMETHING();</div><div class="line">else</div><div class="line">     DOOTHERTHING();</div></pre></td></tr></table></figure></p>
+<p>会被扩展成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">if (a&gt;0) &#123;</div><div class="line">    foo1();</div><div class="line">    foo2();</div><div class="line">&#125;;</div><div class="line">else</div><div class="line">    DOOTHERTHING(wolf);</div></pre></td></tr></table></figure></p>
+<p>这样不会编译通过。所以，很多人才采用了do{…}while(0);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING() \</div><div class="line">        do&#123; \</div><div class="line">          foo1();\</div><div class="line">          foo2();\</div><div class="line">        &#125;while(0)\</div><div class="line">    </div><div class="line">...</div><div class="line"> </div><div class="line">if(a&gt;0)</div><div class="line">    DOSOMETHING();</div><div class="line"> </div><div class="line">...</div></pre></td></tr></table></figure>
+<p>这样，宏被展开后，才会保留初始的语义。GCC提供了Statement-Expressions用以替代do{…}while(0); 所以你也可以这样定义宏：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#define DOSOMETHING() (&#123;\</div><div class="line">        foo1(); \</div><div class="line">        foo2(); \</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>2、避免使用goto对程序流进行统一的控制：</p>
+<p>有些函数中，在函数return之前我们经常会进行一些收尾的工作，比如free掉一块函数开始malloc的内存，goto一直都是一个比较简便的方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">int foo()</div><div class="line">&#123;</div><div class="line">    somestruct* ptr = malloc(...);</div><div class="line"> </div><div class="line">    dosomething...;</div><div class="line">    if(error)</div><div class="line">    &#123;</div><div class="line">        goto END;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    dosomething...;</div><div class="line">    if(error)</div><div class="line">    &#123;</div><div class="line">        goto END;</div><div class="line">    &#125;</div><div class="line">    dosomething...;</div><div class="line"> </div><div class="line">END:</div><div class="line">    free(ptr);</div><div class="line">    return 0;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>由于goto不符合软件工程的结构化，而且有可能使得代码难懂，所以很多人都不倡导使用，那这个时候就可以用do{}while(0)来进行统一的管理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">int foo()</div><div class="line">&#123;</div><div class="line"> </div><div class="line">    somestruct* ptr = malloc(...);</div><div class="line"> </div><div class="line">    do&#123;</div><div class="line">        dosomething...;</div><div class="line">        if(error)</div><div class="line">        &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line"> </div><div class="line">        dosomething...;</div><div class="line">        if(error)</div><div class="line">        &#123;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        dosomething...;</div><div class="line">    &#125;while(0);</div><div class="line"> </div><div class="line">    free(ptr);</div><div class="line">    return 0;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里将函数主体使用do()while(0)包含起来，使用break来代替goto，后续的处理工作在while之后，就能够达到同样的效果。</p>
+<p>3、避免空宏引起的warning</p>
+<p>内核中由于不同架构的限制，很多时候会用到空宏，在编译的时候，空宏会给出warning，为了避免这样的warning，就可以使用do{}while(0)来定义空宏：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#define EMPTYMICRO do&#123;&#125;while(0)</div></pre></td></tr></table></figure>
+<p>4、定义一个单独的函数块来实现复杂的操作：</p>
+<p>当你的功能很复杂，变量很多你又不愿意增加一个函数的时候，使用do{}while(0);，将你的代码写在里面，里面可以定义变量而不用考虑变量名会同函数之前或者之后的重复。</p>
+<p>理解了这个do{…}while(0),一切豁然开朗。<br>发现ZVAL_RESOURCE,ZVAL_STRING,ZVAL_ZVAL等宏也都是使用的do{}while(0)的形式,ZVAL_DOUBLE,ZVAL_LONG等并没有使用,个人理解ZVAL_BOOL这样定义宏属于第一种情况。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/C/">C</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/01/04/c/" title="C指针" itemprop="url">C指针</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-04T11:59:00.000Z" itemprop="datePublished"> 发表于 2016-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近深入学习写扩展，发现C功底太弱了，也印证了那句话，出来混迟早要还的。<br>大学里因为不喜欢指针，放弃了C转战java，结果到现在，也只有自己给自己填坑了。<br>所以找了些文章充实一下吧。<br>本文转自<a href="http://www.cnblogs.com/wchhuangya/archive/2009/12/24/1631121.html" target="_blank" rel="external">C指针</a></p>
+<h2 id="第一章-指针的概念"><a href="#第一章-指针的概念" class="headerlink" title="第一章 指针的概念"></a>第一章 指针的概念</h2><p>指针是一个特殊的变量，它里面存储的数值被解释成为内存里的一个地址。 </p>
+<p>要搞清一个指针需要搞清指针的四方面的内容：指针的类型，指针所指向的类型，指针的值或者叫指针所指向的内存区，还有指针本身所占据的内存区。让我们分别说明。<br>先声明几个指针放着做例子：<br>例一：<br>(1)int <em>ptr;<br>(2)char </em>ptr;<br>(3)int <em>*ptr;<br>(4)int (</em>ptr)[3];<br>(5)int <em>(</em>ptr)[4]; </p>
+<ol>
+<li><p>指针的类型。<br>从语法的角度看，你只要把指针声明语句里的指针名字去掉，剩下的部分就是这个指针的类型。这是指针本身所具有的类型。让我们看看例一中各个指针的类型：<br>(1)int <em>ptr; //指针的类型是int </em><br>(2)char <em>ptr; //指针的类型是char </em><br>(3)int <strong>ptr; //指针的类型是 int </strong><br>(4)int (<em>ptr)[3]; //指针的类型是 int(</em>)[3]<br>(5)int <em>(</em>ptr)[4]; //指针的类型是 int <em>(</em>)[4]<br>怎么样？找出指针的类型的方法是不是很简单？ </p>
+</li>
+<li><p>指针所指向的类型。<br>当你通过指针来访问指针所指向的内存区时，指针所指向的类型决定了编译器将把那片内存区里的内容当做什么来看待。从语法上看，你只须把指针声明语句中的指针名字和名字左边的指针声明符<em>去掉，剩下的就是指针所指向的类型。例如：<br>(1)int </em>ptr; //指针所指向的类型是int<br>(2)char <em>ptr; //指针所指向的的类型是char<br>(3)int **ptr; //指针所指向的的类型是 int </em><br>(4)int (<em>ptr)[3]; //指针所指向的的类型是 int()[3]<br>(5)int </em>(<em>ptr)[4]; //指针所指向的的类型是 int </em>()[4]<br>在指针的算术运算中，指针所指向的类型有很大的作用。指针的类型(即指针本身的类型)和指针所指向的类型是两个概念。当你对C越<br>来越熟悉时，你会发现，把与指针搅和在一起的”类型”这个概念分成”指针的类型”和”指针所指向的类型”两个概念，是精通指针的关键点之一。我看了不少书，发现有些写得差的书中，就把指针的这两个概念搅在一起了，所以看起书来前后矛盾，越看越糊涂。 </p>
+</li>
+<li><p>指针的值，或者叫指针所指向的内存区或地址。<br>指针的值是指针本身存储的数值，这个值将被编译器当作一个地址，而不是一个一般的数值。在32位程序里，所有类型的指针的值都是一个32位整数，因为32位程序里内存地址全都是32位长。指针所指向的内存区就是从指针的值所代表的那个内存地址开始，长度为si<br>zeof(指针所指向的类型)的一片内存区。以后，我们说一个指针的值是XX，就相当于说该指针指向了以XX为首地址的一片内存区域；我们说一个指针指向了某块内存区域，就相当于说该指针的值是这块内存区域的首地址。指针所指向的内存区和指针所指向的类型是两个完全不同的概念。在例一中，指针所指向的类型已经有了，但由于指针还未初始化，所以它所指向的内存区是不存在的，或者说是无意义的。以后，每遇到一个指针，都应该问问：这个指针的类型是什么？指针指向的类型是什么？该指针指向了哪里？ </p>
+</li>
+<li><p>指针本身所占据的内存区。<br>指针本身占了多大的内存？你只要用函数sizeof(指针的类型)测一下就知道<br>了。在32位平台里，指针本身占据了4个字节的长度。<br>指针本身占据的内存这个概念在判断一个指针表达式是否是左值时很有用。 </p>
+</li>
+</ol>
+<h2 id="第二章-指针的算术运算"><a href="#第二章-指针的算术运算" class="headerlink" title="第二章 指针的算术运算"></a>第二章 指针的算术运算</h2><p>指针可以加上或减去一个整数。指针的这种运算的意义和通常的数值的加减运算的意义是不一样的。例如：<br>例二：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">char a[20]; </div><div class="line">int *ptr=a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr++;</div></pre></td></tr></table></figure></p>
+<p>在上例中，指针ptr的类型是int*,它指向的类型是int，它被初始化为指向整形变量a。接下来的第3句中，指针ptr被加了1，编译器是这样处理的：它把指针ptr的值加上了sizeof(int)，在32位程序中，是被加上了4。由于地址是用字节做单位的，故ptr所指向的地址由原来的变量a的地址向高地址方向增加了4个字节。由于char类型的长度是一个字节，所以，原来ptr是指向数组a的第0号单元开始的四个字节，此时指向了数组a中从第4号单元开始的四个字节。我们可以用一个指针和一个循环来遍历一个数组，看例子：<br>例三：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">int array[20]; </div><div class="line">int *ptr=array; </div><div class="line">... </div><div class="line">//此处略去为整型数组赋值的代码。 </div><div class="line">... </div><div class="line">for(i=0;i&lt;20;i++) </div><div class="line">&#123; </div><div class="line">(*ptr)++; </div><div class="line">ptr++； </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个例子将整型数组中各个单元的值加1。由于每次循环都将指针ptr加1，所以每次循环都能访问数组的下一个单元。<br>再看例子：<br>例四：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">char a[20]; </div><div class="line">int *ptr=a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr+=5;</div><div class="line">``` </div><div class="line">在这个例子中，ptr被加上了5，编译器是这样处理的：将指针ptr的值加上5乘sizeof(int)，在32位程序中就是加上了5乘4=20。由于地址的单位是字节，故现在的ptr所指向的地址比起加5后的ptr所指向的地址来说，向高地址方向移动了20个字节。在这个例子中，没加5前的ptr指向数组a的第0号单元开始的四个字节，加5后，ptr已经指向了数组a的合法范围之外了。虽然这种情况在应用上会出问题，但在语法上却是可以的。这也体现出了指针的灵活性。如果上例中，ptr是被减去5，那么处理过程大同小异，只不过ptr的值是被减去5乘sizeof(int)，新的ptr指向的地址将比原来的ptr所指向的地址向低地址方向移动了20个字节。 </div><div class="line"></div><div class="line">总结一下，一个指针ptrold加上一个整数n后，结果是一个新的指针ptrnew,ptrnew的类型和ptrold的类型相同，ptrnew所指向的类型和ptrold所指向的类型也相同。ptrnew的值将比ptrold的值增加了n乘sizeof(ptrold所指向的类型)个字节。就是说,ptrnew所指向的内存区将比ptrold所指向的内存区向高地址方向移动了n乘sizeof(ptrold所指向的类型)个字节。一个指针ptrold减去一个整数n后，结果是一个新的指针ptrnew，ptrnew的类型和ptrold的类型相同，ptrnew所指向的类型和ptrold所指向的类型也相同。ptrnew的值将比ptrold的值减少了n乘sizeof(ptrold所指向的类型)个字节，就是说 ，ptrnew所指向的内存区将比ptrold所指向的内存区向低地址方向移动了n乘sizeof(ptrold所指向的类型)个字节。 </div><div class="line"></div><div class="line">第三章 运算符号&amp;和*</div><div class="line">-----------</div><div class="line"></div><div class="line">这里&amp;是取地址运算符，*是...书上叫做&quot;间接运算符&quot;。&amp;a的运算结果是一个指针，指针的类型是a的类型加个*，指针所指向的类型 </div><div class="line">是a的类型，指针所指向的地址嘛，那就是a的地址。*p的运算结果就五花八门了。总之*p的结果是p所指向的东西，这个东西有这 </div><div class="line">些特点：它的类型是p指向的类型，它所占用的地址是p所指向的地址。 </div><div class="line">例五：</div></pre></td></tr></table></figure></p>
+<p>int a=12;<br>int b;<br>int <em>p;<br>int **ptr;<br>p=&a;//&amp;a的结果是一个指针，类型是int</em>，指向的类型是int，指向的地址是a的地址。<br><em>p=24;//</em>p的结果，在这里它的类型是int，它所占用的地址是p所指向的地址，显然，<em>p就是变量a。<br>ptr=&p;//&amp;p的结果是个指针，该指针的类型是p的类型加个</em>，在这里是int<strong>。该指针所指向的类型是p的类型，这里是int<em>。该指针所指向的地址就是指针p自己的地址。 
+</em>ptr=&b;//<em>ptr是个指针，&amp;b的结果也是个指针，且这两个指针的类型和所指向的类型是一样的，所以用&amp;b来给</em>ptr赋值就是毫无      问题的了。 
+</strong>ptr=34;//<em>ptr的结果是ptr所指向的东西，在这里是一个指针，对这个指针再做一次</em>运算，结果就是一个int类型的变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">第四章 指针表达式</div><div class="line">---------</div><div class="line"></div><div class="line">一个表达式的最后结果如果是一个指针，那么这个表达式就叫指针表达式。下面是一些指针表达式的例子： </div><div class="line">例六：</div></pre></td></tr></table></figure></p>
+<p>int a,b;<br>int array[10];<br>int <em>pa;<br>pa=&a;//&amp;a是一个指针表达式。<br>int **ptr=&pa;//&amp;pa也是一个指针表达式。 
+</em>ptr=&b;//*ptr和&amp;b都是指针表达式。<br>pa=array;<br>pa++;//这也是指针表达式。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">例七：</div><div class="line">``` </div><div class="line">char *arr[20]; </div><div class="line">char **parr=arr;//如果把arr看作指针的话，arr也是指针表达式 </div><div class="line">char *str; </div><div class="line">str=*parr;//*parr是指针表达式 </div><div class="line">str=*(parr+1);//*(parr+1)是指针表达式 </div><div class="line">str=*(parr+2);//*(parr+2)是指针表达式</div></pre></td></tr></table></figure></p>
+<p>由于指针表达式的结果是一个指针，所以指针表达式也具有指针所具有的四个要素：指针的类型，指针所指向的类型，指针指向的内存区，指针自身占据的内存。好了，当一个指针表达式的结果指针已经明确地具有了指针自身占据的内存的话，这个指针表达式就是一个左值，否则就不是一个左值。<br>在例六中，&amp;a不是一个左值，因为它还没有占据明确的内存。<em>ptr是一个左值，因为</em>ptr这个指针已经占据了内存，其实<em>ptr就是指针pa，既然pa已经在内存中有了自己的位置，那么</em>ptr当然也有了自己的位置。 </p>
+<h2 id="第五章-数组和指针的关系"><a href="#第五章-数组和指针的关系" class="headerlink" title="第五章 数组和指针的关系"></a>第五章 数组和指针的关系</h2><p>数组的数组名其实可以看作一个指针。看下例：<br>例八：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">int array[10]=&#123;0,1,2,3,4,5,6,7,8,9&#125;,value; </div><div class="line">... </div><div class="line">... </div><div class="line">value=array[0];//也可写成：value=*array; </div><div class="line">value=array[3];//也可写成：value=*(array+3); </div><div class="line">value=array[4];//也可写成：value=*(array+4);</div><div class="line">``` </div><div class="line">上例中，一般而言数组名array代表数组本身，类型是int [10]，但如果把array看做指针的话，它指向数组的第0个单元，类型是int *，所指向的类型是数组单元的类型即int。因此*array等于0就一点也不奇怪了。同理，array+3是一个指向数组第3个单元的指针，所以*(array+3)等于3。其它依此类推。 </div><div class="line"></div><div class="line">例九： </div><div class="line">``` </div><div class="line">char *str[3]=&#123; </div><div class="line">&quot;Hello,this is a sample!&quot;, </div><div class="line">&quot;Hi,good morning.&quot;, </div><div class="line">&quot;Hello world&quot; </div><div class="line">&#125;; </div><div class="line">char s[80]； </div><div class="line">strcpy(s,str[0]);//也可写成strcpy(s,*str); </div><div class="line">strcpy(s,str[1]);//也可写成strcpy(s,*(str+1)); </div><div class="line">strcpy(s,str[2]);//也可写成strcpy(s,*(str+2));</div></pre></td></tr></table></figure></p>
+<p>上例中，str是一个三单元的数组，该数组的每个单元都是一个指针，这些指针各指向一个字符串。把指针数组名str当作一个指针的话，它指向数组的第0号单元，它的类型是char<strong>，它指向的类型是char <em>。</em>str也是一个指针，它的类型是char*，它所指向的类型是char，它指向的地址是字符串”Hello,this is a sample!”的第一个字符的地址，即’H’的地址。str+1也是一个指针，它指向数组的第1号单元，它的类型是char</strong>，它指向的类型是char <em>。 </em>(str+1)也是一个指针，它的类型是char*，它所指向的类型是char，它指向 “Hi,good morning.”的第一个字符’H’，等等。 </p>
+<p>下面总结一下数组的数组名的问题。声明了一个数组TYPE array[n]，则数组名称array就有了两重含义：第一，它代表整个数组，它的类型是TYPE [n]；第二，它是一个指针，该指针的类型是TYPE<em>，该指针指向的类型是TYPE，也就是数组单元的类型，该指针指向的内存区就是数组第0号单元，该指针自己占有单独的内存区，注意它和数组第0号单元占据的内存区是不同的。该指针的值是不能修改的，即类似array++的表达式是错误的。<br>在不同的表达式中数组名array可以扮演不同的角色。在表达式sizeof(array)中，数组名array代表数组本身，故这时sizeof函数<br>测出的是整个数组的大小。在表达式</em>array中，array扮演的是指针，因此这个表达式的结果就是数组第 0号单元的值。sizeof(<em>array)测出的是数组单元的大小。 表达式array+n（其中n=0，1，2，….。）中，array扮演的是指针，故arr<br>ay+n的结果是一个指针，它的类型是TYPE</em>，它指向的类型是TYPE，它指向数组第<br>n号单元。故sizeof(array+n)测出的是指针类型的大小。<br>例十：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int array[10]; </div><div class="line">int (*ptr)[10]; </div><div class="line">ptr=&amp;array;</div></pre></td></tr></table></figure></p>
+<p>上例中ptr是一个指针，它的类型是int (*)[10]，他指向的类型是int [10]，我们用整个数组的首地址来初始化它。在语句ptr=&amp;array中，array代表数组本身。 </p>
+<p>本节中提到了函数sizeof()，那么我来问一问，sizeof(指针名称)测出的究竟是指针自身类型的大小呢还是指针所指向的类型的大小？答案是前者。例如： </p>
+<p>int (*ptr)[10];<br>则在32位程序中，有：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sizeof(int(*)[10])==4 </div><div class="line">sizeof(int [10])==40 </div><div class="line">sizeof(ptr)==4</div></pre></td></tr></table></figure></p>
+<p>实际上，sizeof(对象)测出的都是对象自身的类型的大小，而不是别的什么类型的大小。 </p>
+<h2 id="第六章-指针和结构类型的关系"><a href="#第六章-指针和结构类型的关系" class="headerlink" title="第六章 指针和结构类型的关系"></a>第六章 指针和结构类型的关系</h2><p>可以声明一个指向结构类型对象的指针。<br>例十一：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">struct MyStruct </div><div class="line">&#123; </div><div class="line">int a; </div><div class="line">int b; </div><div class="line">int c; </div><div class="line">&#125; </div><div class="line">MyStruct ss=&#123;20,30,40&#125;;//声明了结构对象ss，并把ss的三个成员初始化为20，30和40。 </div><div class="line">MyStruct *ptr=&amp;ss;//声明了一个指向结构对象ss的指针。它的类型是MyStruct*,它指向的类型是MyStruct。 </div><div class="line">int *pstr=(int*)&amp;ss;//声明了一个指向结构对象ss的指针。但是它的类型和它指向的类型和ptr是不同的。</div></pre></td></tr></table></figure></p>
+<p>请问怎样通过指针ptr来访问ss的三个成员变量？<br>答案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ptr-&gt;a; </div><div class="line">ptr-&gt;b; </div><div class="line">ptr-&gt;c;</div></pre></td></tr></table></figure></p>
+<p>又请问怎样通过指针pstr来访问ss的三个成员变量？<br>答案：<br><em>pstr；//访问了ss的成员a。 
+</em>(pstr+1);//访问了ss的成员b。<br><em>(pstr+2)//访问了ss的成员c。<br>呵呵，虽然我在我的MSVC++6.0上调式过上述代码，但是要知道，这样使用pstr来访问结构成员是不正规的，为了说明为什么不正规，让我们看看怎样通过指针来访问数组的各个单元：<br>例十二：<br>int array[3]={35,56,37};<br>int </em>pa=array;<br>通过指针pa访问数组array的三个单元的方法是：<br><em>pa;//访问了第0号单元 
+</em>(pa+1);//访问了第1号单元<br><em>(pa+2);//访问了第2号单元<br>从格式上看倒是与通过指针访问结构成员的不正规方法的格式一样。所有的C/C++编译器在排列数组的单元时，总是把各个数组单元存放在连续的存储区里，单元和单元之间没有空隙。但在存放结构对象的各个成员时，在某种编译环境下，可能会需要字对齐或双字对齐或者是别的什么对齐，需要在相邻两个成员之间加若干?quot;填充字节”，这就导致各个成员之间可能会有若干个字节的空隙。<br>所以，在例十二中，即使</em>pstr访问到了结构对象ss的第一个成员变量a，也不能保证<em>(pstr+1)就一定能访问到结构成员b。因为成员a和成员b之间可能会有若干填充字节，说不定</em>(pstr+1)就正好访问到了这些填充字节呢。这也证明了指针的灵活性。要是你的目的就是想看看各个结构成员之间到底有没有填充字节，嘿，这倒是个不错的方法。 通过指针访问结构成员的正确方法应该是象例十二中使用指针ptr的方法。 </p>
+<h2 id="第七章-指针和函数的关系"><a href="#第七章-指针和函数的关系" class="headerlink" title="第七章 指针和函数的关系"></a>第七章 指针和函数的关系</h2><p>可以把一个指针声明成为一个指向函数的指针。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">int fun1(char*,int); </div><div class="line">int (*pfun1)(char*,int); </div><div class="line">pfun1=fun1; </div><div class="line">.... </div><div class="line">.... </div><div class="line">int a=(*pfun1)(&quot;abcdefg&quot;,7);//通过函数指针调用函数。</div></pre></td></tr></table></figure></p>
+<p>可以把指针作为函数的形参。在函数调用语句中，可以用指针表达式来作为实参。<br>例十三：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">int fun(char*); </div><div class="line">int a; </div><div class="line">char str[]=&quot;abcdefghijklmn&quot;; </div><div class="line">a=fun(str); </div><div class="line">... </div><div class="line">... </div><div class="line">int fun(char*s) </div><div class="line">&#123; </div><div class="line">int num=0; </div><div class="line">for(int i=0;i&lt;strlen(s);i++) </div><div class="line">&#123; </div><div class="line">num+=*s;s++; </div><div class="line">&#125; </div><div class="line">return num; </div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>这个例子中的函数fun统计一个字符串中各个字符的ASCII码值之和。前面说了，数组的名字也是一个指针。在函数调用中，当把str作为实参传递给形参s后，实际是把str的值传递给了s，s所指向的地址就和str所指向的地址一致，但是str和s各自占用各自的存储空间。在函数体内对s进行自加1运算，并不意味着同时对str进行了自加1运算。 </p>
+<h2 id="第八章-指针类型转换"><a href="#第八章-指针类型转换" class="headerlink" title="第八章 指针类型转换"></a>第八章 指针类型转换</h2><p>当我们初始化一个指针或给一个指针赋值时，赋值号的左边是一个指针，赋值号的右边是一个指针表达式。在我们前面所举的例子中，绝大多数情况下，指针的类型和指针表达式的类型是一样的，指针所指向的类型和指针表达式所指向的类型是一样的。<br>例十四：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">float f=12.3; </div><div class="line">float *fptr=&amp;f; </div><div class="line">int *p;</div></pre></td></tr></table></figure></p>
+<p>在上面的例子中，假如我们想让指针p指向实数f，应该怎么搞？是用下面的语句吗？<br>p=&f;<br>不对。因为指针p的类型是int<em>，它指向的类型是int。表达式&amp;f的结果是一个指针，指针的类型是float</em>,它指向的类型是float。两者不一致，直接赋值的方法是不行的。至少在我的MSVC++6.0上，对指针的赋值语句要求赋值号两边的类型一致，所指向的类型也一致，其它的编译器上我没试过，大家可以试试。为了实现我们的目的，需要进行”强制类型转换”：<br>p=(int<em>)&f;<br>如果有一个指针p，我们需要把它的类型和所指向的类型改为TYEP</em>和TYPE,那么语法格式是：<br>(TYPE<em>)p；<br>这样强制类型转换的结果是一个新指针，该新指针的类型是TYPE</em>，它指向的类型是TYPE，它指向的地址就是原指针指向的地址。而原来的指针p的一切属性都没有被修改。 </p>
+<p>一个函数如果使用了指针作为形参，那么在函数调用语句的实参和形参的结合过程中，也会发生指针类型的转换。<br>例十五：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">void fun(char*); </div><div class="line">int a=125,b; </div><div class="line">fun((char*)&amp;a); </div><div class="line">... </div><div class="line">... </div><div class="line">void fun(char*s) </div><div class="line">&#123; </div><div class="line">char c; </div><div class="line">c=*(s+3);*(s+3)=*(s+0);*(s+0)=c; </div><div class="line">c=*(s+2);*(s+2)=*(s+1);*(s+1)=c; </div><div class="line">&#125; </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意这是一个32位程序，故int类型占了四个字节，char类型占一个字节。函数fun的作用是把一个整数的四个字节的顺序来个颠倒。注意到了吗？在函数调用语句中，实参&amp;a的结果是一个指针，它的类型是int <em>，它指向的类型是int。形参这个指针的类型是char</em>，它指向的类型是char。这样，在实参和形参的结合过程中，我们必须进行一次从int<em>类型到char</em>类型的转换。结合这个例子，我们可以这样来想象编译器进行转换的过程：编译器先构造一个临时指针 char<em>temp，然后执行temp=(char</em>)&amp;a，最后再把temp的值传递给s。所以最后的结果是：s的类型是char*,它指向的类型是char，它指向的地址就是a的首地址。 </p>
+<p>我们已经知道，指针的值就是指针指向的地址，在32位程序中，指针的值其实是一个32位整数。那可不可以把一个整数当作指针的值直接赋给指针呢？就象下面的语句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">unsigned int a; </div><div class="line">TYPE *ptr;//TYPE是int，char或结构类型等等类型。 </div><div class="line">... </div><div class="line">... </div><div class="line">a=20345686; </div><div class="line">ptr=20345686;//我们的目的是要使指针ptr指向地址20345686（十进制 </div><div class="line">） </div><div class="line">ptr=a;//我们的目的是要使指针ptr指向地址20345686（十进制）</div></pre></td></tr></table></figure></p>
+<p>编译一下吧。结果发现后面两条语句全是错的。那么我们的目的就不能达到了吗？不，还有办法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">unsigned int a; </div><div class="line">TYPE *ptr;//TYPE是int，char或结构类型等等类型。 </div><div class="line">... </div><div class="line">... </div><div class="line">a=某个数，这个数必须代表一个合法的地址； </div><div class="line">ptr=(TYPE*)a；//呵呵，这就可以了。</div></pre></td></tr></table></figure></p>
+<p>严格说来这里的(TYPE<em>)和指针类型转换中的(TYPE</em>)还不一样。这里的(TYPE*)的意思是把无符号整数a的值当作一个地址来看待。<br>上面强调了a的值必须代表一个合法的地址，否则的话，在你使用ptr的时候，就会出现非法操作错误。 </p>
+<p>想想能不能反过来，把指针指向的地址即指针的值当作一个整数取出来。完全可以。下面的例子演示了把一个指针的值当作一个整数取出来，然后再把这个整数当作一个地址赋给一个指针：<br>例十六：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">int a=123,b; </div><div class="line">int *ptr=&amp;a; </div><div class="line">char *str; </div><div class="line">b=(int)ptr;//把指针ptr的值当作一个整数取出来。 </div><div class="line">str=(char*)b;//把这个整数的值当作一个地址赋给指针str。</div></pre></td></tr></table></figure></p>
+<p>好了，现在我们已经知道了，可以把指针的值当作一个整数取出来，也可以把一个整数值当作地址赋给一个指针。 </p>
+<h2 id="第九章-指针的安全问题"><a href="#第九章-指针的安全问题" class="headerlink" title="第九章 指针的安全问题"></a>第九章 指针的安全问题</h2><p>看下面的例子：<br>例十七：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">char s=’a’; </div><div class="line">int *ptr; </div><div class="line">ptr=(int*)&amp;s; </div><div class="line">*ptr=1298；</div></pre></td></tr></table></figure></p>
+<p>指针ptr是一个int*类型的指针，它指向的类型是int。它指向的地址就是s的首地址。在32位程序中，s占一个字节，int类型占四个字节。最后一条语句不但改变了s所占的一个字节，还把和s相临的高地址方向的三个字节也改变了。这三个字节是干什么的？只有编译程序知道，而写程序的人是不太可能知道的。也许这三个字节里存储了非常重要的数据，也许这三个字节里正好是程序的一条代码，而由于你对指针的马虎应用，这三个字节的值被改变了！这会造成崩溃性的错误。<br>让我们再来看一例：<br>例十八：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">char a; </div><div class="line">int *ptr=&amp;a; </div><div class="line">... </div><div class="line">... </div><div class="line">ptr++; </div><div class="line">*ptr=115;</div></pre></td></tr></table></figure></p>
+<p>该例子完全可以通过编译，并能执行。但是看到没有？第3句对指针ptr进行自加1运算后，ptr指向了和整形变量a相邻的高地址方向的一块存储区。这块存储区里是什么？我们不知道。有可能它是一个非常重要的数据，甚至可能是一条代码。而第4句竟然往这片存储区里写入一个数据！这是严重的错误。所以在使用指针时，程序员心里必须非常清楚：我的指针究竟指向了哪里。<br>在用指针访问数组的时候，也要注意不要超出数组的低端和高端界限，否则也会造成类似的错误。<br>在指针的强制类型转换：ptr1=(TYPE*)ptr2中，如果sizeof(ptr2的类型)大于sizeof(ptr1的类型)，那么在使用指针ptr1来访问ptr2所指向的存储区时是安全的。如果sizeof(ptr2的类型)小于sizeof(ptr1的类型)，那么在使用指针ptr1来访问ptr2所指向的存储区时是不安全的。至于为什么，读者结合例十七来想一想，应该会明白的。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/C/">C</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

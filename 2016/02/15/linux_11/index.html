@@ -1,0 +1,623 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>探索linux系统下proc文件系统内容 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="以下部分参考自深入理解linux系统下proc文件系统内容Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。  基于/proc文件系统如上所述的特殊性">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="探索linux系统下proc文件系统内容">
+<meta property="og:url" content="http://magnetoeric.github.io/2016/02/15/linux_11/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="以下部分参考自深入理解linux系统下proc文件系统内容Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。  基于/proc文件系统如上所述的特殊性">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="探索linux系统下proc文件系统内容">
+<meta name="twitter:description" content="以下部分参考自深入理解linux系统下proc文件系统内容Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。  基于/proc文件系统如上所述的特殊性">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/15/linux_11/" title="探索linux系统下proc文件系统内容" itemprop="url">探索linux系统下proc文件系统内容</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-15T06:46:00.000Z" itemprop="datePublished"> 发表于 2016-02-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程目录中的常见文件介绍"><span class="toc-number">1.</span> <span class="toc-text">进程目录中的常见文件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#proc目录下常见的文件介绍"><span class="toc-number">2.</span> <span class="toc-text">/proc目录下常见的文件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#proc-sys目录详解"><span class="toc-number">3.</span> <span class="toc-text">/proc/sys目录详解</span></a></li></ol>
+		
+		</div>
+		
+		<p>以下部分参考自<a href="http://www.cnblogs.com/cute/archive/2011/04/20/2022280.html" target="_blank" rel="external">深入理解linux系统下proc文件系统内容</a><br>Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。 </p>
+<p>基于/proc文件系统如上所述的特殊性，其内的文件也常被称作虚拟文件，并具有一些独特的特点。例如，其中有些文件虽然使用查看命令查看时会返回大量信息，但文件本身的大小却会显示为0字节。此外，这些特殊文件中大多数文件的时间及日期属性通常为当前系统时间和日期，这跟它们随时会被刷新（存储于RAM中）有关。 </p>
+<p>为了查看及使用上的方便，这些文件通常会按照相关性进行分类存储于不同的目录甚至子目录中，如/proc/scsi目录中存储的就是当前系统上所有SCSI设备的相关信息，/proc/N中存储的则是系统当前正在运行的进程的相关信息，其中N为正在运行的进程（可以想象得到，在某进程结束后其相关目录则会消失）。 </p>
+<p>大多数虚拟文件可以使用文件查看命令如cat、more或者less进行查看，有些文件信息表述的内容可以一目了然，但也有文件的信息却不怎么具有可读性。不过，这些可读性较差的文件在使用一些命令如apm、free、lspci或top查看时却可以有着不错的表现。 </p>
+<h3 id="进程目录中的常见文件介绍"><a href="#进程目录中的常见文件介绍" class="headerlink" title="进程目录中的常见文件介绍"></a>进程目录中的常见文件介绍</h3><p>/proc目录中包含许多以数字命名的子目录，这些数字表示系统当前正在运行进程的进程号，里面包含对应进程相关的多个信息文件。<br>以下实验都是在基于docker的nginx容器里进行的，部分内容可能会与真实系统有些区别（用docker的原因是进程比较少，可以直接使用<code>docker run -it nginx:1.7 /bin/bash</code>创建一个nginx的容器并进入容器内部)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@cdb3d33f6cb4:/# ls /bin/</div><div class="line">bash   cp    dir	    egrep    gunzip    ln     mknod	  mv		 pwd	   run-parts   ss     tar	uname	      zcat    zforce</div><div class="line">cat    dash  dmesg	    false    gzexe     login  mktemp	  nisdomainname  rbash	   sed	       stty   tempfile	uncompress    zcmp    zgrep</div><div class="line">chgrp  date  dnsdomainname  fgrep    gzip      ls     more	  pidof		 readlink  sh	       su     touch	vdir	      zdiff   zless</div><div class="line">chmod  dd    domainname     findmnt  hostname  lsblk  mount	  ping		 rm	   sh.distrib  sync   true	which	      zegrep  zmore</div><div class="line">chown  df    echo	    grep     ip        mkdir  mountpoint  ping6		 rmdir	   sleep       tailf  umount	ypdomainname  fgrep  znew</div></pre></td></tr></table></figure>
+<p>容器中可用的命令少之又少，都是些基本的命令，但是有这些命令，可以做很多事情了，虽然很多命令我也不懂。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/# cd proc/</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1	   bus	      consoles	diskstats    fb		  iomem     kcore      kpagecount  meminfo  mtrr	  scsi	    stat	   sysvipc	tty	     vmstat</div><div class="line">15	   cgroups    cpuinfo	dma	     filesystems  ioports   key-users  kpageflags  misc     net		  self	    swaps	   thread-self	uptime	     zoneinfo</div><div class="line">acpi	   cmdline    crypto	driver	     fs		  irq	    keys       loadavg	   modules  pagetypeinfo  slabinfo  sys		   timer_list	version</div><div class="line">buddyinfo  config.gz  devices	execdomains  interrupts   kallsyms  kmsg       locks	   mounts   partitions	  softirqs  sysrq-trigger  timer_stats	vmallocinfo</div></pre></td></tr></table></figure>
+<p>上面列出的是/proc目录中一些进程相关的目录，每个目录中是当程本身相关信息的文件。<br>下面我们来启动一个nginx，看看会发生什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# nginx</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1   acpi       cmdline	  crypto     driver	  fs	      irq	 keys	     loadavg  modules  pagetypeinfo  slabinfo  sys	      timer_list   version</div><div class="line">17  buddyinfo  config.gz  devices    execdomains  interrupts  kallsyms	 kmsg	     locks    mounts   partitions    softirqs  sysrq-trigger  timer_stats  vmallocinfo</div><div class="line">18  bus        consoles   diskstats  fb		  iomem       kcore	 kpagecount  meminfo  mtrr     scsi	     stat      sysvipc	      tty	   vmstat</div><div class="line">19  cgroups    cpuinfo	  dma	     filesystems  ioports     key-users  kpageflags  misc     net      self	     swaps     thread-self    uptime	   zoneinfo</div></pre></td></tr></table></figure>
+<p>嗯？ 多出来3个数字命名的目录，对就是pid 为17，18，19的进程。再次ls，发现19小时，没错19应该是运行ls产生的进程，运行完成就消失了，猜测17，18一个是nginx master，另一个应该是worker<br>查看以下pid为18的进程，属组和用户都是nginx，更加确定它就是nginx的worker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 18</div><div class="line">ls: cannot read symbolic link 18/cwd: Permission denied</div><div class="line">ls: cannot read symbolic link 18/root: Permission denied</div><div class="line">ls: cannot read symbolic link 18/exe: Permission denied</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 nginx nginx 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root  root  0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 nginx nginx 0 Feb 15 02:17 attr</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 autogroup</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 auxv</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cgroup</div><div class="line">--w-------   1 nginx nginx 0 Feb 15 02:17 clear_refs</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cmdline</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 comm</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 coredump_filter</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cpuset</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 cwd</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 environ</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 exe</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fd</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fdinfo</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 gid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 limits</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 map_files</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 maps</div><div class="line">-rw-------   1 nginx nginx 0 Feb 15 02:17 mem</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mountinfo</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mounts</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 mountstats</div><div class="line">dr-xr-xr-x   7 nginx nginx 0 Feb 15 02:17 net</div><div class="line">dr-x--x--x   2 nginx nginx 0 Feb 15 02:17 ns</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_adj</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score_adj</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 pagemap</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 personality</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 projid_map</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 root</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 setgroups</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 smaps</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 stack</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 stat</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 statm</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 status</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 syscall</div><div class="line">dr-xr-xr-x   3 nginx nginx 0 Feb 15 02:17 task</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 timers</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 uid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 wchar</div></pre></td></tr></table></figure>
+<p>有些文件没有权限，还是看nginx的master吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 17/</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 root root 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root root 0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 root root 0 Feb 15 02:19 attr</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 autogroup</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 auxv</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cgroup</div><div class="line">--w-------   1 root root 0 Feb 15 02:19 clear_refs</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cmdline</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 comm</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 coredump_filter</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cpuset</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 cwd -&gt; /proc</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 environ</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fd</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fdinfo</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 gid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 limits</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 map_files</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 maps</div><div class="line">-rw-------   1 root root 0 Feb 15 02:19 mem</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mountinfo</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mounts</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 mountstats</div><div class="line">dr-xr-xr-x   7 root root 0 Feb 15 02:19 net</div><div class="line">dr-x--x--x   2 root root 0 Feb 15 02:19 ns</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_adj</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 oom_score</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_score_adj</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 pagemap</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 personality</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 projid_map</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 root -&gt; /</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 setgroups</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 smaps</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 stack</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 stat</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 statm</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 status</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 syscall</div><div class="line">dr-xr-xr-x   3 root root 0 Feb 15 02:19 task</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 timers</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 uid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 wchan</div></pre></td></tr></table></figure>
+<p>接下来看看各个文件都是干吗用的吧</p>
+<ul>
+<li>cmdline — 启动当前进程的完整命令，但僵尸进程目录中的此文件不包含任何信息;</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cd 17</div><div class="line">root@c27f523688ea:/proc/17# more cmdline</div><div class="line">nginx: master process nginx</div></pre></td></tr></table></figure>
+<ul>
+<li><p>cwd 指向当前进程运行目录的一个符号链接； </p>
+</li>
+<li><p>environ 当前进程的环境变量列表，彼此间用空字符（NULL）隔开；变量用大写字母表示，其值用小写字母表示；</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# more environ</div><div class="line"> master process nginx</div></pre></td></tr></table></figure>
+<ul>
+<li>exe 指向启动当前进程的可执行文件（完整路径）的符号链接，通过/proc/N/exe可以启动当前进程的一个拷贝； </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ls -al exe</div><div class="line">lrwxrwxrwx 1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div></pre></td></tr></table></figure>
+<p>实际的可执行文件就是/usr/sbin/nginx</p>
+<ul>
+<li><p>fd 这是个目录，包含当前进程打开的每一个文件的文件描述符（file descriptor），这些文件描述符是指向实际文件的一个符号链接;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# ls -al fd</div><div class="line">total 0</div><div class="line">dr-x------ 2 root root  0 Feb 15 02:19 .</div><div class="line">dr-xr-xr-x 9 root root  0 Feb 15 02:13 ..</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 0 -&gt; /dev/null</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 1 -&gt; /dev/null</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 2 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 3 -&gt; socket:[63800]</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 4 -&gt; /1</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 5 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 6 -&gt; socket:[63798]</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 7 -&gt; socket:[63801]</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>limits 当前进程所使用的每一个受限资源的软限制、硬限制和管理单元；此文件仅可由实际启动当前进程的UID用户读取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat limits</div><div class="line">Limit                     Soft Limit           Hard Limit           Units</div><div class="line">Max cpu time              unlimited            unlimited            seconds</div><div class="line">Max file size             unlimited            unlimited            bytes</div><div class="line">Max data size             unlimited            unlimited            bytes</div><div class="line">Max stack size            8388608              unlimited            bytes</div><div class="line">Max core file size        0                    unlimited            bytes</div><div class="line">Max resident set          unlimited            unlimited            bytes</div><div class="line">Max processes             1048576              1048576              processes</div><div class="line">Max open files            1048576              1048576              files</div><div class="line">Max locked memory         65536                65536                bytes</div><div class="line">Max address space         unlimited            unlimited            bytes</div><div class="line">Max file locks            unlimited            unlimited            locks</div><div class="line">Max pending signals       3867                 3867                 signals</div><div class="line">Max msgqueue size         819200               819200               bytes</div><div class="line">Max nice priority         0                    0</div><div class="line">Max realtime priority     0                    0</div><div class="line">Max realtime timeout      unlimited            unlimited            us</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>再运行 ulimit ，因为用户都是root，所以 ulimit应该和这个limits表示的内容是相同的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ulimit -a</div><div class="line">core file size          (blocks, -c) 0</div><div class="line">data seg size           (kbytes, -d) unlimited</div><div class="line">scheduling priority             (-e) 0</div><div class="line">file size               (blocks, -f) unlimited</div><div class="line">pending signals                 (-i) 3867</div><div class="line">max locked memory       (kbytes, -l) 64</div><div class="line">max memory size         (kbytes, -m) unlimited</div><div class="line">open files                      (-n) 1048576</div><div class="line">pipe size            (512 bytes, -p) 8</div><div class="line">POSIX message queues     (bytes, -q) 819200</div><div class="line">real-time priority              (-r) 0</div><div class="line">stack size              (kbytes, -s) 8192</div><div class="line">cpu time               (seconds, -t) unlimited</div><div class="line">max user processes              (-u) 1048576</div><div class="line">virtual memory          (kbytes, -v) unlimited</div><div class="line">file locks                      (-x) unlimited</div></pre></td></tr></table></figure>
+<ul>
+<li>maps — 当前进程关联到的每个可执行文件和库文件在内存中的映射区域及其访问权限所组成的列表;<br>看不懂 先过了</li>
+</ul>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat maps</div><div class="line">00400000-004c1000 r-xp 00000000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c0000-006c1000 r--p 000c0000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c1000-006d7000 rw-p 000c1000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006d7000-006e6000 rw-p 00000000 00:00 0</div><div class="line">01c28000-01c85000 rw-p 00000000 00:00 0                                  [heap]</div><div class="line">7fb1c3d4f000-7fb1c3d5a000 r-xp 00000000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3d5a000-7fb1c3f59000 ---p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f59000-7fb1c3f5a000 r--p 0000a000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5a000-7fb1c3f5b000 rw-p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5b000-7fb1c3f65000 r-xp 00000000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c3f65000-7fb1c4164000 ---p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4164000-7fb1c4165000 r--p 00009000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4165000-7fb1c4166000 rw-p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4166000-7fb1c417b000 r-xp 00000000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c417b000-7fb1c437a000 ---p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437a000-7fb1c437b000 r--p 00014000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437b000-7fb1c437c000 rw-p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437c000-7fb1c437e000 rw-p 00000000 00:00 0</div><div class="line">7fb1c437e000-7fb1c4385000 r-xp 00000000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4385000-7fb1c4584000 ---p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4584000-7fb1c4585000 r--p 00006000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4585000-7fb1c4586000 rw-p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4586000-7fb1c4588000 r-xp 00000000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4588000-7fb1c4788000 ---p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4788000-7fb1c4789000 r--p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4789000-7fb1c478a000 rw-p 00003000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c478a000-7fb1c490b000 r-xp 00000000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c490b000-7fb1c4b0b000 ---p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0b000-7fb1c4b0f000 r--p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0f000-7fb1c4b10000 rw-p 00185000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b10000-7fb1c4b15000 rw-p 00000000 00:00 0</div><div class="line">7fb1c4b15000-7fb1c4b2b000 r-xp 00000000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4b2b000-7fb1c4d2a000 ---p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2a000-7fb1c4d2b000 r--p 00015000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2b000-7fb1c4d2c000 rw-p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2c000-7fb1c4ef6000 r-xp 00000000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c4ef6000-7fb1c50f6000 ---p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c50f6000-7fb1c5111000 r--p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5111000-7fb1c5120000 rw-p 001e5000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5120000-7fb1c5124000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5124000-7fb1c517a000 r-xp 00000000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c517a000-7fb1c537a000 ---p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537a000-7fb1c537d000 r--p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537d000-7fb1c5384000 rw-p 00059000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c5384000-7fb1c53c0000 r-xp 00000000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c53c0000-7fb1c55c0000 ---p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c0000-7fb1c55c1000 rw-p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c1000-7fb1c55c9000 r-xp 00000000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c55c9000-7fb1c57c8000 ---p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c8000-7fb1c57c9000 r--p 00007000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c9000-7fb1c57ca000 rw-p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57ca000-7fb1c57f8000 rw-p 00000000 00:00 0</div><div class="line">7fb1c57f8000-7fb1c580f000 r-xp 00000000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c580f000-7fb1c5a0e000 ---p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0e000-7fb1c5a0f000 r--p 00016000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0f000-7fb1c5a10000 rw-p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a10000-7fb1c5a14000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5a14000-7fb1c5a34000 r-xp 00000000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c2a000-7fb1c5c2f000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c30000-7fb1c5c31000 rw-s 00000000 00:01 63799                      /dev/zero (deleted)</div><div class="line">7fb1c5c31000-7fb1c5c33000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c33000-7fb1c5c34000 r--p 0001f000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c34000-7fb1c5c35000 rw-p 00020000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c35000-7fb1c5c36000 rw-p 00000000 00:00 0</div><div class="line">7ffe5a572000-7ffe5a593000 rw-p 00000000 00:00 0                          [stack]</div><div class="line">7ffe5a5e3000-7ffe5a5e5000 r--p 00000000 00:00 0                          [vvar]</div><div class="line">7ffe5a5e5000-7ffe5a5e7000 r-xp 00000000 00:00 0                          [vdso]</div><div class="line">ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]</div></pre></td></tr></table></figure>
+<ul>
+<li>mem 当前进程所占用的内存空间，由open、read和lseek等系统调用使用，不能被用户读取；</li>
+<li>root 指向当前进程运行根目录的符号链接；在Unix和Linux系统上，通常采用chroot命令使每个进程运行于独立的根目录；</li>
+<li><p>stat 当前进程的状态信息，包含一系统格式化后的数据列，可读性差，通常由ps命令使用； </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more stat</div><div class="line">17 (nginx) S 1 17 17 0 -1 4218944 49 0 0 0 0 0 0 0 20 0 1 0 5428469 31825920 195 18446744073709551615 4194304 4982492 140730414209264 140730414208128 140401482384618 0 0 1073745920</div><div class="line">402745863 0 0 0 17 0 0 0 0 0 0 7081352 7168288 29523968 140730414214953 140730414214959 140730414214959 140730414215144 0</div></pre></td></tr></table></figure>
+</li>
+<li><p>status 与stat所提供信息类似，但可读性较好，如下所示，每行表示一个属性信息；其详细介绍请参见 proc的man手册页;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more status</div><div class="line">Name:	nginx</div><div class="line">State:	S (sleeping)</div><div class="line">Tgid:	17</div><div class="line">Ngid:	0</div><div class="line">Pid:	17</div><div class="line">PPid:	1</div><div class="line">TracerPid:	0</div><div class="line">Uid:	0	0	0	0</div><div class="line">Gid:	0	0	0	0</div><div class="line">FDSize:	64</div><div class="line">Groups:</div><div class="line">NStgid:	17</div><div class="line">NSpid:	17</div><div class="line">NSpgid:	17</div><div class="line">NSsid:	17</div><div class="line">VmPeak:	   31080 kB</div><div class="line">VmSize:	   31080 kB</div><div class="line">VmLck:	       0 kB</div><div class="line">VmPin:	       0 kB</div><div class="line">VmHWM:	     780 kB</div><div class="line">VmRSS:	     780 kB</div><div class="line">VmData:	     724 kB</div><div class="line">VmStk:	     136 kB</div><div class="line">VmExe:	     772 kB</div><div class="line">VmLib:	    4500 kB</div><div class="line">VmPTE:	      76 kB</div><div class="line">VmPMD:	      12 kB</div><div class="line">VmSwap:	       0 kB</div><div class="line">Threads:	1</div><div class="line">SigQ:	0/3867</div><div class="line">SigPnd:	0000000000000000</div><div class="line">ShdPnd:	0000000000000000</div><div class="line">SigBlk:	0000000000000000</div><div class="line">SigIgn:	0000000040001000</div><div class="line">SigCgt:	0000000198016a07</div><div class="line">CapInh:	00000000a80425fb</div><div class="line">CapPrm:	00000000a80425fb</div><div class="line">CapEff:	00000000a80425fb</div><div class="line">CapBnd:	00000000a80425fb</div><div class="line">Seccomp:	0</div><div class="line">Cpus_allowed:	1</div><div class="line">Cpus_allowed_list:	0</div><div class="line">Mems_allowed:	1</div><div class="line">Mems_allowed_list:	0</div><div class="line">voluntary_ctxt_switches:	1</div><div class="line">--More--(0%)</div></pre></td></tr></table></figure>
+</li>
+<li><p>task 目录文件，包含由当前进程所运行的每一个线程的相关信息，每个线程的相关信息文件均保存在一个由线程号（tid）命名的目录中，这类似于其内容类似于每个进程目录中的内容</p>
+</li>
+</ul>
+<h3 id="proc目录下常见的文件介绍"><a href="#proc目录下常见的文件介绍" class="headerlink" title="/proc目录下常见的文件介绍"></a>/proc目录下常见的文件介绍</h3><ul>
+<li>/proc/apm 高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用(容器中没有)</li>
+<li>/proc/buddyinfo 用于诊断内存碎片问题的相关信息文件(容器中没有)</li>
+<li>/proc/cmdline 在启动时传递至内核的相关参数信息，这些信息通常由lilo或grub等启动管理工具进行传递</li>
+<li>/proc/cpuinfo 处理器的相关信息的文件</li>
+<li>/proc/crypto 系统上已安装的内核使用的密码算法及每个算法的详细信息列表</li>
+<li>/proc/devices 系统已经加载的所有块设备和字符设备的信息，包含主设备号和设备组（与主设备号对应的设备类型）名</li>
+<li>/proc/diskstats 每块磁盘设备的磁盘I/O统计信息列表</li>
+<li>/proc/dma 每个正在使用且注册的ISA DMA通道的信息列表</li>
+<li>/proc/execdomains 内核当前支持的执行域（每种操作系统独特“个性”）信息列表</li>
+<li>/proc/fb 帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息；</li>
+<li>/proc/filesystems 当前被内核支持的文件系统类型列表文件，被标示为nodev的文件系统表示不需要块设备的支持；通常mount一个设备时，如果没有指定文件系统类型将通过此文件来决定其所需文件系统的类型</li>
+<li>/proc/interrupts X86或X86_64体系架构系统上每个IRQ相关的中断号列表；多路处理器平台上每个CPU对于每个I/O设备均有自己的中断号</li>
+<li>/proc/iomem 每个物理设备上的记忆体（RAM或者ROM）在系统内存中的映射信息</li>
+<li>/proc/ioports 当前正在使用且已经注册过的与物理设备进行通讯的输入-输出端口范围信息列表；如下面所示，第一列表示注册的I/O端口范围，其后表示相关的设备</li>
+<li>/proc/kallsyms 模块管理工具用来动态链接或绑定可装载模块的符号定义，由内核输出;通常这个文件中的信息量相当大；</li>
+<li>/proc/kcore 系统使用的物理内存，以ELF核心文件（core file）格式存储，其文件大小为已使用的物理内存（RAM）加上4KB；这个文件用来检查内核数据结构的当前状态，因此，通常由GDB通常调试工具使用，但不能使用文件查看命令打开此文件</li>
+<li>/proc/kmsg 此文件用来保存由内核输出的信息，通常由/sbin/klogd或/bin/dmsg等程序使用，不要试图使用查看命令打开此文件</li>
+<li>/proc/locks 保存当前由内核锁定的文件的相关信息，包含内核内部的调试数据；每个锁定占据一行，且具有一个惟一的编号；如下输出信息中每行的第二列表示当前锁定使用的锁定类别，POSIX表示目前较新类型的文件锁，由lockf系统调用产生，FLOCK是传统的UNIX文件锁，由flock系统调用产生；第三列也通常由两种类型，ADVISORY表示不允许其他用户锁定此文件，但允许读取，MANDATORY表示此文件锁定期间不允许其他用户任何形式的访问；  </li>
+<li><p>/proc/meminfo 系统中关于当前内存的利用状况等的信息，常由free命令使用；可以使用文件查看命令直接读取此文件，其内容显示为两列，前者为统计属性，后者为对应的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat meminfo</div><div class="line">MemTotal:        1020096 kB</div><div class="line">MemFree:          746572 kB</div><div class="line">MemAvailable:     802920 kB</div><div class="line">Buffers:           41512 kB</div><div class="line">Cached:           139888 kB</div><div class="line">SwapCached:            0 kB</div><div class="line">Active:           135888 kB</div><div class="line">Inactive:          92792 kB</div><div class="line">Active(anon):      83496 kB</div><div class="line">Inactive(anon):    90648 kB</div><div class="line">Active(file):      52392 kB</div><div class="line">Inactive(file):     2144 kB</div><div class="line">Unevictable:           0 kB</div><div class="line">Mlocked:               0 kB</div><div class="line">SwapTotal:       1182172 kB</div><div class="line">SwapFree:        1182172 kB</div><div class="line">Dirty:                 8 kB</div><div class="line">Writeback:             0 kB</div><div class="line">AnonPages:         47276 kB</div><div class="line">Mapped:            29256 kB</div><div class="line">Shmem:            126868 kB</div><div class="line">Slab:              28464 kB</div><div class="line">SReclaimable:      16392 kB</div><div class="line">SUnreclaim:        12072 kB</div><div class="line">KernelStack:        2432 kB</div><div class="line">PageTables:         1616 kB</div><div class="line">NFS_Unstable:          0 kB</div><div class="line">Bounce:                0 kB</div><div class="line">WritebackTmp:          0 kB</div><div class="line">CommitLimit:     1692220 kB</div><div class="line">Committed_AS:     371556 kB</div><div class="line">VmallocTotal:   34359738367 kB</div><div class="line">VmallocUsed:        8908 kB</div><div class="line">VmallocChunk:   34359699820 kB</div><div class="line">AnonHugePages:     32768 kB</div><div class="line">HugePages_Total:       0</div><div class="line">HugePages_Free:        0</div><div class="line">HugePages_Rsvd:        0</div><div class="line">HugePages_Surp:        0</div><div class="line">Hugepagesize:       2048 kB</div><div class="line">DirectMap4k:       47040 kB</div><div class="line">DirectMap2M:     1001472 kB</div></pre></td></tr></table></figure>
+</li>
+<li><p>/proc/mounts 在内核2.4.29版本以前，此文件的内容为系统当前挂载的所有文件系统，在2.4.19以后的内核中引进了每个进程使用独立挂载名称空间的方式，此文件则随之变成了指向/proc/self/mounts（每个进程自身挂载名称空间中的所有挂载点列表）文件的符号链接；/proc/self是一个独特的目录，后文中会对此目录进行介绍</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al mounts</div><div class="line">lrwxrwxrwx 1 root root 11 Feb 15 06:18 mounts -&gt; self/mounts</div></pre></td></tr></table></figure>
+<p>其中第一列表示挂载的设备，第二列表示在当前目录树中的挂载点，第三点表示当前文件系统的类型，第四列表示挂载属性（ro或者rw），第五列和第六列用来匹配/etc/mtab文件中的转储（dump）属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# more mounts</div><div class="line">none / aufs rw,relatime,si=6bfa28fca2bd64f1,dio,dirperm1 0 0</div><div class="line">proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /dev tmpfs rw,nosuid,mode=755 0 0</div><div class="line">devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0</div><div class="line">sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /sys/fs/cgroup tmpfs ro,nosuid,nodev,noexec,relatime,mode=755 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuset cgroup ro,nosuid,nodev,noexec,relatime,cpuset 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpu cgroup ro,nosuid,nodev,noexec,relatime,cpu 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuacct cgroup ro,nosuid,nodev,noexec,relatime,cpuacct 0 0</div><div class="line">cgroup /sys/fs/cgroup/blkio cgroup ro,nosuid,nodev,noexec,relatime,blkio 0 0</div><div class="line">cgroup /sys/fs/cgroup/memory cgroup ro,nosuid,nodev,noexec,relatime,memory 0 0</div><div class="line">cgroup /sys/fs/cgroup/devices cgroup ro,nosuid,nodev,noexec,relatime,devices 0 0</div><div class="line">cgroup /sys/fs/cgroup/freezer cgroup ro,nosuid,nodev,noexec,relatime,freezer 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_cls cgroup ro,nosuid,nodev,noexec,relatime,net_cls 0 0</div><div class="line">cgroup /sys/fs/cgroup/perf_event cgroup ro,nosuid,nodev,noexec,relatime,perf_event 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_prio cgroup ro,nosuid,nodev,noexec,relatime,net_prio 0 0</div><div class="line">cgroup /sys/fs/cgroup/hugetlb cgroup ro,nosuid,nodev,noexec,relatime,hugetlb 0 0</div></pre></td></tr></table></figure>
+<p>可以看到/proc 使用的是proc文件系统,大多数的ubuntu镜像使用的是aufs文件系统，当然可以在启动镜像时的时候指定storage driver</p>
+<ul>
+<li><p>/proc/modules 当前装入内核的所有模块名称列表，可以由lsmod命令使用，也可以直接查看；如下所示，其中第一列表示模块名，第二列表示此模块占用内存空间大小，第三列表示此模块有多少实例被装入，第四列表示此模块依赖于其它哪些模块，第五列表示此模块的装载状态（Live：已经装入；Loading：正在装入；Unloading：正在卸载），第六列表示此模块在内核内存（kernel memory）中的偏移量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat modules</div><div class="line">veth 16384 0 - Live 0xffffffffa0173000</div><div class="line">xt_conntrack 16384 1 - Live 0xffffffffa0152000</div><div class="line">ipt_MASQUERADE 16384 1 - Live 0xffffffffa014d000</div><div class="line">nf_nat_masquerade_ipv4 16384 1 ipt_MASQUERADE, Live 0xffffffffa01a5000</div></pre></td></tr></table></figure>
+</li>
+<li><p>proc/partitions 块设备每个分区的主设备号（major）和次设备号（minor）等信息，同时包括每个分区所包含的块（block）数目（如下面输出中第三列所示)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# more partitions</div><div class="line">major minor  #blocks  name</div><div class="line"></div><div class="line">   1        0      65535 ram0</div><div class="line">   1        1      65535 ram1</div><div class="line">   1        2      65535 ram2</div><div class="line">   1        3      65535 ram3</div><div class="line">   1        4      65535 ram4</div><div class="line">   1        5      65535 ram5</div><div class="line">   1        6      65535 ram6</div><div class="line">   1        7      65535 ram7</div><div class="line"> 250        0     194216 zram0</div><div class="line">  11        0      30720 sr0</div><div class="line">   8        0   20480000 sda</div><div class="line">   8        1   19486845 sda1</div><div class="line">   8        2     987966 sda2</div></pre></td></tr></table></figure>
+</li>
+<li><p>/proc/pci<br>内核初始化时发现的所有PCI设备及其配置信息列表，其配置信息多为某PCI设备相关IRQ信息，可读性不高，可以用“/sbin/lspci –vb”命令获得较易理解的相关信息；在2.6内核以后，此文件已为/proc/bus/pci目录及其下的文件代替</p>
+<ul>
+<li>/proc/slabinfo 在内核中频繁使用的对象（如inode、dentry等）都有自己的cache，即slab pool，而/proc/slabinfo文件列出了这些对象相关slap的信息；详情可以参见内核文档中slapinfo的手册页</li>
+<li><p>/proc/stat<br>实时追踪自系统上次启动以来的多种统计信息；如下所示，其中</p>
+<p>“cpu”行后的八个值分别表示以1/100（jiffies）秒为单位的统计值（包括系统运行于用户模式、低优先级用户模式，运系统模式、空闲模式、I/O等待模式的时间等）</p>
+<p>“intr”行给出中断的信息，第一个为自系统启动以来，发生的所有的中断的次数；然后每个数对应一个特定的中断自系统启动以来所发生的次数； </p>
+<p>“ctxt”给出了自系统启动以来CPU发生的上下文交换的次数。 </p>
+<p>“btime”给出了从系统启动到现在为止的时间，单位为秒； </p>
+<p>“processes (total_forks) 自系统启动以来所创建的任务的个数目； </p>
+<p>“procs_running”：当前运行队列的任务的数目； </p>
+<p>“procs_blocked”：当前被阻塞的任务的数目； </p>
+</li>
+<li>/proc/swaps 当前系统上的交换分区及其空间利用信息，如果有多个交换分区的话，则会每个交换分区的信息分别存储于/proc/swap目录中的单独文件中，而其优先级数字越低，被使用到的可能性越大 </li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat swaps</div><div class="line">Filename				Type		Size	Used	Priority</div><div class="line">/dev/zram0                              partition	194212	0	-1</div><div class="line">/dev/sda2                               partition	987960	0	-2</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/uptime 系统上次启动以来的运行时间,如下所示，其第一个数字表示系统运行时间，第二个数字表示系统空闲时间，单位是秒；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">	root@c27f523688ea:/proc# cat uptime</div><div class="line">70344.11 70304.83</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/version<br>当前系统运行的内核版本号，还会显示系统安装的gcc版本，如下所示；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat version</div><div class="line">Linux version 4.1.13-boot2docker (root@11aafb97cfeb) (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Fri Nov 20 19:05:50 UTC 2015</div></pre></td></tr></table></figure>
+<ul>
+<li>/proc/vmstat<br>当前系统虚拟内存的多种统计数据，信息量可能会比较大，这因系统而有所不同，可读性较好</li>
+<li>/proc/zoneinfo 内存区域（zone）的详细信息列表，信息量较大</li>
+</ul>
+<h3 id="proc-sys目录详解"><a href="#proc-sys目录详解" class="headerlink" title="/proc/sys目录详解"></a>/proc/sys目录详解</h3><p>与 /proc下其它文件的“只读”属性不同的是，管理员可对/proc/sys子目录中的许多文件内容进行修改以更改内核的运行特性，事先可以使用“ls -l”命令查看某文件是否“可写入”。写入操作通常使用类似于“echo  DATA &gt; /path/to/your/filename”的格式进行。需要注意的是，即使文件可写，其一般也不可以使用编辑器进行编辑。 </p>
+<ul>
+<li><p>/proc/sys/debug 子目录<br>此目录通常是一空目录； </p>
+</li>
+<li><p>/proc/sys/dev 子目录<br>为系统上特殊设备提供参数信息文件的目录，其不同设备的信息文件分别存储于不同的子目录中，如大多数系统上都会具有的/proc/sys/dev /cdrom和/proc/sys/dev/raid（如果内核编译时开启了支持raid的功能） 目录，其内存储的通常是系统上cdrom和raid的相关参数信息文件。</p>
+</li>
+</ul>
+<p>照着搬过来很多内容，了解了一些，一些还是不懂，写博客的好处，就是可以温故而知新</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2016/02/15/linux_11/" data-title="探索linux系统下proc文件系统内容 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/02/07/docker/" title="docker 笔记">
+  <strong>上一篇：</strong><br/>
+  <span>
+  docker 笔记</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/04/20/rabbitmq-搭建/"  title="rabbitmq 环境搭建">
+ <strong>下一篇：</strong><br/> 
+ <span>rabbitmq 环境搭建
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程目录中的常见文件介绍"><span class="toc-number">1.</span> <span class="toc-text">进程目录中的常见文件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#proc目录下常见的文件介绍"><span class="toc-number">2.</span> <span class="toc-text">/proc目录下常见的文件介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#proc-sys目录详解"><span class="toc-number">3.</span> <span class="toc-text">/proc/sys目录详解</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

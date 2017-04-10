@@ -1,0 +1,653 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>SHELL编程之内建命令 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="文章转自SHELL编程之内建命令  微博ID：orroz   微信公众号：Linux系统技术  前言本文是shell编程系列的第五篇，集中介绍了bash相关内建命令的使用。通过学习本文内容，可以帮你解决以下问题：  什么是内建命令？为什么要有内建命令？ 为啥echo 111 222 333 444 555| read -a test之后echo ${test[*]}不好使？ ./script和.">
+<meta name="keywords" content="shell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SHELL编程之内建命令">
+<meta property="og:url" content="http://magnetoeric.github.io/2016/06/14/shell-4/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="文章转自SHELL编程之内建命令  微博ID：orroz   微信公众号：Linux系统技术  前言本文是shell编程系列的第五篇，集中介绍了bash相关内建命令的使用。通过学习本文内容，可以帮你解决以下问题：  什么是内建命令？为什么要有内建命令？ 为啥echo 111 222 333 444 555| read -a test之后echo ${test[*]}不好使？ ./script和.">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SHELL编程之内建命令">
+<meta name="twitter:description" content="文章转自SHELL编程之内建命令  微博ID：orroz   微信公众号：Linux系统技术  前言本文是shell编程系列的第五篇，集中介绍了bash相关内建命令的使用。通过学习本文内容，可以帮你解决以下问题：  什么是内建命令？为什么要有内建命令？ 为啥echo 111 222 333 444 555| read -a test之后echo ${test[*]}不好使？ ./script和.">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/06/14/shell-4/" title="SHELL编程之内建命令" itemprop="url">SHELL编程之内建命令</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-06-14T03:59:00.000Z" itemprop="datePublished"> 发表于 2016-06-14</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么要有内建命令"><span class="toc-number">1.1.</span> <span class="toc-text">为什么要有内建命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#输入输出"><span class="toc-number">1.2.</span> <span class="toc-text">输入输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#作业控制"><span class="toc-number">2.</span> <span class="toc-text">作业控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#信号处理"><span class="toc-number">3.</span> <span class="toc-text">信号处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程控制"><span class="toc-number">4.</span> <span class="toc-text">进程控制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wait："><span class="toc-number">4.1.</span> <span class="toc-text">wait：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#exec"><span class="toc-number">4.2.</span> <span class="toc-text">exec</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令行参数处理"><span class="toc-number">5.</span> <span class="toc-text">命令行参数处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程环境"><span class="toc-number">6.</span> <span class="toc-text">进程环境</span></a></li></ol>
+		
+		</div>
+		
+		<p>文章转自<a href="http://liwei.life/2016/06/13/shell编程之内建命令/" target="_blank" rel="external">SHELL编程之内建命令</a></p>
+<p><strong> 微博ID：orroz </strong></p>
+<p><strong> 微信公众号：Linux系统技术 </strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第五篇，集中介绍了bash相关内建命令的使用。通过学习本文内容，可以帮你解决以下问题：</p>
+<ol>
+<li>什么是内建命令？为什么要有内建命令？</li>
+<li>为啥echo 111 222 333 444 555| read -a test之后echo ${test[*]}不好使？</li>
+<li>./script和. script有啥区别？</li>
+<li>如何让让kill杀不掉你的bash脚本？</li>
+<li>如何更优雅的处理bash的命令行参数</li>
+</ol>
+<h3 id="为什么要有内建命令"><a href="#为什么要有内建命令" class="headerlink" title="为什么要有内建命令"></a>为什么要有内建命令</h3><p>内建命令是指bash内部实现的命令。bash在执行这些命令的时候不同于一般外部命令的fork、exec、wait的处理过程，这内建功能本身不需要打开一个子进程执行，而是bash本身就可以进行处理。分析外部命令的执行过程我们可以理解内建命令的重要性，外建命令都会打开一个子进程执行，所以有些功能没办法通过外建命令实现。比如当我们想改变当前bash进程的某些环境的时候，如：切换当前进程工作目录，如果打开一个子进程，切换之后将会改变子进程的工作目录，与当前bash没关系。所以内建命令基本都是从必须放在bash内部实现的命令。bash所有的内建命令只有50多个，绝大多数的命令我们在之前的介绍中都已经使用过了。下面我们就把它们按照使用的场景分类之后，分别介绍一下在bash编程中可能会经常用到的内建命令。</p>
+<h3 id="输入输出"><a href="#输入输出" class="headerlink" title="输入输出"></a>输入输出</h3><p>对于任何编程语言来说，程序跟文件的输入输出都是非常重要的内容，bash编程当然也不例外。所有的shell编程与其他语言在IO处理这一块的最大区别就是，shell可以直接使用命令进行处理，而其他语言基本上都要依赖IO处理的库和函数进行处理。所以对于shell编程来说，IO处理的相关代码写起来要简单的多。本节我们只讨论bash内建的IO处理命令，而外建的诸如grep、sed、awk这样的高级处理命令不在本文的讨论范围内。</p>
+<p>source：</p>
+<p>.：</p>
+<p>以上两个命令：source和.实际上是同一个内建命令，它们的功能完全一样，只是两种不同写法。我们都应该见过这样一种写法，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">for i in /etc/profile.d/*.sh; do</div><div class="line">    if [ -r &quot;$i&quot; ]; then</div><div class="line">        if [ &quot;$PS1&quot; ]; then</div><div class="line">            . &quot;$i&quot;</div><div class="line">        else</div><div class="line">            . &quot;$i&quot; &gt;/dev/null 2&gt;&amp;1</div><div class="line">        fi</div><div class="line">    fi</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>这里的”. $i”实际上就是source $i。这个命令的含义是：读取文件的内容，并在当前bash环境下将其内容当命令执行。注意，这与输入一个可执行脚本的路径的执行方式是不同的。路径执行的方式会打开一个子进程的bash环境去执行脚本中的内容，而source方式将会直接在当前bash环境中执行其内容。所以这种方式主要用于想引用一个脚本中的内容用来改变当前bash环境。如：加载环境变量配置脚本或从另一个脚本中引用其定义的函数时。我们可以通过如下例子来理解一下这个内建命令的作用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat source.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">aaa=1000</div><div class="line"></div><div class="line">echo $aaa</div><div class="line">echo $$</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./source.sh </div><div class="line">1000</div><div class="line">27051</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $aaa</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ . source.sh </div><div class="line">1000</div><div class="line">17790</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $$</div><div class="line">17790</div></pre></td></tr></table></figure>
+<p>我们可以通过以上例子中的$aaa变量看到当前bash环境的变化，可以通过$$变量，看到不同执行过程的进程环境变化。</p>
+<p>read：</p>
+<p>这个命令可以让bash从标准输入读取输字符串到一个变量中。用法如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat input.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">read -p &quot;Login: &quot; username</div><div class="line"></div><div class="line">read -p &quot;Passwd: &quot; password</div><div class="line"></div><div class="line">echo $username</div><div class="line"></div><div class="line">echo $password</div></pre></td></tr></table></figure>
+<p>程序执行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./input.sh </div><div class="line">Login: zorro</div><div class="line">Passwd: zorro</div><div class="line">zorro</div><div class="line">zorro</div></pre></td></tr></table></figure>
+<p>我们可以利用read命令实现一些简单的交互程序。read自带提示输出功能，-p参数可以让read在读取输入之前先打印一个字符串。read命令除了可以读取输入并赋值一个变量以外，还可以赋值一个数组，比如我们想把一个命令的输出读到一个数组中，使用方法是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat read.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line"></div><div class="line">read -a test</div><div class="line"></div><div class="line">echo $&#123;test[*]&#125;</div></pre></td></tr></table></figure>
+<p>执行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./read.sh </div><div class="line">111 222 333 444 555</div><div class="line">111 222 333 444 555</div></pre></td></tr></table></figure>
+<p>输入为：111 222 333 444 555，就会打印出整个数组列表。</p>
+<p>mapfile：</p>
+<p>readarray：</p>
+<p>这两个命令又是同一个命令的两种写法。它们的功能是，将一个文本文件直接变成一个数组，每行作为数组的一个元素。这对某些程序的处理是很方便的。尤其是当你要对某些文件进行全文的分析或者处理的时候，比一行一行读进来处理方便的多。用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat mapfile.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">exec 3&lt; /etc/passwd</div><div class="line"></div><div class="line">mapfile -u 3 passwd </div><div class="line"></div><div class="line">exec 3&lt;&amp;-</div><div class="line"></div><div class="line">echo $&#123;#passwd&#125;</div><div class="line"></div><div class="line">for ((i=0;i&lt;$&#123;#passwd&#125;;i++))</div><div class="line">do</div><div class="line">    echo $&#123;passwd[$i]&#125;</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>程序输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./mapfile.sh </div><div class="line">32</div><div class="line">root:x:0:0:root:/root:/bin/bash</div><div class="line">bin:x:1:1:bin:/bin:/usr/bin/nologin</div><div class="line">daemon:x:2:2:daemon:/:/usr/bin/nologin</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>本例子中使用了-u参数，表示让mapfile或readarray命令从一个文件描述符读取，如果不指定文件描述符，命令将默认从标准输入读取。所以很多人可能习惯用管道的方式读取，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat /etc/passwd|mapfile passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $&#123;passwd[*]&#125;</div></pre></td></tr></table></figure>
+<p>但是最后却发现passwd变量根本不存在。这个原因是：如果内建命令放到管道环境中执行，那么bash会给它创建一个subshell进行处理。于是创建的数组实际上与父进程没有关系。这点是使用内建命令需要注意的一点。同样，read命令也可能会出现类似的使用错误。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo 111 222 333 444 555| read -a test</div></pre></td></tr></table></figure>
+<p>执行完之后，我们在bash脚本环境中仍然无法读取到test变量的值，也是同样的原因。</p>
+<p>mapfile的其他参数，大家可以自行参考help mapfile或help readarray取得帮助。</p>
+<p>echo：</p>
+<p>printf：</p>
+<p>这两个都是用来做输出的命令，其中echo是我们经常使用的，就不啰嗦了，具体参数可以help echo。printf命令是一个用来进行格式化输出的命令，跟C语言或者其他语言的printf格式化输出的方法都类似，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ printf &quot;%d\t%s %f\n&quot; 123 zorro 1.23</div><div class="line">123 zorro 1.230000</div></pre></td></tr></table></figure>
+<p>使用很简单，具体也请参见：help printf。</p>
+<h2 id="作业控制"><a href="#作业控制" class="headerlink" title="作业控制"></a>作业控制</h2><p>作业控制指的是jobs功能。一般情况下bash执行命令的方式是打开一个子进程并wait等待其退出，所以bash在等待一个命令执行的过程中不能处理其他命令。而jobs功能给我们提供了一种办法，可以让bash不用显示的等待子进程执行完毕后再处理别的命令，在命令行中使用这个功能的方法是在命令后面加&amp;符号，表明进程放进作业控制中处理，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 3000 &amp;</div><div class="line">[1] 30783</div><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 3000 &amp;</div><div class="line">[2] 30787</div><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 3000 &amp;</div><div class="line">[3] 30791</div><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 3000 &amp;</div><div class="line">[4] 30795</div><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 3000 &amp;</div><div class="line">[5] 30799</div></pre></td></tr></table></figure>
+<p>我们放了5个sleep进程进入jobs作业控制。大家可以当作这是bash提供给我们的一种“并发处理”方式。此时我们可以使用jobs命令查看作业系统中有哪些进程在执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ jobs</div><div class="line">[1]   Running                 sleep 3000 &amp;</div><div class="line">[2]   Running                 sleep 3000 &amp;</div><div class="line">[3]   Running                 sleep 3000 &amp;</div><div class="line">[4]-  Running                 sleep 3000 &amp;</div><div class="line">[5]+  Running                 sleep 3000 &amp;</div></pre></td></tr></table></figure>
+<p>除了数字外，这里还有+和-号标示。+标示当前作业任务，-表示备用的当前作业任务。所谓的当前作业，就是最后一个被放到作业控制中的进程，而备用的则是当前进程如果退出，那么备用的就会变成当前的。这些jobs进程可以使用编号和PID的方式控制，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ kill %1</div><div class="line">[1]   Terminated              sleep 3000</div><div class="line">[zorro@zorrozou-pc0 bash]$ jobs</div><div class="line">[2]   Running                 sleep 3000 &amp;</div><div class="line">[3]   Running                 sleep 3000 &amp;</div><div class="line">[4]-  Running                 sleep 3000 &amp;</div><div class="line">[5]+  Running                 sleep 3000 &amp;</div></pre></td></tr></table></figure>
+<p>表示杀掉1号作业任务，还可以使用kill %+或者kill %-以及kill %%（等同于%+）。除了可以kill这些进程以外，bash还提供了其他控制命令：</p>
+<p>fg：<br>bg：</p>
+<p>将指定的作业进程回到前台让当前bash去wait。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ fg %5</div><div class="line">sleep 3000</div></pre></td></tr></table></figure>
+<p>于是当前bash又去“wait”5号作业任务了。当然fg后面也可以使用%%、％+、%-等符号，如果fg不加参数效果跟fg %+也是一样的。让一个当前bash正在wait的进程回到作业控制，可以使用ctrl+z快捷键，这样会让这个进程处于stop状态：</p>
+<p>[zorro@zorrozou-pc0 bash]$ fg %5<br>sleep 3000<br>^Z<br>[5]+  Stopped                 sleep 3000</p>
+<p>[zorro@zorrozou-pc0 bash]$ jobs<br>[2]   Running                 sleep 3000 &amp;<br>[3]   Running                 sleep 3000 &amp;<br>[4]-  Running                 sleep 3000 &amp;<br>[5]+  Stopped                 sleep 3000</p>
+<p>这个进程目前是stopped的，想让它再运行起来可以使用bg命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ bg %+</div><div class="line">[5]+ sleep 3000 &amp;</div><div class="line">[zorro@zorrozou-pc0 bash]$ jobs</div><div class="line">[2]   Running                 sleep 3000 &amp;</div><div class="line">[3]   Running                 sleep 3000 &amp;</div><div class="line">[4]-  Running                 sleep 3000 &amp;</div><div class="line">[5]+  Running                 sleep 3000 &amp;</div></pre></td></tr></table></figure>
+<p>disown：</p>
+<p>disown命令可以让一个jobs作业控制进程脱离作业控制，变成一个“野”进程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ disown </div><div class="line">[zorro@zorrozou-pc0 bash]$ jobs</div><div class="line">[2]   Running                 sleep 3000 &amp;</div><div class="line">[3]-  Running                 sleep 3000 &amp;</div><div class="line">[4]+  Running                 sleep 3000 &amp;</div></pre></td></tr></table></figure>
+<p>直接回车的效果跟diswon ％+是一样的，也是处理当前作业进程。这里要注意的是，disown之后的进程仍然是还在运行的，只是bash不会wait它，jobs中也不在了。</p>
+<h2 id="信号处理"><a href="#信号处理" class="headerlink" title="信号处理"></a>信号处理</h2><p>进程在系统中免不了要处理信号，即使是bash。我们至少需要使用命令给别进程发送信号，于是就有了kill命令。kill这个命令应该不用多说了，但是需要大家更多理解的是信号的概念。大家可以使用kill -l命令查看信号列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ kill -l</div><div class="line"> 1) SIGHUP   2) SIGINT   3) SIGQUIT  4) SIGILL   5) SIGTRAP</div><div class="line"> 6) SIGABRT  7) SIGBUS   8) SIGFPE   9) SIGKILL 10) SIGUSR1</div><div class="line">11) SIGSEGV 12) SIGUSR2 13) SIGPIPE 14) SIGALRM 15) SIGTERM</div><div class="line">16) SIGSTKFLT   17) SIGCHLD 18) SIGCONT 19) SIGSTOP 20) SIGTSTP</div><div class="line">21) SIGTTIN 22) SIGTTOU 23) SIGURG  24) SIGXCPU 25) SIGXFSZ</div><div class="line">26) SIGVTALRM   27) SIGPROF 28) SIGWINCH    29) SIGIO   30) SIGPWR</div><div class="line">31) SIGSYS  34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1  64) SIGRTMAX</div></pre></td></tr></table></figure>
+<p>每个信号的意思以及进程接收到相关信号的默认行为了这个内容大家可以参见《UNIX环境高级编程》。我们在此先只需知道，常用的信号有2号（crtl c就是发送2号信号），15号（kill默认发送），9号（著名的kill -9）这几个就可以了。其他我们还需要知道，这些信号绝大多数是可以被进程设置其相应行为的，除了9号和19号信号。这也是为什么我们一般用kill直接无法杀掉的进程都会再用kill -9试试的原因。</p>
+<p>那么既然进程可以设置信号的行为，bash中如何处理呢？使用trap命令。方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat trap.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">trap &apos;echo hello&apos; 2 15</div><div class="line">trap &apos;exit 17&apos; 3</div><div class="line"></div><div class="line">while :</div><div class="line">do</div><div class="line">    sleep 1</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>trap命令的格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">trap [-lp] [[arg] signal_spec ...]</div></pre></td></tr></table></figure>
+<p>在我们的例子中，第一个trap命令的意思是，定义针对2号和15号信号的行为，当进程接收到这两个信号的时候，将执行echo hello。第二个trap的意思是，如果进程接收到3号信号将执行exit 17，以17为返回值退出进程。然后我们来看一下进程执行的效果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./trap.sh </div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">hello</div><div class="line">hello</div></pre></td></tr></table></figure>
+<p>此时按ctrl+c和kill这个bash进程都会让进程打印hello。3号信号可以用ctrl+\发送：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./trap.sh </div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">^Chello</div><div class="line">hello</div><div class="line">hello</div><div class="line">^\Quit (core dumped)</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">17</div></pre></td></tr></table></figure>
+<p>此时进程退出，返回值是17，而不是128+3=131。这就是trap命令的用法。</p>
+<p>suspend：</p>
+<p>bash还提供了一种让bash执行暂停并等待信号的功能，就是suspend命令。它等待的是18号SIGCONT信号，这个信号本身的含义就是让一个处在T（stop）状态的进程恢复运行。使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat suspend.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">pid=$$</div><div class="line"></div><div class="line">echo &quot;echo $pid&quot;</div><div class="line">#打开jobs control功能，在没有这个功能suspend无法使用，脚本中默认此功能关闭。</div><div class="line">#我们并不推荐在脚本中开启此功能。</div><div class="line">set -m</div><div class="line"></div><div class="line">echo &quot;Begin!&quot;</div><div class="line"></div><div class="line">echo $-</div><div class="line"></div><div class="line">echo &quot;Enter suspend stat:&quot;</div><div class="line"></div><div class="line">#让一个进程十秒后给本进程发送一个SIGCONT信号</div><div class="line">( sleep 10 ; kill -18 $pid ) &amp;</div><div class="line">#本进程进入等待</div><div class="line">suspend </div><div class="line"></div><div class="line">echo &quot;Get SIGCONT and continue running.&quot;</div><div class="line"></div><div class="line">echo &quot;End!&quot;</div></pre></td></tr></table></figure>
+<p>执行效果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./suspend.sh </div><div class="line">echo 31833</div><div class="line">Begin!</div><div class="line">hmB</div><div class="line">Enter suspend stat:</div><div class="line"></div><div class="line">[1]+  Stopped                 ./suspend.sh</div></pre></td></tr></table></figure>
+<p>十秒之后：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ </div><div class="line">[zorro@zorrozou-pc0 bash]$ Get SIGCONT and continue running.</div><div class="line">End!</div></pre></td></tr></table></figure>
+<p>以上是suspend在脚本中的使用方法。另外，suspend默认不能在非loginshell中使用，如果使用，需要加-f参数。</p>
+<h2 id="进程控制"><a href="#进程控制" class="headerlink" title="进程控制"></a>进程控制</h2><p>bash中也实现了基本的进程控制方法。主要的命令有exit，exec，logout，wait。其中exit我们已经了解了。logout的功能跟exit实际上差不多，区别只是logout是专门用来退出login方式的bash的。如果bash不是login方式执行的，logout会报错：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat logout.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">logout</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./logout.sh </div><div class="line">./logout.sh: line 3: logout: not login shell: use `exit&apos;</div></pre></td></tr></table></figure>
+<h3 id="wait："><a href="#wait：" class="headerlink" title="wait："></a>wait：</h3><p>wait命令的功能是用来等待jobs作业控制进程退出的。因为一般进程默认行为就是要等待其退出之后才能继续执行。wait可以等待指定的某个jobs进程，也可以等待所有jobs进程都退出之后再返回，实际上wait命令在bash脚本中是可以作为类似“屏障”这样的功能使用的。考虑这样一个场景，我们程序在运行到某一个阶段之后，需要并发的执行几个jobs，并且一定要等到这些jobs都完成工作才能继续执行，但是每个jobs的运行时间又不一定多久，此时，我们就可以用这样一个办法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat wait.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">echo &quot;Begin:&quot;</div><div class="line"></div><div class="line">(sleep 3; echo 3) &amp;</div><div class="line">(sleep 5; echo 5) &amp;</div><div class="line">(sleep 7; echo 7) &amp;</div><div class="line">(sleep 9; echo 9) &amp;</div><div class="line"></div><div class="line">wait</div><div class="line"></div><div class="line">echo parent continue</div><div class="line"></div><div class="line">sleep 3</div><div class="line"></div><div class="line">echo end!</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./wait.sh </div><div class="line">Begin:</div><div class="line">3</div><div class="line">5</div><div class="line">7</div><div class="line">9</div><div class="line">parent continue</div><div class="line">end!</div></pre></td></tr></table></figure>
+<p>通过这个例子可以看到wait的行为：在不加任何参数的情况下，wait会等到所有作业控制进程都退出之后再回返回，否则就会一直等待。当然，wait也可以指定只等待其中一个进程，可以指定pid和jobs方式的作业进程编号，如%3，就变成了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat wait.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">echo &quot;Begin:&quot;</div><div class="line"></div><div class="line">(sleep 3; echo 3) &amp;</div><div class="line">(sleep 5; echo 5) &amp;</div><div class="line">(sleep 7; echo 7) &amp;</div><div class="line">(sleep 9; echo 9) &amp;</div><div class="line"></div><div class="line">wait %3</div><div class="line"></div><div class="line">echo parent continue</div><div class="line"></div><div class="line">sleep 3</div><div class="line"></div><div class="line">echo end!</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./wait.sh </div><div class="line">Begin:</div><div class="line">3</div><div class="line">5</div><div class="line">7</div><div class="line">parent continue</div><div class="line">9</div><div class="line">end!</div></pre></td></tr></table></figure>
+<h3 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h3><p>我们已经在重定向那一部分讲过exec处理bash程序的文件描述符的使用方法了，在此补充一下它是如何执行命令的。这个命令的执行过程跟exec族的函数功能是一样的：将当前进程的执行镜像替换成指定进程的执行镜像。还是举例来看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat exec.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">echo &quot;Begin:&quot;</div><div class="line"></div><div class="line">echo &quot;Before exec:&quot;</div><div class="line"></div><div class="line">exec ls /etc/passwd</div><div class="line"></div><div class="line">echo &quot;After exec:&quot;</div><div class="line"></div><div class="line">echo &quot;End!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./exec.sh </div><div class="line">Begin:</div><div class="line">Before exec:</div><div class="line">/etc/passwd</div></pre></td></tr></table></figure>
+<p>实际上这个脚本在执行到exec ls /etc/passwd之后，bash进程就已经替换为ls进程了，所以后续的echo命令都不会执行，ls执行完，这个进程就完全退出了。</p>
+<h2 id="命令行参数处理"><a href="#命令行参数处理" class="headerlink" title="命令行参数处理"></a>命令行参数处理</h2><p>我们已经学习过使用shift方式处理命令行参数了，但是这个功能还是比较简单，它每次执行就仅仅是将参数左移一位而已，将本次的$2变成下次的$1。bash也给我们提供了一个更为专业的命令行参数处理方法，这个命令是getopts。</p>
+<p>我们都知道一般的命令参数都是通过-a、-b、-c这样的参数来指定各种功能的，如果我们想要实现这样的功能，只单纯使用shift这样的方式手工处理将会非常麻烦，而且还不能支持让-a -b写成-ab这样的方式。bash跟其他语言一样，提供了getopts这样的方法来帮助我们处理类似的问题，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat getopts.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#getopts的使用方式：字母后面带:的都是需要执行子参数的，如：-c xxxxx -e xxxxxx，后续可以用$OPTARG变量进行判断。</div><div class="line">#getopts会将输入的-a -b分别赋值给arg变量，以便后续判断。</div><div class="line">while getopts &quot;abc:de:f&quot; arg</div><div class="line">do</div><div class="line">    case $arg in</div><div class="line">        a)</div><div class="line">        echo &quot;aaaaaaaaaaaaaaa&quot;</div><div class="line">        ;;</div><div class="line">        b)</div><div class="line">        echo &quot;bbbbbbbbbbbbbbb&quot;</div><div class="line">        ;;</div><div class="line">        c)</div><div class="line">        echo &quot;c: arg:$OPTARG&quot;</div><div class="line">        ;;</div><div class="line">        d)</div><div class="line">        echo &quot;ddddddddddddddd&quot;</div><div class="line">        ;;</div><div class="line">        e)</div><div class="line">        echo &quot;e: arg:$OPTARG&quot;</div><div class="line">        ;;</div><div class="line">        f)</div><div class="line">        echo &quot;fffffffffffffff&quot;</div><div class="line">        ;;</div><div class="line">        ?)</div><div class="line">        echo &quot;$arg :no this arguments!&quot;</div><div class="line">    esac</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>以下为程序输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./getopts.sh -a -bd -c zorro -e jerry </div><div class="line">aaaaaaaaaaaaaaa</div><div class="line">bbbbbbbbbbbbbbb</div><div class="line">ddddddddddddddd</div><div class="line">c: arg:zorro</div><div class="line">e: arg:jerry</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./getopts.sh -c xxxxxxx</div><div class="line">c: arg:xxxxxxx</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./getopts.sh -a</div><div class="line">aaaaaaaaaaaaaaa</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./getopts.sh -f</div><div class="line">fffffffffffffff</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./getopts.sh -g</div><div class="line">./getopts.sh: illegal option -- g</div><div class="line">unknow argument!</div></pre></td></tr></table></figure>
+<p>getopts只能处理段格式参数，如：-a这样的。不能支持的是如–login这种长格式参数。实际上我们的系统中还给了一个getopt命令，可以处理长格式参数。这个命令不是内建命令，使用方法跟getopts类似，大家可以自己man getopt近一步学习这个命令的使用，这里就不再赘述了。</p>
+<h2 id="进程环境"><a href="#进程环境" class="headerlink" title="进程环境"></a>进程环境</h2><p>内建命令中最多的就是关于进程环境的配置的相关命令，当然绝大多数我们之前已经会用了。它们包括：alias、unalias、cd、declare、typeset、dirs、enable、export、hash、history、popd、pushd、local、pwd、readonly、set、unset、shopt、ulimit、umask。</p>
+<p>我们在这需要简单说明的命令有：</p>
+<p>declare：</p>
+<p>typeset：</p>
+<p>这两个命令用来声明或显示进程的变量或函数相关信息和属性。如：</p>
+<p>declare -a array：可以声明一个数组变量。</p>
+<p>declare -A array：可以声明一个关联数组。</p>
+<p>declare -f func：可以声明或查看一个函数。</p>
+<p>其他常用参数可以help declare查看。</p>
+<p>enable：</p>
+<p>可以用来打开或者关闭某个内建命令的功能。</p>
+<p>dirs：</p>
+<p>popd：</p>
+<p>pushd：</p>
+<p>dirs、popd、pushd可以用来操作目录栈。目录栈是bash提供的一种纪录曾经去过的相关目录的缓存数据结构，可以方便的使操作者在多个深层次的目录中方便的跳转。使用演示：</p>
+<p>显示当前目录栈：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 dirstack]$ dirs</div><div class="line">~/bash/dirstack</div></pre></td></tr></table></figure>
+<p>只有一个当前工作目录。将aaa加入目录栈：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 dirstack]$ pushd aaa</div><div class="line">~/bash/dirstack/aaa ~/bash/dirstack</div></pre></td></tr></table></figure>
+<p>pushd除了将目录加入了目录栈外，还改变了当前工作目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 aaa]$ pwd</div><div class="line">/home/zorro/bash/dirstack/aaa</div></pre></td></tr></table></figure>
+<p>将bbb目录加入目录栈：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 aaa]$ pushd ../bbb/</div><div class="line">~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack</div><div class="line">[zorro@zorrozou-pc0 bbb]$ dirs</div><div class="line">~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack</div><div class="line">[zorro@zorrozou-pc0 bbb]$ pwd</div><div class="line">/home/zorro/bash/dirstack/bbb</div></pre></td></tr></table></figure>
+<p>加入ccc、ddd、eee目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bbb]$ pushd ../ccc</div><div class="line">~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack</div><div class="line">[zorro@zorrozou-pc0 ccc]$ pushd ../ddd</div><div class="line">~/bash/dirstack/ddd ~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack</div><div class="line">[zorro@zorrozou-pc0 ddd]$ pushd ../eee</div><div class="line">~/bash/dirstack/eee ~/bash/dirstack/ddd ~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack</div><div class="line">[zorro@zorrozou-pc0 eee]$ dirs</div><div class="line">~/bash/dirstack/eee ~/bash/dirstack/ddd ~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack</div></pre></td></tr></table></figure>
+<p>将当前工作目录切换到目录栈中的第2个目录，即当前的ddd目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 eee]$ pushd +1</div><div class="line">~/bash/dirstack/ddd ~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack ~/bash/dirstack/eee</div></pre></td></tr></table></figure>
+<p>将当前工作目录切换到目录栈中的第5个目录，即当前的~/bash/dirstack目录:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ddd]$ pushd +4</div><div class="line">~/bash/dirstack ~/bash/dirstack/eee ~/bash/dirstack/ddd ~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa</div></pre></td></tr></table></figure>
+<p>+N表示当前目录栈从左往右数的第N个，第一个是左边的第一个目录，从0开始。<br>将当前工作目录切换到目录栈中的倒数第3个目录，即当前的ddd目录:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 dirstack]$ pushd -3</div><div class="line">~/bash/dirstack/ddd ~/bash/dirstack/ccc ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack ~/bash/dirstack/eee</div></pre></td></tr></table></figure>
+<p>-N表示当亲啊目录栈从右往左数的第N个，第一个是右边的第一个目录，从0开始。<br>从目录栈中推出一个目录，默认推出当前所在的目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ccc]$ popd </div><div class="line">~/bash/dirstack/ddd ~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack ~/bash/dirstack/eee</div><div class="line">[zorro@zorrozou-pc0 ddd]$ popd </div><div class="line">~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack ~/bash/dirstack/eee</div></pre></td></tr></table></figure>
+<p>指定要推出的目录编号，数字含义跟pushd一样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bbb]$ popd +2</div><div class="line">~/bash/dirstack/bbb ~/bash/dirstack/aaa ~/bash/dirstack/eee</div><div class="line">[zorro@zorrozou-pc0 bbb]$ popd -2</div><div class="line">~/bash/dirstack/aaa ~/bash/dirstack/eee</div><div class="line">[zorro@zorrozou-pc0 aaa]$ pushd +1</div><div class="line">~/bash/dirstack/eee ~/bash/dirstack/aaa</div></pre></td></tr></table></figure>
+<p>readonly：</p>
+<p>声明一个只读变量。</p>
+<p>local：</p>
+<p>声明一个局部变量。bash的局部变量概念很简单，它只能在函数中使用，并且局部变量只有在函数中可见。</p>
+<p>set：</p>
+<p>shopt：</p>
+<p>我们之前已经讲过这两个命令的使用。这里补充一下其他信息，请参见：<a href="http://www.cnblogs.com/ziyunfei/p/4913758.html" target="_blank" rel="external">http://www.cnblogs.com/ziyunfei/p/4913758.html</a></p>
+<p>eval：</p>
+<p>eval是一个可能会被经常用到的内建命令。它的作用其实很简单，就是将指定的命令解析两次。可以这样理解这个命令：</p>
+<p>首先我们定义一个变量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ pipe=&quot;|&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $pipe</div><div class="line">|</div></pre></td></tr></table></figure>
+<p>这个变量时pipe，值就是”|”这个字符。然后我们试图在后续命令中引入管道这个功能，但是管道符是从变量中引入的，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat /etc/passwd $pipe wc -l</div><div class="line">cat: invalid option -- &apos;l&apos;</div><div class="line">Try &apos;cat --help&apos; for more information.</div></pre></td></tr></table></figure>
+<p>此时执行报错了，因为bash在解释这条命令的时候，并不会先将$pipe解析成”|”再做解释。这时候我们需要让bash先解析$pipe，然后得到”|”字符之后，再将cat /etc/passwd ｜ wc -l当成一个要执行的命令传给bash解释执行。此时我们需要eval：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">［zorro@zorrozou-pc0 bash]$ eval cat /etc/passwd $pipe wc -l</div><div class="line">30</div></pre></td></tr></table></figure>
+<p>这就是eval的用法。再来理解一下，eval就是将所给的命令解析两遍。</p>
+<p>最后</p>
+<p>通过本文和之前的文章，我们几乎将所有的bash内建命令都覆盖到了。本文主要包括的知识点为：</p>
+<ol>
+<li>bash脚本程序的输入输出。</li>
+<li>bash的作业控制。</li>
+<li>bash脚本的信号处理。</li>
+<li>bash对进程的控制。</li>
+<li>命令行参数处理。</li>
+<li>使用内建命令改变bash相关环境。</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2016/06/14/shell-4/" data-title="SHELL编程之内建命令 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/06/08/shell-3/" title="SHELL编程之特殊符号">
+  <strong>上一篇：</strong><br/>
+  <span>
+  SHELL编程之特殊符号</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/11/17/union/"  title="并查集">
+ <strong>下一篇：</strong><br/> 
+ <span>并查集
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么要有内建命令"><span class="toc-number">1.1.</span> <span class="toc-text">为什么要有内建命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#输入输出"><span class="toc-number">1.2.</span> <span class="toc-text">输入输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#作业控制"><span class="toc-number">2.</span> <span class="toc-text">作业控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#信号处理"><span class="toc-number">3.</span> <span class="toc-text">信号处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程控制"><span class="toc-number">4.</span> <span class="toc-text">进程控制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wait："><span class="toc-number">4.1.</span> <span class="toc-text">wait：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#exec"><span class="toc-number">4.2.</span> <span class="toc-text">exec</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令行参数处理"><span class="toc-number">5.</span> <span class="toc-text">命令行参数处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进程环境"><span class="toc-number">6.</span> <span class="toc-text">进程环境</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

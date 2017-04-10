@@ -1,0 +1,548 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>guid | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="分布式id生成器概念有些人也喜欢叫发号器，一般是作为服务运行，主要目的是就是为一个系统的数据对象分配一个唯一id。 特点 唯一性 时间段内粗略有序 可制造 可反解  一般来说，id生成器的要求主要是一下几点:  快速响应，可以毫秒级并发 高可用性 体积小(存储)  这里不讨论uuiduuid-vs-int-insert-performance 生成方法自增有序这种方式可以利用mysql的自增id。">
+<meta name="keywords" content="arch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="guid">
+<meta property="og:url" content="http://magnetoeric.github.io/2016/11/29/guid/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="分布式id生成器概念有些人也喜欢叫发号器，一般是作为服务运行，主要目的是就是为一个系统的数据对象分配一个唯一id。 特点 唯一性 时间段内粗略有序 可制造 可反解  一般来说，id生成器的要求主要是一下几点:  快速响应，可以毫秒级并发 高可用性 体积小(存储)  这里不讨论uuiduuid-vs-int-insert-performance 生成方法自增有序这种方式可以利用mysql的自增id。">
+<meta property="og:image" content="http://githubforericwang.qiniudn.com/hexo/eric/autoincreament.png">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="guid">
+<meta name="twitter:description" content="分布式id生成器概念有些人也喜欢叫发号器，一般是作为服务运行，主要目的是就是为一个系统的数据对象分配一个唯一id。 特点 唯一性 时间段内粗略有序 可制造 可反解  一般来说，id生成器的要求主要是一下几点:  快速响应，可以毫秒级并发 高可用性 体积小(存储)  这里不讨论uuiduuid-vs-int-insert-performance 生成方法自增有序这种方式可以利用mysql的自增id。">
+<meta name="twitter:image" content="http://githubforericwang.qiniudn.com/hexo/eric/autoincreament.png">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/11/29/guid/" title="guid" itemprop="url">guid</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-11-29T11:55:00.000Z" itemprop="datePublished"> 发表于 2016-11-29</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#分布式id生成器"><span class="toc-number">1.</span> <span class="toc-text">分布式id生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-number">1.1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#特点"><span class="toc-number">1.2.</span> <span class="toc-text">特点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生成方法"><span class="toc-number">1.3.</span> <span class="toc-text">生成方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#自增有序"><span class="toc-number">1.3.1.</span> <span class="toc-text">自增有序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#时间有序"><span class="toc-number">1.3.2.</span> <span class="toc-text">时间有序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">1.4.</span> <span class="toc-text">参考</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="分布式id生成器"><a href="#分布式id生成器" class="headerlink" title="分布式id生成器"></a>分布式id生成器</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>有些人也喜欢叫发号器，一般是作为服务运行，主要目的是就是为一个系统的数据对象分配一个唯一id。</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
+<li>唯一性</li>
+<li>时间段内粗略有序</li>
+<li>可制造</li>
+<li>可反解</li>
+</ul>
+<p>一般来说，id生成器的要求主要是一下几点:</p>
+<ul>
+<li>快速响应，可以毫秒级并发</li>
+<li>高可用性</li>
+<li>体积小(存储)</li>
+</ul>
+<p>这里不讨论uuid<a href="http://kccoder.com/mysql/uuid-vs-int-insert-performance/" target="_blank" rel="external">uuid-vs-int-insert-performance</a></p>
+<h2 id="生成方法"><a href="#生成方法" class="headerlink" title="生成方法"></a>生成方法</h2><h3 id="自增有序"><a href="#自增有序" class="headerlink" title="自增有序"></a>自增有序</h3><p>这种方式可以利用mysql的自增id。但是使用mysql有一些瓶颈:</p>
+<ul>
+<li>单点问题(高可用性)</li>
+<li>并发</li>
+</ul>
+<p>flickr巧妙的利用replace实现分布式发号器<br>自增id使用big int  为了提高并发，使用多台mysql机器，每台机器设置不同的起始值和步长，sql使用replace唯一id的方式使得mysql每次增长一个步长(insert on duplacate key也可以，update不可以,是因为update的返回值是成功还是失败)<br>表结构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `Tickets64` (</div><div class="line">  `id` bigint(20) unsigned NOT NULL auto_increment,</div><div class="line">  `stub` char(1) NOT NULL default &apos;&apos;,</div><div class="line">  PRIMARY KEY  (`id`),</div><div class="line">  UNIQUE KEY `stub` (`stub`)</div><div class="line">) ENGINE=MyISAM</div></pre></td></tr></table></figure>
+<p>sql语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">REPLACE INTO Tickets64 (stub) VALUES (&apos;a&apos;);</div><div class="line">SELECT LAST_INSERT_ID();</div></pre></td></tr></table></figure>
+<p>设置步长和起始值(步长也可以直接在session中指定)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">TicketServer1:</div><div class="line">auto-increment-increment = 2</div><div class="line">auto-increment-offset = 1</div><div class="line"></div><div class="line">TicketServer2:</div><div class="line">auto-increment-increment = 2</div><div class="line">auto-increment-offset = 2</div></pre></td></tr></table></figure>
+<p>php 实现，java无法使用jpa，可以用jdbcTemplate实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">include_once &apos;pdoFactory.php&apos;;</div><div class="line">// insert</div><div class="line">//$sql = &quot;INSERT INTO Tickets64 (stub) VALUES (&apos;a&apos;) ON DUPLiCATE KEY UPDATE id=id+1&quot;;</div><div class="line">// replace</div><div class="line">$sql = &quot;REPLACE INTO Tickets64 (stub) VALUES (&apos;a&apos;)&quot;;</div><div class="line"></div><div class="line">$pdo = pdoFactory::getInstance()-&gt;getPdo(&apos;default&apos;);</div><div class="line">$p = $pdo-&gt;exec($sql);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($pdo-&gt;lastInsertId());exit;</div></pre></td></tr></table></figure>
+<p>优缺点</p>
+<p>优点是简单，实现快速。</p>
+<p>缺点是mysql中需要设置起始值，需要多台mysql服务，可扩展性差。并发取决于mysql节点数量</p>
+<p>架构图</p>
+<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/autoincreament.png" alt=""></p>
+<p>腾讯的seqsvr <a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&amp;mid=2650992918&amp;idx=1&amp;sn=be5121c3c57257291a30715ef7130a90&amp;scene=23&amp;srcid=0628Xb1bDyZ2EdvPffymi6za#rd" target="_blank" rel="external">万亿级调用系统：微信序列号生成器架构设计及演变</a><br>简单来讲，seqsvr是一个巨大的long数组,每个元素代表一个用户，比如小明的uid是12,那么seq[12]就是他产生的guid，每个用户(元素)之间产生的uid互不影响,每个uid产生的guid严格递增(为了保证这一点，付出的代价很高，不能使用负载均衡，同一时间只有一个服务器产生该用户的guid)，发号分为两层，下层是持久化层，主要存储当前uid产生的最大的guid，上层为缓存层，缓存一个步长，用来发号。也做了很多优化，比如设置最大临时guid,相邻的uid共享该max_guid，这样在服务器重启时可以大大减少向存储层发起的请求，减少内存使用。容灾问题上做了很多处理，前面说到这种方式存在单点问题，seqsrv做了很多，分set做隔离，路由和配置服务做失败请求，仲裁服务做服务切换</p>
+<h3 id="时间有序"><a href="#时间有序" class="headerlink" title="时间有序"></a>时间有序</h3><p>主流的方式都是类似twitter的snowflake，一个long是64字节，可以根据自身业务特点选择秒级别还是毫秒级别，一般系统寿命在30年左右，所以毫秒级别需要41位表示时间，秒级别需要30位，剩下的需要几位去表示机器号，也可以预留2位表示版本，方便切换</p>
+<p>摘自<a href="http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/" target="_blank" rel="external">一乐:业务系统需要什么样的ID生成器</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">SnowFlake</div><div class="line"></div><div class="line">41bit留给毫秒时间，10bit给MachineID，也就是机器要预先配置，剩下12位留给Sequence。</div><div class="line"></div><div class="line">Weibo</div><div class="line"></div><div class="line">微博使用了秒级的时间，用了30bit，Sequence 用了15位，理论上可以搞定3.2w/s的速度。用4bit来区分IDC，也就是可以支持16个 IDC，对于核心机房来说够了。剩下的有2bit 用来区分业务，由于当前发号服务是机房中心式的，1bit 来区分热备。是的，也没有用满64bit。</div><div class="line"></div><div class="line">Ticktick</div><div class="line"></div><div class="line">也就是当前在环信系统里要用到的。使用了30bit 的秒级时间，20bit 给Sequence。这里是有个考虑，第一版实现还是希望到毫秒级，所以20bit 的前10bit给了毫秒来用，剩下10bit给 Sequence。等到峰值提高的时候可以暂时回到秒级。</div><div class="line"></div><div class="line">前面说到的三十年问题，因此我在高位留了2bit 做 Version，或者到时候改造使用更长字节数，用第一位来标识不同 ID，或者可以把这2bit 挪给时间用，可以给系统改造留出一定的时间。</div><div class="line"></div><div class="line">剩下的10bit 留给 MachineID，也就是说当前 ID 生成可以直接内嵌在业务服务中，最多支持千级别的服务器数量。最后有2bit 做Tag 用，可能区分群消息和单聊消息。同时你也看出，这个 ID 最多支持一天10亿消息，也是怕系统增速太快，这2bit 可以挪给 Sequence，可以支持40亿级别消息量，或者结合前面的版本支持到百亿级别。</div><div class="line"></div><div class="line">修正：评论里指出上面一个计算错误，不挪借的话应该是支持一天约千亿级别。对比当前 Whatsapp 的600亿和腾讯 QQ 的200亿，已经足够了。</div></pre></td></tr></table></figure>
+<p>snowflake</p>
+<p>优点:可用性强</p>
+<p>缺点:依赖zookeeper，要么人肉做配置，总之需要在服务中配置机器号识别。</p>
+<p>Instagram<br><a href="http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram" target="_blank" rel="external">sharding-ids-at-instagram</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">CREATE OR REPLACE FUNCTION insta5.next_id(OUT result bigint) AS $$</div><div class="line">DECLARE</div><div class="line">    our_epoch bigint := 1314220021721;</div><div class="line">    seq_id bigint;</div><div class="line">    now_millis bigint;</div><div class="line">    shard_id int := 5;</div><div class="line">BEGIN</div><div class="line">    SELECT nextval(&apos;insta5.table_id_seq&apos;) %% 1024 INTO seq_id;</div><div class="line"></div><div class="line">    SELECT FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000) INTO now_millis;</div><div class="line">    result := (now_millis - our_epoch) &lt;&lt; 23;</div><div class="line">    result := result | (shard_id &lt;&lt; 10);</div><div class="line">    result := result | (seq_id);</div><div class="line">END;</div><div class="line">$$ LANGUAGE PLPGSQL;</div></pre></td></tr></table></figure>
+<p>也是类似snowflake,直接在postgrsql中实现的。简单看了一下，类似触发器，id自增换成函数生成<br>达达的也类似<a href="http://www.infoq.com/cn/articles/imdada-high-performance-server-optimization/" target="_blank" rel="external">达达-高性能服务端优化之路</a></p>
+<p>优： 开发成本低<br>劣： 基于postgreSQL的存储过程，较为偏门</p>
+<p>基于redis的id生成器</p>
+<p>基于redis的id生成器(<a href="http://blog.csdn.net/hengyunabc/article/details/44244951" target="_blank" rel="external">http://blog.csdn.net/hengyunabc/article/details/44244951</a>)</p>
+<p>优点:利用redis lua脚本实现，少量机器即可满足需求</p>
+<p>缺点: 需要配置redis起始值及步长</p>
+<p>一些变种</p>
+<p>Hibernate <a href="https://github.com/hibernate/hibernate-orm/blob/master/hibernate-core/src/main/java/org/hibernate/id/uuid/CustomVersionOneStrategy.java" target="_blank" rel="external">github</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">- 时间戳(6bytes, 48bit)：毫秒级别的，从1970年算起，能撑8925年....</div><div class="line">- 顺序号(2bytes, 16bit, 最大值65535): 没有时间戳过了一秒要归零的事，各搞各的，short溢出到了负数就归0。</div><div class="line">- 机器标识(4bytes 32bit): 拿localHost的IP地址，IPV4呢正好4个byte，但如果是IPV6要16个bytes，就只拿前4个byte。</div><div class="line">- 进程标识(4bytes 32bit)： 用当前时间戳右移8位再取整数应付，不信两条线程会同时启动。</div><div class="line"></div><div class="line">值得留意就是，机器进程和进程标识组成的64bit Long几乎不变，只变动另一个Long就够了。</div></pre></td></tr></table></figure>
+<p>mongodb <a href="https://docs.mongodb.com/manual/reference/bson-types/#objectid" target="_blank" rel="external">Mongdodb objectId</a> 非long型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">- 时间戳(4 bytes 32bit): 是秒级别的，从1970年算起，能撑136年。</div><div class="line"></div><div class="line">- 自增序列(3bytes 24bit, 最大值一千六百万)： 是一个从随机数开始（机智）的Int不断加一，也没有时间戳过了一秒要归零的事，各搞各的。因为只有3bytes，所以一个4bytes的Int还要截一下后3bytes。</div><div class="line"></div><div class="line">- 机器标识(3bytes 24bit): 将所有网卡的Mac地址拼在一起做个HashCode，同样一个int还要截一下后3bytes。搞不到网卡就用随机数混过去。</div><div class="line"></div><div class="line">- 进程标识(2bytes 16bits)：从JMX里搞回来到进程号，搞不到就用进程名的hash或者随机数混过去。</div><div class="line"></div><div class="line">可见，MongoDB的每一个字段设计都比Hibernate的更合理一点，比如时间戳是秒级别的。总长度也降到了12 bytes 96bit，但如果果用64bit长的Long来保存有点不上不下的，只能表达成byte数组或16进制字符串。</div></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://calvin1978.blogcn.com/articles/uuid.html" target="_blank" rel="external">江南白衣:分布式Unique ID的生成方法一览</a></p>
+<p><a href="http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/" target="_blank" rel="external">一乐:业务系统需要什么样的ID生成器</a></p>
+<p><a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap/" target="_blank" rel="external">flickr Ticket Servers: Distributed Unique Primary Keys on the Cheap</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/arch/">arch</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/arch/">arch</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2016/11/29/guid/" data-title="guid | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/11/17/split/" title="利用shell脚本对大文件进行分割">
+  <strong>上一篇：</strong><br/>
+  <span>
+  利用shell脚本对大文件进行分割</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/11/29/c_02/"  title="linux下c语言编程">
+ <strong>下一篇：</strong><br/> 
+ <span>linux下c语言编程
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#分布式id生成器"><span class="toc-number">1.</span> <span class="toc-text">分布式id生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-number">1.1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#特点"><span class="toc-number">1.2.</span> <span class="toc-text">特点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生成方法"><span class="toc-number">1.3.</span> <span class="toc-text">生成方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#自增有序"><span class="toc-number">1.3.1.</span> <span class="toc-text">自增有序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#时间有序"><span class="toc-number">1.3.2.</span> <span class="toc-text">时间有序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">1.4.</span> <span class="toc-text">参考</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

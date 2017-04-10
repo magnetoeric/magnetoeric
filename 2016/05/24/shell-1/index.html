@@ -1,0 +1,608 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>SHELL编程之执行过程 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="SHELL编程之执行过程每次看这位大大的文章都会收获很多文章转自SHELL编程之执行过程作者相关:123微博ID：**orroz**微信公众号：**Linux系统技术** 前言本文是shell编程系列的第二篇，主要介绍bash脚本是如何执行命令的。通过本文，您应该可以解决以下问题：  脚本开始的#!到底是怎么起作用的？  bash执行过程中的字符串判断顺序究竟是什么样？  如果我们定义了一个函数叫">
+<meta name="keywords" content="shell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SHELL编程之执行过程">
+<meta property="og:url" content="http://magnetoeric.github.io/2016/05/24/shell-1/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="SHELL编程之执行过程每次看这位大大的文章都会收获很多文章转自SHELL编程之执行过程作者相关:123微博ID：**orroz**微信公众号：**Linux系统技术** 前言本文是shell编程系列的第二篇，主要介绍bash脚本是如何执行命令的。通过本文，您应该可以解决以下问题：  脚本开始的#!到底是怎么起作用的？  bash执行过程中的字符串判断顺序究竟是什么样？  如果我们定义了一个函数叫">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SHELL编程之执行过程">
+<meta name="twitter:description" content="SHELL编程之执行过程每次看这位大大的文章都会收获很多文章转自SHELL编程之执行过程作者相关:123微博ID：**orroz**微信公众号：**Linux系统技术** 前言本文是shell编程系列的第二篇，主要介绍bash脚本是如何执行命令的。通过本文，您应该可以解决以下问题：  脚本开始的#!到底是怎么起作用的？  bash执行过程中的字符串判断顺序究竟是什么样？  如果我们定义了一个函数叫">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/24/shell-1/" title="SHELL编程之执行过程" itemprop="url">SHELL编程之执行过程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-24T01:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SHELL编程之执行过程"><span class="toc-number">1.</span> <span class="toc-text">SHELL编程之执行过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#以魔法-开始"><span class="toc-number">2.</span> <span class="toc-text">以魔法#!开始</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#bash如何执行shell命令？"><span class="toc-number">2.1.</span> <span class="toc-text">bash如何执行shell命令？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#别名alias"><span class="toc-number">2.1.1.</span> <span class="toc-text">别名alias</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关键字：keyword"><span class="toc-number">2.1.2.</span> <span class="toc-text">关键字：keyword</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数：function"><span class="toc-number">2.1.3.</span> <span class="toc-text">函数：function</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内建命令：built-in"><span class="toc-number">2.1.4.</span> <span class="toc-text">内建命令：built in</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#哈西索引：hash"><span class="toc-number">2.1.5.</span> <span class="toc-text">哈西索引：hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#外部命令：command"><span class="toc-number">2.1.6.</span> <span class="toc-text">外部命令：command</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#脚本的退出"><span class="toc-number">2.2.</span> <span class="toc-text">脚本的退出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后"><span class="toc-number">2.3.</span> <span class="toc-text">最后</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="SHELL编程之执行过程"><a href="#SHELL编程之执行过程" class="headerlink" title="SHELL编程之执行过程"></a>SHELL编程之执行过程</h1><p>每次看这位大大的文章都会收获很多<br>文章转自<a href="http://liwei.life/2016/05/23/shell%E7%BC%96%E7%A8%8B%E4%B9%8B%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/" target="_blank" rel="external">SHELL编程之执行过程</a><br>作者相关:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">微博ID：**orroz**</div><div class="line"></div><div class="line">微信公众号：**Linux系统技术**</div></pre></td></tr></table></figure></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第二篇，主要介绍bash脚本是如何执行命令的。通过本文，您应该可以解决以下问题：</p>
+<ul>
+<li><p>脚本开始的#!到底是怎么起作用的？</p>
+</li>
+<li><p>bash执行过程中的字符串判断顺序究竟是什么样？</p>
+</li>
+<li><p>如果我们定义了一个函数叫ls，那么调用ls的时候，到底bash是执行ls函数还是ls命令？</p>
+</li>
+<li><p>内建命令和外建命令到底有什么差别？</p>
+</li>
+<li><p>程度退出的时候要注意什么？</p>
+</li>
+</ul>
+<h1 id="以魔法-开始"><a href="#以魔法-开始" class="headerlink" title="以魔法#!开始"></a>以魔法#!开始</h1><p>一个脚本程序的开始方式都比较统一，它们几乎都开始于一个#!符号。这个符号的作用大家似乎也都知道，叫做声明解释器。脚本语言跟编译型语言的不一样之处主要是脚本语言需要解释器。因为脚本语言主要是文本，而系统中能够执行的文件实际上都是可执行的二进制文件，就是编译好的文件。文本的好处是人看方便，但是操作系统并不能直接执行，所以就需要将文本内容传递给一个可执行的二进制文件进行解析，再由这个可执行的二进制文件根据脚本的内容所确定的行为进行执行。可以做这种解析执行的二进制可执行程序都可以叫做解释器。</p>
+<p>脚本开头的#!就是用来声明本文件的文本内容是交给那个解释器进行解释的。比如我们写bash脚本，一般声明的方法是#!/bin/bash或#!/bin/sh。如果写的是一个python脚本，就用#!/usr/bin/python。当然，在不同环境的系统中，这个解释器放的路径可能不一样，所以固定写一个路径的方式就可能造成脚本在不同环境的系统中不通用的情况，于是就出现了这样的写法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env 脚本解释器名称</div></pre></td></tr></table></figure>
+<p>这就利用了env命令可以得到可执行程序执行路径的功能，让脚本自行找到在当前系统上到底解释器在什么路径。让脚本更具通用性。但是大家有没有想过一个问题，大多数脚本语言都是将#后面出现的字符当作是注释，在脚本中并不起作用。这个#!和这个注释的规则不冲突么？</p>
+<p>这就要从#!符号起作用的原因说起，其实也很简单，这个功能是由操作系统的程序载入器做的。在Linux操作系统上，出了1号进程以外，我们可以认为其它所有进程都是由父进程fork出来的。所以对bash来说，所谓的载入一个脚本执行，无非就是父进程调用fork()、exec()来产生一个子进程。这#!就是在内核处理exec的时候进行解析的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">内核中整个调用过程如下（linux 4.4），内核处理exec族函数的主要实现在fs/exec.c文件的do_execveat_common()方法中，其中调用exec_binprm()方法处理执行逻辑，这函数中使用</div><div class="line">search_binary_handler()对要加载的文件进行各种格式的判断，脚本（script）只是其中的一种。确定是script格式后，就会调用script格式对应的load_binary方法：</div><div class="line">load_script()进行处理，#!就是在这个函数中解析的。解析到了#!以后，内核会取其后面的可执行程序路径，再传递给search_binary_handler（）重新解析。</div><div class="line">这样最终找到真正的可执行二进制文件进行相关执行操作。</div></pre></td></tr></table></figure>
+<p>因此，对脚本第一行的#!解析，其实是内核给我们变的魔术。#!后面的路径内容在起作用的时候还没有交给脚本解释器。很多人认为#!这一行是脚本解释器去解析的，然而并不是。了解了原理之后，也顺便明白了为什么#!一定要写在第一行的前两个字符，因为这是在内核里写死的，它就只检查前两个字符。当内核帮你选好了脚本解释器之后，后续的工作就都交给解释器做了。脚本的所有内容也都会原封不动的交给解释器再次解释，是的，包括#!。但是由于对于解释器来说，#开头的字符串都是注释，并不生效，所以解释器自然对#!后面所有的内容无感，继续解释对于它来说有意义的字符串去了。</p>
+<p>我们可以用一个自显示脚本来观察一下这个事情，什么是自显示脚本？无非就是#!/bin/cat，这样文本的所有内容包括#!行都会交给cat进行显示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat cat.sh </div><div class="line">#!/bin/cat</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./cat.sh </div><div class="line">#!/bin/cat</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div></pre></td></tr></table></figure>
+<p>或者自删除脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat rm.sh </div><div class="line">#!/bin/rm</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ chmod +x rm.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ ./rm.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ cat rm.sh</div><div class="line">cat: rm.sh: No such file or directory</div></pre></td></tr></table></figure>
+<p>这就是#!的本质。</p>
+<h2 id="bash如何执行shell命令？"><a href="#bash如何执行shell命令？" class="headerlink" title="bash如何执行shell命令？"></a>bash如何执行shell命令？</h2><p>刚才我们从#!的作用原理讲解了一个bash脚本是如何被加载的。就是说当#!/bin/bash的时候，实际上内核给我们启动了一个bash进程，然后把脚本内容都传递给bash进行解析执行。实际上，无论在脚本里还是在命令行中，bash对文本的解析方法大致都是一样的。首先，bash会以一些特殊字符作为分隔符，将文本进行分段解析。最主要的分隔符无疑就是回车，类似功能的分隔符还有分号”;”。所以在bash脚本中是以回车或者分号作为一行命令结束的标志的。这基本上就是第一层级的解析，主要目的是将大段的命令行进行分段。</p>
+<p>之后是第二层级解析，这一层级主要是区分所要执行的命令。这一层级主要解析的字符是管道”|”，&amp;&amp;、||这样的可以起到连接命令作用的特殊字符。这一层级解析完后，bash就能拿到最基本的一个个的要执行的命令了。</p>
+<p>当然拿到命令之后还要继续第三层解析，这一层主要是区分出要执行的命令和其参数，主要解析的是空格和tab字符。这一层次解析完之后，bash才开始对最基本的字符串进行解释工作。当然，绝大多数解析完的字符串，bash都是在fork之后将其传递给exec进行执行，然后wait其执行完毕之后再解析下一行。这就是bash脚本也被叫做批处理脚本的原因，主要执行过程是一个一个指令串行执行的，上一个执行完才执行下一个。以上这个过程并不能涵盖bash解释字符串的全过程，实际情况要比这复杂。</p>
+<p>bash在解释命令的时候为了方便一些操作和提高某些效率做了不少特性，包括alias功能和外部命令路径的hash功能。bash还因为某些功能不能做成外部命令，所以必须实现一些内建命令，比如cd、pwd等命令。当然除了内建命令以外，bash还要实现一些关键字，比如其编程语法结构的if或是while这样的功能。实际上作为一种编程语言，bash还要实现函数功能，我们可以理解为，bash的函数就是将一堆命令做成一个命令，然后调用执行这个名字，bash就是去执行事先封装好的那堆命令。</p>
+<p>好吧，问题来了：我们已知有一个内建命令叫做cd，如果此时我们又建立一个alias也叫cd，那么当我在bash中敲入cd并回车之后，bash究竟是将它当成内建命令解释还是当成alias解释？同样，如果cd又是一个外部命令能？如果又是一个hash索引呢？如果又是一个关键字或函数呢？</p>
+<p>实际上bash在做这些功能的时候已经安排好了它们在名字冲突的情况下究竟该先以什么方式解释。优先顺序是：</p>
+<ol>
+<li><p>别名：alias</p>
+</li>
+<li><p>关键字：keyword</p>
+</li>
+<li><p>函数：function</p>
+</li>
+<li><p>内建命令：built in</p>
+</li>
+<li><p>哈西索引：hash</p>
+</li>
+<li><p>外部命令：command</p>
+</li>
+</ol>
+<p>这些bash要判断的字符串类型都可以用type命令进行判断，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ type egrep</div><div class="line">egrep is aliased to &apos;egrep --color=auto&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ type if</div><div class="line">if is a shell keyword</div><div class="line">[zorro@zorrozou-pc0 bash]$ type pwd</div><div class="line">pwd is a shell builtin</div><div class="line">[zorro@zorrozou-pc0 bash]$ type passwd</div><div class="line">passwd is /usr/bin/passwd</div></pre></td></tr></table></figure>
+<h3 id="别名alias"><a href="#别名alias" class="headerlink" title="别名alias"></a>别名alias</h3><p>bash提供了一种别名(alias)功能，可以将某一个字符串做成另一个字符串的别名，使用方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias cat=&apos;cat -n&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ cat /etc/passwd</div><div class="line">     1  root:x:0:0:root:/root:/bin/bash</div><div class="line">     2  bin:x:1:1:bin:/bin:/usr/bin/nologin</div><div class="line">     3  daemon:x:2:2:daemon:/:/usr/bin/nologin</div><div class="line">     4  mail:x:8:12:mail:/var/spool/mail:/usr/bin/nologin</div><div class="line">     ......</div></pre></td></tr></table></figure>
+<p>于是我们再使用cat命令的时候，bash会将其解释为cat -n。</p>
+<p>这个功能在交互方式进行bash操作的时候可以提高不少效率。如果我们发现我们常用到某命令的某个参数的时候，就可以将其做成alias，以后就可以方便使用了。交互bash中，我们可以用alias命令查看目前已经有的alias列表。可以用unalias取消这个别名设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias </div><div class="line">alias cat=&apos;cat -n&apos;</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ unalias cat</div></pre></td></tr></table></figure>
+<p>alias功能在交互打开的bash中是默认开启的，但是在bash脚本中是默认关闭的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#shopt -s expand_aliases</div><div class="line"></div><div class="line">alias ls=&apos;ls -l&apos;</div><div class="line">ls /etc</div></pre></td></tr></table></figure>
+<p>此时本程序输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./alias.sh </div><div class="line">adjtime       cgconfig.conf         docker       group      ifplugd     libao.conf      mail.rc      netconfig       passwd   request-key.conf  shells         udisks2</div><div class="line">adobe         cgrules.conf          drirc   ...</div></pre></td></tr></table></figure>
+<p>使用注释行中的shopt -s expand_aliases命令可以打开alias功能支持，我们将这行注释取消掉之后的执行结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./alias.sh </div><div class="line">total 1544</div><div class="line">-rw-r--r-- 1 root    root        44 11月 13 19:53 adjtime</div><div class="line">drwxr-xr-x 2 root    root      4096 4月  20 09:34 adobe</div><div class="line">-rw-r--r-- 1 root    root       389 4月  18 22:19 appstream.conf</div><div class="line">-rw-r--r-- 1 root    root         0 10月  1 2015 arch-release</div><div class="line">-rw-r--r-- 1 root    root       260 7月   1 2014 asound.conf</div><div class="line">drwxr-xr-x 3 root    root      4096 3月  11 10:09 avahi</div></pre></td></tr></table></figure>
+<p>这就是bash的alias功能。</p>
+<h3 id="关键字：keyword"><a href="#关键字：keyword" class="headerlink" title="关键字：keyword"></a>关键字：keyword</h3><p>关键字的概念很简单，主要就是bash提供的语法。比如if，while，function等等。对这些关键字使用type命令会显示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ type function</div><div class="line">function is a shell keyword</div></pre></td></tr></table></figure>
+<p>说明这是一个keyword。我想这个概念没什么可以解释的了，无非就是bash提供的一种语法而已。只是要注意，bash会在判断alias之后才来判断字符串是不是个keyword。就是说，我们还是可以创建一个叫if的alias，并且在执行的时候，bash只把它当成alias看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias if=&apos;echo zorro&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ if</div><div class="line">zorro</div><div class="line">[zorro@zorrozou-pc0 bash]$ unalias if</div></pre></td></tr></table></figure>
+<h3 id="函数：function"><a href="#函数：function" class="headerlink" title="函数：function"></a>函数：function</h3><p>bash在判断完字符串不是一个关键字之后，将会检查其是不是一个函数。在bash编程中，我们可以使用关键字function来定义一个函数，当然这个关键字其实也可以省略：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">name () compound-command [redirection]</div><div class="line">function name [()] compound-command [redirection]</div></pre></td></tr></table></figure>
+<p>语法结构中的compound-command一般是放在{}里的一个命令列表（list）。定义好的函数其实就是一系列shell命令的封装，并且它还具有很多bash程序的特征，比如在函数内部可以使用$1，$2等这样的变量来判断函数的参数，也可以对函数使用重定向功能。</p>
+<p>关于函数的更细节讨论我们会在后续的文章中展开说明，再这里我们只需要知道它对于bash来说是第几个被解释的即可。</p>
+<h3 id="内建命令：built-in"><a href="#内建命令：built-in" class="headerlink" title="内建命令：built in"></a>内建命令：built in</h3><p>在判断完函数之后，bash将查看给的字符串是不是一个内建命令。内建命令是相对于外建命令来说的。其实我们在bash中执行的命令最常见的是外建（外部）命令。比如常见的ls，find，passwd等。这些外建命令的特点是，它们是作为一个可执行程序放在$PATH变量所包含的目录中的。bash在执行这些命令的时候，都会进行fork(),exec()并且wait()。就是用标准的打开子进程的方式处理外部命令。但是内建命令不同，这些命令都是bash自身实现的命令，它们不依靠外部的可执行文件存在。只要有bash，这些命令就可以执行。典型的内建命令有cd、pwd等。大家可以直接help cd或者任何一个内建命令来查看它们的帮助。大家还可以man bash来查看bash相关的帮助，当然也包括所有的内建命令。</p>
+<p>其实内建命令的个数并不会很多，一共大概就这些：</p>
+<p>:,  ., [, alias, bg, bind, break, builtin, caller, cd, command, compgen, complete, compopt, continue, declare, dirs, disown, echo, enable, eval, exec, exit, export, false, fc,<br>   fg, getopts, hash, help, history, jobs, kill, let, local, logout, mapfile, popd, printf, pushd, pwd, read, readonly, return, set, shift, shopt, source, suspend,  test,  times,  trap,<br>   true, type, typeset, ulimit, umask, unalias, unset, wait</p>
+<p>我们在后续的文章中会展开讲解这些命令的功能。</p>
+<h3 id="哈西索引：hash"><a href="#哈西索引：hash" class="headerlink" title="哈西索引：hash"></a>哈西索引：hash</h3><p>hash功能实际上是针对外部命令做的一个功能。刚才我们已经知道了，外部命令都是放在$PATH变量对应的路径中的可执行文件。bash在执行一个外部命令时所需要做的操作是：如果发现这个命令是个外部命令就按照$PATH变量中按照目录路径的顺序，在每个目录中都遍历一遍，看看有没有对应的文件名。如果有，就fork、exec、wait。我们系统上一般的$PATH内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo $PATH</div><div class="line">/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:</div><div class="line">/usr/bin/vendor_perl:/usr/bin/core_perl:/home/zorro/.local/bin:/home/zorro/bin</div></pre></td></tr></table></figure>
+<p>当然，很多系统上的$PATH变量包含的路径可能更多，目录中的文件数量也可能会很多。于是，遍历这些目录去查询文件名的行为就可能比较耗时。于是bash提供了一种功能，就是建立一个bash表，在第一次找到一个命令的路径之后，对其命令名和对应的路径建立一个hash索引。这样下次再执行这个命令的时候，就不用去遍历所有的目录了，只要查询索引就可以更快的找到命令路径，以加快执行程序的速度。</p>
+<p>我们可以使用内建命令hash来查看当前已经建立缓存关系的命令和其命中次数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ hash</div><div class="line">hits    command</div><div class="line">   1    /usr/bin/flock</div><div class="line">   4    /usr/bin/chmod</div><div class="line">  20    /usr/bin/vim</div><div class="line">   4    /usr/bin/cat</div><div class="line">   1    /usr/bin/cp</div><div class="line">   1    /usr/bin/mkdir</div><div class="line">  16    /usr/bin/man</div><div class="line">  27    /usr/bin/ls</div></pre></td></tr></table></figure>
+<p>这个命令也可以对当前的hash表进行操作，-r参数用来清空当前hash表。手工创建一个hash：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -p /usr/sbin/passwd psw</div><div class="line">[root@zorrozou-pc0 bash]# psw</div><div class="line">Enter new UNIX password: </div><div class="line">Retype new UNIX password:</div></pre></td></tr></table></figure>
+<p>此时我们就可以通过执行psw来执行passwd命令了。查看更详细的hash对应关系：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -l</div><div class="line">builtin hash -p /usr/bin/netdata netdata</div><div class="line">builtin hash -p /usr/bin/df df</div><div class="line">builtin hash -p /usr/bin/chmod chmod</div><div class="line">builtin hash -p /usr/bin/vim vim</div><div class="line">builtin hash -p /usr/bin/ps ps</div><div class="line">builtin hash -p /usr/bin/man man</div><div class="line">builtin hash -p /usr/bin/pacman pacman</div><div class="line">builtin hash -p /usr/sbin/passwd psw</div><div class="line">builtin hash -p /usr/bin/ls ls</div><div class="line">builtin hash -p /usr/bin/ss ss</div><div class="line">builtin hash -p /usr/bin/ip ip</div></pre></td></tr></table></figure>
+<p>删除某一个hash对应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -d psw</div><div class="line">[root@zorrozou-pc0 bash]# hash -l</div><div class="line">builtin hash -p /usr/bin/netdata netdata</div><div class="line">builtin hash -p /usr/bin/df df</div><div class="line">builtin hash -p /usr/bin/chmod chmod</div><div class="line">builtin hash -p /usr/bin/vim vim</div><div class="line">builtin hash -p /usr/bin/ps ps</div><div class="line">builtin hash -p /usr/bin/man man</div><div class="line">builtin hash -p /usr/bin/pacman pacman</div><div class="line">builtin hash -p /usr/bin/ls ls</div><div class="line">builtin hash -p /usr/bin/ss ss</div><div class="line">builtin hash -p /usr/bin/ip ip</div></pre></td></tr></table></figure>
+<p>显示某一个hash对应的路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -t chmod</div><div class="line">/usr/bin/chmod</div></pre></td></tr></table></figure>
+<p>在交互式bash操作和bash编程中，hash功能总是打开的，我们可以用set +h关闭hash功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat hash.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#set +h</div><div class="line"></div><div class="line">hash</div><div class="line"></div><div class="line">hash -p /usr/bin/useradd uad</div><div class="line"></div><div class="line">hash -t uad</div><div class="line"></div><div class="line">uad</div></pre></td></tr></table></figure>
+<p>默认打开hash的脚本输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./hash.sh </div><div class="line">hash: hash table empty</div><div class="line">/usr/bin/useradd</div><div class="line">Usage: uad [options] LOGIN</div><div class="line">       uad -D</div><div class="line">       uad -D [options]</div><div class="line"></div><div class="line">Options:</div><div class="line">  -b, --base-dir BASE_DIR       base directory for the home directory of the</div><div class="line">                            new account</div><div class="line">  -c, --comment COMMENT         GECOS field of the new account</div><div class="line">  -d, --home-dir HOME_DIR       home directory of the new account</div><div class="line">  -D, --defaults                print or change default useradd configuration</div><div class="line">  -e, --expiredate EXPIRE_DATE  expiration date of the new account</div><div class="line">  -f, --inactive INACTIVE       password inactivity period of the new account</div><div class="line">  -g, --gid GROUP               name or ID of the primary group of the new</div><div class="line">                            account</div><div class="line">  -G, --groups GROUPS           list of supplementary groups of the new</div><div class="line">                            account</div><div class="line">  -h, --help                    display this help message and exit</div><div class="line">  -k, --skel SKEL_DIR           use this alternative skeleton directory</div><div class="line">  -K, --key KEY=VALUE           override /etc/login.defs defaults</div><div class="line">  -l, --no-log-init             do not add the user to the lastlog and</div><div class="line">                            faillog databases</div><div class="line">  -m, --create-home             create the user&apos;s home directory</div><div class="line">  -M, --no-create-home          do not create the user&apos;s home directory</div><div class="line">  -N, --no-user-group           do not create a group with the same name as</div><div class="line">                            the user</div><div class="line">  -o, --non-unique              allow to create users with duplicate</div><div class="line">                            (non-unique) UID</div><div class="line">  -p, --password PASSWORD       encrypted password of the new account</div><div class="line">  -r, --system                  create a system account</div><div class="line">  -R, --root CHROOT_DIR         directory to chroot into</div><div class="line">  -s, --shell SHELL             login shell of the new account</div><div class="line">  -u, --uid UID                 user ID of the new account</div><div class="line">  -U, --user-group              create a group with the same name as the user</div></pre></td></tr></table></figure>
+<p>关闭hash之后的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./hash.sh </div><div class="line">./hash.sh: line 5: hash: hashing disabled</div><div class="line">./hash.sh: line 7: hash: hashing disabled</div><div class="line">./hash.sh: line 9: hash: hashing disabled</div><div class="line">./hash.sh: line 11: uad: command not found</div></pre></td></tr></table></figure>
+<h3 id="外部命令：command"><a href="#外部命令：command" class="headerlink" title="外部命令：command"></a>外部命令：command</h3><p>除了以上说明之外的命令都会当作外部命令处理。执行外部命令的固定动作就是在$PATH路径下找命令，找到之后fork、exec、wait。如果没有这个可执行文件名，就报告命令不存在。这也是bash最后去判断的字符串类型。</p>
+<p>外建命令都是通过fork调用打开子进程执行的，所以bash单纯只用外建命令是不能实现部分功能的。比如大家都知道cd命令是用来修改当前进程的工作目录的，如果这个功能使用外部命令实现，那么进程将fork打开一个子进程，子进程通过chdir()进行当前工作目录的修改时，实际上只改变了子进程本身的当前工作目录，而父进程bash的工作目录没变。之后子进程退出，返回到父进程的交互操作环境之后，用户会发现，当前的bash的pwd还在原来的目录下。所以大家应该可以理解，虽然我们的原则是尽量将所有命令都外部实现，但是还是有一些功能不能以创建子进程的方式达到目的，那么这些功能就必须内部实现。这就是内建命令必须存在的原因。另外要注意：bash在正常调用内部命令的时候并不会像外部命令一样产生一个子进程。</p>
+<h2 id="脚本的退出"><a href="#脚本的退出" class="headerlink" title="脚本的退出"></a>脚本的退出</h2><p>一个bash脚本的退出一般有多种方式，比如使用exit退出或者所有脚本命令执行完之后退出。无论怎么样退出，脚本都会有个返回码，而且返回码可能不同。</p>
+<p>任何命令执行完之后都有返回码，主要用来判断这个命令是否执行成功。在交互中bash中，我们可以使用$?来查看上一个命令的返回码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">2</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls /</div><div class="line">bin  boot  cgroup  data  dev  etc  home  lib  lib64  lost+found  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
+<p>返回码逻辑上有两类，0为真，非零为假。就是说，返回为0表示命令执行成功，非零表示执行失败。返回码的取值范围为0-255。其中错误返回码为1-255。bash为我们提供了一个内建命令exit，通过中这个命令可以人为指定退出的返回码是多少。这个命令的使用是一般进行bash编程的运维人员所不太注意的。我们在上一篇的bash编程语法结构的讲解中说过，if、while语句的条件判断实际上就是判断命令的返回值，如果我们自己写的bash脚本不注意规范的使用脚本退出时的返回码的话，那么这样的bash脚本将可能不可以在别人编写脚本的时候，直接使用if将其作为条件判断，这可能会对程序的兼容性造成影响。因此，请大家注意自己写的bash程序的返回码状态。如果我们的bash程序没有显示的以一个exit指定返回码退出的话，那么其最后执行命令的返回码将成为整个bash脚本退出的返回码。</p>
+<p>当然，一个bash程序的退出还可能因为被中间打断而发生，这一般是因为进程接收到了一个需要程序退出的信号。比如我们日常使用的ctrl＋c操作，就是给进程发送了一个2号SIGINT信号。考虑到程序退出可能性的各种可能，系统将错误返回码设计成1-255，这其中还分成两类：</p>
+<ul>
+<li>程序退出的返回码：1-127。这部分返回码一般用来作为给程序员自行设定错误退出用的返回码，比如：如果一个文件不存在，ls将返回2。如果要执行的命令不存在，则bash统一返回127<br>。返回码125和126有特殊用处，一个是程序命令不存在的返回码，另一个是命令的文件在，但是不可执行的返回码。</li>
+<li>程序被信号打断的返回码：128-255。这部分系统习惯上是用来表示进程被信号打断的退出返回码的。一个进程如果被信号打断了，其退出返回码一般是128+信号编号的数字。</li>
+</ul>
+<p>比如说，如果一个进程被2号信号打断的话，其返回码一般是128+2=130。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 1000</div><div class="line">^C</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">130</div></pre></td></tr></table></figure>
+<p>在执行sleep命令的过程中，我使用ctrl+c中断了进程的执行。此时返回值为130。可以用内建命令kill -l查看所有信号和其对应的编号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ kill -l</div><div class="line"> 1) SIGHUP   2) SIGINT   3) SIGQUIT  4) SIGILL   5) SIGTRAP</div><div class="line"> 6) SIGABRT  7) SIGBUS   8) SIGFPE   9) SIGKILL 10) SIGUSR1</div><div class="line">11) SIGSEGV 12) SIGUSR2 13) SIGPIPE 14) SIGALRM 15) SIGTERM</div><div class="line">16) SIGSTKFLT   17) SIGCHLD 18) SIGCONT 19) SIGSTOP 20) SIGTSTP</div><div class="line">21) SIGTTIN 22) SIGTTOU 23) SIGURG  24) SIGXCPU 25) SIGXFSZ</div><div class="line">26) SIGVTALRM   27) SIGPROF 28) SIGWINCH    29) SIGIO   30) SIGPWR</div><div class="line">31) SIGSYS  34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1  64) SIGRTMAX</div></pre></td></tr></table></figure>
+<p>在我们编写bash脚本的时候，一般可以指定的返回码范围是1-124。建议大家养成编写返回码的编程习惯，但是系统并不对这做出限制，作为程序员你依然可以使用0-255的所有返回码。但是如果你滥用这些返回码，很可能会给未来程序的扩展造成不必要的麻烦。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文中我们描述了一个脚本的执行过程，从#!开始，到中间的解析过程，再到最后的退出返回码。希望这些对大家深入理解bash的执行过程和编写更高质量的脚本有帮助。通过本文我们明确了以下知识点：</p>
+<ul>
+<li>脚本开始的#!的作用原理。</li>
+<li>bash的字符串解析过程。</li>
+<li>什么是alias。</li>
+<li>什么是关键字。</li>
+<li>什么是function。</li>
+<li>什么是内建命令，hash和外建命令以及它们的执行方法。</li>
+<li>如何退出一个bash脚本以及返回码的含义。</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2016/05/24/shell-1/" data-title="SHELL编程之执行过程 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/05/22/ansible/" title="初试ansible">
+  <strong>上一篇：</strong><br/>
+  <span>
+  初试ansible</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/06/08/shell-2/"  title="shell编程之执行环境">
+ <strong>下一篇：</strong><br/> 
+ <span>shell编程之执行环境
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SHELL编程之执行过程"><span class="toc-number">1.</span> <span class="toc-text">SHELL编程之执行过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#以魔法-开始"><span class="toc-number">2.</span> <span class="toc-text">以魔法#!开始</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#bash如何执行shell命令？"><span class="toc-number">2.1.</span> <span class="toc-text">bash如何执行shell命令？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#别名alias"><span class="toc-number">2.1.1.</span> <span class="toc-text">别名alias</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关键字：keyword"><span class="toc-number">2.1.2.</span> <span class="toc-text">关键字：keyword</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数：function"><span class="toc-number">2.1.3.</span> <span class="toc-text">函数：function</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内建命令：built-in"><span class="toc-number">2.1.4.</span> <span class="toc-text">内建命令：built in</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#哈西索引：hash"><span class="toc-number">2.1.5.</span> <span class="toc-text">哈西索引：hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#外部命令：command"><span class="toc-number">2.1.6.</span> <span class="toc-text">外部命令：command</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#脚本的退出"><span class="toc-number">2.2.</span> <span class="toc-text">脚本的退出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后"><span class="toc-number">2.3.</span> <span class="toc-text">最后</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

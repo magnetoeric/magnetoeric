@@ -1,0 +1,644 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>shell编程之执行环境 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="文章转自SHELL编程之执行环境 微博ID：orroz 微信公众号：Linux系统技术 前言本文是shell编程系列的第三篇，主要介绍bash脚本的执行环境以及注意事项。通过本文，应该可以帮助您解决以下问题：  执行bash和执行sh究竟有什么区别？ 如何调试bash脚本？ 如何记录用户在什么时候执行的某条命令？ 为什么有时ulimit命令的设置不生效或者报错？ 环境变量和一般变量有什么区别？？">
+<meta name="keywords" content="shell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shell编程之执行环境">
+<meta property="og:url" content="http://magnetoeric.github.io/2016/06/08/shell-2/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="文章转自SHELL编程之执行环境 微博ID：orroz 微信公众号：Linux系统技术 前言本文是shell编程系列的第三篇，主要介绍bash脚本的执行环境以及注意事项。通过本文，应该可以帮助您解决以下问题：  执行bash和执行sh究竟有什么区别？ 如何调试bash脚本？ 如何记录用户在什么时候执行的某条命令？ 为什么有时ulimit命令的设置不生效或者报错？ 环境变量和一般变量有什么区别？？">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="shell编程之执行环境">
+<meta name="twitter:description" content="文章转自SHELL编程之执行环境 微博ID：orroz 微信公众号：Linux系统技术 前言本文是shell编程系列的第三篇，主要介绍bash脚本的执行环境以及注意事项。通过本文，应该可以帮助您解决以下问题：  执行bash和执行sh究竟有什么区别？ 如何调试bash脚本？ 如何记录用户在什么时候执行的某条命令？ 为什么有时ulimit命令的设置不生效或者报错？ 环境变量和一般变量有什么区别？？">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/06/08/shell-2/" title="shell编程之执行环境" itemprop="url">shell编程之执行环境</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-06-08T08:36:50.000Z" itemprop="datePublished"> 发表于 2016-06-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常用参数"><span class="toc-number">2.</span> <span class="toc-text">常用参数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#交互式login-shell"><span class="toc-number">2.1.</span> <span class="toc-text">交互式login shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bash和sh"><span class="toc-number">2.2.</span> <span class="toc-text">bash和sh</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#脚本调试"><span class="toc-number">3.</span> <span class="toc-text">脚本调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#环境变量"><span class="toc-number">4.</span> <span class="toc-text">环境变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令历史"><span class="toc-number">5.</span> <span class="toc-text">命令历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#资源限制"><span class="toc-number">6.</span> <span class="toc-text">资源限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后"><span class="toc-number">7.</span> <span class="toc-text">最后</span></a></li></ol>
+		
+		</div>
+		
+		<p>文章转自<a href="http://liwei.life/2016/05/30/shell%E7%BC%96%E7%A8%8B%E4%B9%8B%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83/" target="_blank" rel="external">SHELL编程之执行环境</a></p>
+<p>微博ID：<strong>orroz</strong></p>
+<p>微信公众号：<strong>Linux系统技术</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第三篇，主要介绍bash脚本的执行环境以及注意事项。通过本文，应该可以帮助您解决以下问题：</p>
+<ul>
+<li>执行bash和执行sh究竟有什么区别？</li>
+<li>如何调试bash脚本？</li>
+<li>如何记录用户在什么时候执行的某条命令？</li>
+<li>为什么有时ulimit命令的设置不生效或者报错？</li>
+<li>环境变量和一般变量有什么区别？？</li>
+</ul>
+<h2 id="常用参数"><a href="#常用参数" class="headerlink" title="常用参数"></a>常用参数</h2><h3 id="交互式login-shell"><a href="#交互式login-shell" class="headerlink" title="交互式login shell"></a>交互式login shell</h3><p>关于bash的编程环境，首先我们要先理解的就是bash的参数。不同方式启动的bash一般默认的参数是不一样的。一般在命令行中使用的bash，都是以login方式打开的，对应的参数是：-l或—login。还有-i参数，表示bash是以交互方式打开的，在默认情况下，不加任何参数的bash也是交互方式打开的。这两种方式都会在启动bash之前加载一些文件：</p>
+<p>首先，bash去检查/etc/profile文件是否存在，如果存在就读取并执行这个文件中的命令。</p>
+<p>之后，bash再按照以下列出的文件顺序依次查看是否存在这些文件，如果任何一个文件存在，就读取、执行文件中的命令：</p>
+<ol>
+<li>~/.bash_profile</li>
+<li>~/.bash_login</li>
+<li>~/.profile</li>
+</ol>
+<p>这里要注意的是，本步骤只会检查到一个文件并处理，即使同时存在2个或3个文件，本步骤也只会处理最优先的那个文件，而忽略其他文件。以上两个步骤的检查都可以用—noprofile参数进行关闭。</p>
+<p>当bash是以login方式登录的时候，在bash退出时（exit），会额外读取并执行~/.bash_logout文件中的命令。</p>
+<p>当bash是以交互方式登录时（-i参数），bash会读取并执行~/.bashrc中的命令。—norc参数可以关闭这个功能，另外还可以通过—rcfile参数指定一个文件替代默认的~/.bashrc文件。</p>
+<p>以上就是bash以login方式和交互式方式登录的主要区别，根据这个过程，我们到RHEL7的环境上看看都需要加载哪些配置：</p>
+<p>1.首先是加载/etc/profile。根据RHEL7上此文件内容，这个脚本还需要去检查/etc/profile.d/目录，将里面以.sh结尾的文件都加载一遍。具体细节可以自行查看本文件内容。<br>2.之后是检查~/.bash_profile。这个文件中会加载~/.bashrc文件。<br>3.之后是处理~/.bashrc文件。此文件主要功能是给bash环境添加一些alias，之后再加载/etc/bashrc文件。<br>4.最后处理/etc/bashrc文件。这个过程并不是bash自身带的过程，而是在RHEL7系统中通过脚本调用实现。</p>
+<p>了解了这些之后，如果你的bash环境不是在RHEL7系统上，也应该可以确定在自己环境中启动的bash到底加载了哪些配置文件。</p>
+<h3 id="bash和sh"><a href="#bash和sh" class="headerlink" title="bash和sh"></a>bash和sh</h3><p>几乎所有人都知道bash有个别名叫sh，也就是说在一个脚本前面写!#/bin/bash和#!/bin/sh似乎没什么不同。但是下面我们要看看它们究竟有什么不同。</p>
+<p>首先，第一个区别就是这两个文件并不是同样的类型。如果细心观察过这两个文件的话，大家会发现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls -l /usr/bin/sh</div><div class="line">lrwxrwxrwx 1 root root 4 11月 24 04:20 /usr/bin/sh -&gt; bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls -l /usr/bin/bash</div><div class="line">-rwxr-xr-x 1 root root 791304 11月 24 04:20 /usr/bin/bash</div></pre></td></tr></table></figure>
+<p>sh是指向bash的一个符号链接。符号链接就像是快捷方式，那么执行sh就是在执行bash。这说明什么？说明这两个执行方式是等同的么？实际上并不是。我们都知道在程序中是可以获得自己执行命令的进程名称的，这个方法在bash编程中可以使用$0变量来实现，参见如下脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat name.sh</div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">echo $0</div><div class="line"></div><div class="line">case $0 in</div><div class="line">*name.sh)</div><div class="line">echo &quot;My name is name!&quot;</div><div class="line">;;</div><div class="line">*na.sh)</div><div class="line">echo &quot;My name is na&quot; </div><div class="line">;;</div><div class="line">*)</div><div class="line">echo &quot;Name error!&quot;</div><div class="line">;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>这个脚本直接执行的结果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./name.sh </div><div class="line">./name.sh</div><div class="line">My name is name!</div></pre></td></tr></table></figure>
+<p>大家也能看到脚本中有个逻辑是，如果进程名字是以na.sh结尾，那么打印的内容不一样。我们如何能让同一个程序触发这段不同的逻辑呢？其实很简单，就是给这个脚本创建一个叫na.sh的符号链接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ln -s name.sh na.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ ./na.sh </div><div class="line">./na.sh</div><div class="line">My name is na</div></pre></td></tr></table></figure>
+<p>通过符号链接的方式改变进程名称是一种常见的编程技巧，我们可以利用这个办法让程序通过不同进程名触发不同处理逻辑。所以大家以后再遇到类似bash和sh这样的符号链接关系的进程时要格外注意它们的区别。在这里它们到底有什么区别呢？实际上bash的源代码中对以bash名称和sh名称执行的时候，会分别触发不同的逻辑，主要的逻辑区别是：以sh名称运行时，会相当于以—posix参数方式启动bash。这个方式跟一般方式的具体区别可以参见：<a href="http://tiswww.case.edu/php/chet/bash/POSIX。" target="_blank" rel="external">http://tiswww.case.edu/php/chet/bash/POSIX。</a></p>
+<p>我遇到过很多次因为不同文件名的处理逻辑不同而引发的问题。其中一次是因为posix模式和一般模式的ulimit -c设置不同导致的。ulimit -c参数可以设置进程出现coredump时产生的文件的大小限制。因为内存的页大多都是4k，所以一般core文件都是最小4k一个，当ulimit -c参数设置小于4k时，无法正常产生core文件。为了调试方便，我们的生产系统都开了ulimit -c限制单位为4。因为默认ulimit -c的限制单位是1k，ulimit -c 4就是4k，够用了。但是我们仍然发现部分服务器不能正常产生core文件，最后排查定位到，这些不能产生core文件的配置脚本只要将#!/bin/sh改为#!/bin/bash就可以正常产生core文件。于是郁闷之余，查阅了bash的处理代码，最终发现原来是这个坑导致的问题。原因是：在posix模式下，ulimit -c的参数单位不是1024，而是512。至于还有什么其他不同，在上述链接中都有说明。</p>
+<h2 id="脚本调试"><a href="#脚本调试" class="headerlink" title="脚本调试"></a>脚本调试</h2><p>程序员对程序的调试工作是必不可少的，bash本身对脚本程序提供的调试手段不多，printf大法是必要技能之一，当然在bash中就是echo大法。另外就是bash的-v参数、-x参数和-n参数。</p>
+<p>-v参数就是可视模式，它会在执行bash程序的时候将要执行的内容也打印出来，除此之外，并不改变bash执行的过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat arg.sh</div><div class="line">#!/bin/bash -v</div><div class="line"></div><div class="line">echo $0</div><div class="line">echo $1</div><div class="line">echo $2</div><div class="line">ls /123</div><div class="line">echo $3</div><div class="line">echo $4</div><div class="line"></div><div class="line">echo $#</div><div class="line">echo $*</div><div class="line">echo $?</div></pre></td></tr></table></figure>
+<p>执行结果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./arg.sh 111 222 333 444 555</div><div class="line">#!/bin/bash -v</div><div class="line"></div><div class="line">echo $0</div><div class="line">./arg.sh</div><div class="line">echo $1</div><div class="line">111</div><div class="line">echo $2</div><div class="line">222</div><div class="line">ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">echo $3</div><div class="line">333</div><div class="line">echo $4</div><div class="line">444</div><div class="line"></div><div class="line">echo $#</div><div class="line">5</div><div class="line">echo $*</div><div class="line">111 222 333 444 555</div><div class="line">echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
+<p>-n参数用来检查bash的语法错误，并且不会真正执行bash脚本。这个就不举例子了。另外，三种方式除了可以直接在bash后面加参数以外，还可以在程序中随时使用内建命令set打开和关闭，方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat arg.sh</div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">set -v</div><div class="line">#set -o verbose</div><div class="line">echo $0</div><div class="line">set +v</div><div class="line">echo $1</div><div class="line">set -x</div><div class="line">#set -o xtrace</div><div class="line">echo $2</div><div class="line">ls /123</div><div class="line">echo $3</div><div class="line">set +x</div><div class="line">echo $4</div><div class="line"></div><div class="line">echo $#</div><div class="line"></div><div class="line">set -n</div><div class="line">#set -o noexec</div><div class="line">echo $*</div><div class="line">echo $?</div><div class="line">set +n</div></pre></td></tr></table></figure>
+<p>执行结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./arg.sh </div><div class="line">#set -o verbose</div><div class="line">echo $0</div><div class="line">./arg.sh</div><div class="line">set +v</div><div class="line"></div><div class="line">+ echo</div><div class="line"></div><div class="line">+ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">+ echo</div><div class="line"></div><div class="line">+ set +x</div><div class="line"></div><div class="line">0</div></pre></td></tr></table></figure>
+<p>以上例子中顺便演示了1、3、#、?的意义，大家可以自行对比它们的区别以理解参数的意义。另外再补充一个-e参数，这个参数可以让bash脚本命令执行错误的时候直接退出，而不是继续执行。这个功能在某些调试的场景下非常有用！</p>
+<p>本节只列出了几个常用的参数的意义和使用注意事项，希望可以起到抛砖引玉的作用。大家如果想要学习更多的bash参数，可以自行查看bash的man手册，并详细学习set和shopt命令的使用方法。</p>
+<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><p>我们目前已经知道有个PATH变量，bash会在查找外部命令的时候到PATH所记录的目录中进行查找，从这个例子我们可以先理解一下环境变量的作用。环境变量就类似PATH这种变量，是bash预设好的一些可能会对其状态和行为产生影响的变量。bash中实现的环境变量个数大概几十个，所有的帮助说明都可以在man bash中找到。我们还是拿一些会在bash编程中经常用到的来讲解一下。</p>
+<p>我们可以使用env命令来查看当前bash已经定义的环境变量。set命令不加任何参数可以查看当前bash环境中的所有变量，包括环境变量和私有的一般变量。一般变量的定义方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">[zorro@zorrozou-pc0 ~]$ set|grep aaa</div><div class="line">aaa=1000</div></pre></td></tr></table></figure>
+<p>上面我们定义了一个变量名字叫做aaa，我们能看到在set命令中可以显示出这个变量，但是env不显示。export命令可以将一个一般变量编程环境变量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ export aaa</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ set|grep aaa</div><div class="line">aaa=1000</div></pre></td></tr></table></figure>
+<p>export之后，env和set都能看到这个变量了。一般变量和环境变量的区别是：一般变量不能被子进程继承，而环境变量会被子进程继承。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ bbb=2000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $bbb</div><div class="line">2000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep bbb</div><div class="line">[zorro@zorrozou-pc0 ~]$ bash</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $bbb</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 ~]$</div></pre></td></tr></table></figure>
+<p>上面测试中，我们的bash环境里有一个环境变量aaa＝1000，又定义了一个一般变量bbb＝2000。此时我们在用bash打开一个子进程，在子进程中我们发现，aaa变量仍然能取到值，但是bbb不可以。证明aaa可以被子进程继承，bbb不可以。</p>
+<p>搞清楚了环境变量的基础知识之后，再来看一下bash中常用的环境变量：</p>
+<p>进程自身信息相关</p>
+<p>BASH：当前bash进程的进程名。</p>
+<p>BASHOPTS：记录了shopt命令已经设置为打开的选项。</p>
+<p>BASH_VERSINFO：bash的版本号信息，是一个数组。可以使用命令：echo ${BASH_VERSINFO[*]}查看数组的信息。有关数组的操作我们会在其它文章里详细说明。</p>
+<p>BASH_VERSION：bash的版本号信息。比上一个信息更少一点。</p>
+<p>HOSTNAME：系统主机名信息。</p>
+<p>HOSTTYPE：系统类型信息。</p>
+<p>OLDPWD：上一个当前工作目录。</p>
+<p>PWD：当前工作目录。</p>
+<p>HOME：主目录。一般指进程uid对应用户的主目录。</p>
+<p>SHELL：bash程序所在路径。</p>
+<p>常用数字</p>
+<p>RANDOM：每次取这个变量的值都能得到一个0-32767的随机数。</p>
+<p>SECONDS：当前bash已经开启了多少秒。</p>
+<p>BASHPID：当前bash进程的PID。</p>
+<p>EUID：进程的有效用户id。</p>
+<p>GROUPS：进程组身份。</p>
+<p>PPID：父进程PID。</p>
+<p>UID：用户uid。</p>
+<p>提示符</p>
+<p>PS1：用户bash的交互提示符，主提示符。</p>
+<p>PS2：第二提示符，主要用在一些除了PS1之外常见的提示符场景，比如输入了’之后回车，就能看到这个提示符。</p>
+<p>PS3：用于select语句的交互提示符。</p>
+<p>PS4：用于跟踪执行过程时的提示符，一般显示为”+”。比如我们在bash中使用set -x之后的跟踪提示就是这个提示符显示的。</p>
+<h2 id="命令历史"><a href="#命令历史" class="headerlink" title="命令历史"></a>命令历史</h2><p>交互bash中提供一种方便追溯曾经使用的命令的功能，叫做命令历史功能。就是将曾经用过的命令纪录下来，以备以后查询或者重复调用。这个功能在交互方式的bash中默认打开，在bash编程环境中默认是没有开启的。可以使用set +H来关闭这个功能，set -H打开这个功能。在开启了history功能的bash中我们可以使用history内建命令查询当前的命令历史列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">1 sudo bash</div><div class="line">2 ps ax</div><div class="line">3 ls</div><div class="line">4 ip ad sh</div></pre></td></tr></table></figure>
+<p>命令历史的相关配置都是通过bash的环境变量来完成的：</p>
+<p>HISTFILE：记录命令历史的文件路径。</p>
+<p>HISTFILESIZE：命令历史文件的行数限制</p>
+<p>HISTCONTROL：这个变量可以用来控制命令历史的一些特性。比如一般的命令历史会完全按照我们执行命令的顺序来完整记录，如果我们连续执行相同的命令，也会重复记录，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">......</div><div class="line">1173 pwd</div><div class="line">1174 pwd</div><div class="line">1175 pwd</div><div class="line">1176 history</div></pre></td></tr></table></figure>
+<p>我们可以利用这个变量的配置来消除命令历史中的重复记录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ export HISTCONTROL=ignoredups</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">1177 export HISTCONTROL=ignoredups</div><div class="line">1178 history </div><div class="line">1179 pwd</div><div class="line">1180 history</div></pre></td></tr></table></figure>
+<p>这个变量还有其它配置，ignorespace可以用来让history忽略以空格开头的命令，ignoreboth可以同时起到ignoredups和ignorespace的作用，</p>
+<p>HISTIGNORE：可以控制history机制忽略某些命令，配置方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export HISTIGNORE=”pwd:ls:cd:”。</div></pre></td></tr></table></figure>
+<p>HISTSIZE：命令历史纪录的命令个数。</p>
+<p>HISTTIMEFORMAT：可以用来定义命令历史纪录的时间格式.在命令历史中记录命令执行时间有时候很有用，配置方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export HISTTIMEFORMAT=&apos;%F %T &apos;</div></pre></td></tr></table></figure>
+<p>相关时间格式的帮助可以查看man 3 strftime。</p>
+<p>HISTCMD：当前命令历史的行数。</p>
+<p>在交互式操作bash的时候，可以通过一些特殊符号对命令历史进行快速调用，这些符号基本都是以!开头的，除非!后面跟的是空格、换行、等号=或者小括号()：</p>
+<p>!n：表示引用命令历史中的第n条命令，如：!123，执行第123条命令。</p>
+<p>!-n：表示引用命令历史中的倒数第n条命令，如：!-123，执行倒数第123条命令。</p>
+<p>!!：重复执行上一条命令。</p>
+<p>!string：在命令历史中找到最近的一条以string字符串开头的命令并执行。</p>
+<p>!?string[?]：在命令历史中找到最近的一条包括string字符的命令并执行。如果最有一个?省略的话，就是找到以string结尾的命令。</p>
+<p>^string1^string2^：将上一个命令中的string1字符串替换成string2字符串并执行。可以简写为：^string1^string2</p>
+<p>!#：重复当前输入的命令。</p>
+<p>以下符号可以作为某个命令的单词代号，如：</p>
+<p>^：!^表示上一条命令中的第一个参数，$123^表示第123条命令的第一个参数。</p>
+<p>$：!$表示上一条命令中的最后一个参数。!123$表示第123条命令的最后一个参数。</p>
+<p>n（数字）：!!0表示上一条命令的命令名，!!3上一条命令的第三个参数。!123:3第123条命令的第三个参数。</p>
+<p>：表示所有参数，如：!123:\或!123*</p>
+<p>x-y：x和y都是数字，表示从第x到第y个参数，如：!123:1-6表示第123条命令的第1个到第6个参数。只写成-y，取前y个，如：!123:-7表示0-7。</p>
+<p>x：表示取从第x个参数之后的所有参数，相当于x-$。如：!123:2\</p>
+<p>x-：表示取从第x个参数之后的所有参数，不包括最后一个。如：!123:2-</p>
+<p>选择出相关命令或者参数之后，我们还可以通过一些命令对其进行操作：</p>
+<p>h 删除所有后面的路径，只留下前面的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/passwd</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:h</div><div class="line">ls /etc</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>紧接着上面的命令执行，相当于运行passwd。</p>
+<p>r 删除后缀.xxx, 留下文件名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls 123.txt</div><div class="line">ls: cannot access &apos;123.txt&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:r</div><div class="line">ls 123</div></pre></td></tr></table></figure>
+<p>e 删除文件名, 留下后缀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ !-2:e</div><div class="line">.txt</div><div class="line">bash: .txt: command not found</div></pre></td></tr></table></figure>
+<p>p 只打印结果命令，但不执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/passwd</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:p</div><div class="line">ls /etc/passwd</div></pre></td></tr></table></figure>
+<p>q 防止代换参数被再次替换，相当于给选择的参数加上了’’，以防止其被转义。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls `echo /etc/passwd`</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:q</div><div class="line">&apos;ls `echo /etc/passwd`&apos;</div><div class="line">-bash: ls `echo /etc/passwd`: No such file or directory</div></pre></td></tr></table></figure>
+<p>x 作用同上，区别是每个参数都会分别给加上’’。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ !-2:x</div><div class="line">&apos;ls&apos; &apos;`echo&apos; &apos;/etc/passwd`&apos;</div><div class="line">ls: cannot access &apos;`echo&apos;: No such file or directory</div><div class="line">ls: cannot access &apos;/etc/passwd`&apos;: No such file or directory</div></pre></td></tr></table></figure>
+<p>s/old/new/ 字符串替换，跟上面的^^类似，但是可以指定任意历史命令。只替换找到的第一个old字符串。<br>&amp; 重复上次替换<br>g 在执行s或者＆命令作为前缀使用，表示全局替换。</p>
+<h2 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h2><p>每一个进程环境中都有对于资源的限制，bash脚本也不例外。我们可以使用ulimit内建命令查看和设置bash环境中的资源限制。</p>
+<p>[zorro@zorrozou-pc0 ~]$ ulimit -a<br>core file size (blocks, -c) unlimited<br>data seg size (kbytes, -d) unlimited<br>scheduling priority (-e) 0<br>file size (blocks, -f) unlimited<br>pending signals (-i) 63877<br>max locked memory (kbytes, -l) 64<br>max memory size (kbytes, -m) unlimited<br>open files (-n) 1024<br>pipe size (512 bytes, -p) 8<br>POSIX message queues (bytes, -q) 819200<br>real-time priority (-r) 0<br>stack size (kbytes, -s) 8192<br>cpu time (seconds, -t) unlimited<br>max user processes (-u) 63877<br>virtual memory (kbytes, -v) unlimited<br>file locks (-x) unlimited</p>
+<p>在上文讲述bash和sh之间的区别时，我们已经接触过这个命令中的-c参数了，用来限制core文件的大小。我们再来看看其它参数的含义：</p>
+<p>data seg size：程序的数据段限制。</p>
+<p>scheduling priority：优先级限制。相关概念的理解可以参考这篇：<a href="http://wp.me/p79Cit-S" target="_blank" rel="external">http://wp.me/p79Cit-S</a></p>
+<p>file size：文件大小限制。</p>
+<p>pending signals：未决信号个数限制。</p>
+<p>max locked memory：最大可以锁内存的空间限制。</p>
+<p>max memory size：最大物理内存使用限制。</p>
+<p>open files：文件打开个数限制。</p>
+<p>pipe size：管道空间限制。</p>
+<p>POSIX message queues：POSIX消息队列空间限制。</p>
+<p>real-time priority：实时优先级限制。相关概念的理解可以参考这篇：<a href="http://wp.me/p79Cit-S" target="_blank" rel="external">http://wp.me/p79Cit-S</a></p>
+<p>stack size：程序栈空间限制。</p>
+<p>cpu time：占用CPU时间限制。</p>
+<p>max user processes：可以打开的的进程个数限制。</p>
+<p>virtual memory：虚拟内存空间限制。</p>
+<p>file locks：锁文件个数限制。</p>
+<p>以上参数涉及各方面的相关知识，我们在此就不详细描述这些相关内容了。在此我们主要关注open files和max user processes参数，这两个参数是我们在优化系统时最常用的两个参数。</p>
+<p>这里需要注意的是，使用ulimit命令配置完这些参数之后的bash产生的子进程都会继承父进程的相关资源配置。ulimit的资源配置的继承关系类似环境变量，父进程的配置变化可以影响子进程。所以，如果我们只是在某个登录shell或者交互式shell中修改了ulimit配置，那么在这个bash环境中执行的命令和产生的子进程都会受到影响，但是对整个系统的其它进程没有影响。如果我们想要让所有用户一登录就有相关的配置，可以考虑把ulimit命令写在bash启动的相关脚本中，如/etc/profile。如果只想影响某一个用户，可以写在这个用户的主目录的bash启动脚本中，如~/.bash_profile。系统的pam模块也给我们提供了配置ulimit相关限制的配置方法，在centos7中大家可以在以下目录和文件中找到相关配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/security/limits.d/</div><div class="line">10-gcr.conf 99-audio.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/security/limits.conf </div><div class="line">/etc/security/limits.conf</div></pre></td></tr></table></figure>
+<p>即使是写在pam相关配置文件中的相关配置，也可能不是系统全局的。如果你想给某一个后台进程设置ulimit，最靠谱的办法还是在它的启动脚本中进行配置。无论如何，只要记得一点，如果相关进程的ulimit没生效，要想的是它的父进程是谁？它的父进程是不是生效了？</p>
+<p>ulimit参数中绝大多数配置都是root才有权限改的更大，而非root身份只能在现有的配置基础上减小限制。如果你执行ulimit的时候报错了，请注意是不是这个原因。<br>```</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>通过本文我们学习了bash编程的进程环境的相关内容，主要包括的知识点为：</p>
+<ul>
+<li>bash的常用参数。</li>
+<li>bash的环境变量。</li>
+<li>命令历史功能和相关变量配置。</li>
+<li>bash脚本的资源限制ulimit的使用。</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2016/06/08/shell-2/" data-title="shell编程之执行环境 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/05/24/shell-1/" title="SHELL编程之执行过程">
+  <strong>上一篇：</strong><br/>
+  <span>
+  SHELL编程之执行过程</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/06/08/shell-3/"  title="SHELL编程之特殊符号">
+ <strong>下一篇：</strong><br/> 
+ <span>SHELL编程之特殊符号
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常用参数"><span class="toc-number">2.</span> <span class="toc-text">常用参数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#交互式login-shell"><span class="toc-number">2.1.</span> <span class="toc-text">交互式login shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bash和sh"><span class="toc-number">2.2.</span> <span class="toc-text">bash和sh</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#脚本调试"><span class="toc-number">3.</span> <span class="toc-text">脚本调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#环境变量"><span class="toc-number">4.</span> <span class="toc-text">环境变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令历史"><span class="toc-number">5.</span> <span class="toc-text">命令历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#资源限制"><span class="toc-number">6.</span> <span class="toc-text">资源限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后"><span class="toc-number">7.</span> <span class="toc-text">最后</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

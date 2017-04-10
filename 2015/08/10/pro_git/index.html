@@ -1,0 +1,535 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>git | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="买个kindle,下了点书,上下班路上就可以看书了.来到ajk后,版本控制一直使用的是git Pro Git强烈推荐这本书,解释的很详尽透彻。附上亚马逊地址  Git 内部原理直接跳到这里吧,git的使用实在不想多写了。从根本上来讲 Git 是一套内容寻址 (content-addressable) 文件系统，在此之上提供了一个 VCS 用户界面。每个目录都创建了 tree对象 (包括根目录),">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git">
+<meta property="og:url" content="http://magnetoeric.github.io/2015/08/10/pro_git/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="买个kindle,下了点书,上下班路上就可以看书了.来到ajk后,版本控制一直使用的是git Pro Git强烈推荐这本书,解释的很详尽透彻。附上亚马逊地址  Git 内部原理直接跳到这里吧,git的使用实在不想多写了。从根本上来讲 Git 是一套内容寻址 (content-addressable) 文件系统，在此之上提供了一个 VCS 用户界面。每个目录都创建了 tree对象 (包括根目录),">
+<meta property="og:image" content="http://githubforericwang.qiniudn.com//hexo/eric/pro_git.jpg">
+<meta property="og:image" content="http://githubforericwang.qiniudn.com//hexo/eric/objects.jpg">
+<meta property="og:image" content="http://githubforericwang.qiniudn.com//hexo/eric/commits.png">
+<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git">
+<meta name="twitter:description" content="买个kindle,下了点书,上下班路上就可以看书了.来到ajk后,版本控制一直使用的是git Pro Git强烈推荐这本书,解释的很详尽透彻。附上亚马逊地址  Git 内部原理直接跳到这里吧,git的使用实在不想多写了。从根本上来讲 Git 是一套内容寻址 (content-addressable) 文件系统，在此之上提供了一个 VCS 用户界面。每个目录都创建了 tree对象 (包括根目录),">
+<meta name="twitter:image" content="http://githubforericwang.qiniudn.com//hexo/eric/pro_git.jpg">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/10/pro_git/" title="git" itemprop="url">git</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Pro-Git"><span class="toc-number">1.</span> <span class="toc-text">Pro Git</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Git-内部原理"><span class="toc-number">2.</span> <span class="toc-text">Git 内部原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#示例"><span class="toc-number">3.</span> <span class="toc-text">示例</span></a></li></ol>
+		
+		</div>
+		
+		<p>买个kindle,下了点书,上下班路上就可以看书了.来到ajk后,版本控制一直使用的是git</p>
+<h2 id="Pro-Git"><a href="#Pro-Git" class="headerlink" title="Pro Git"></a>Pro Git</h2><p><img src="http://githubforericwang.qiniudn.com//hexo/eric/pro_git.jpg" alt="image"><br>强烈推荐这本书,解释的很详尽透彻。附上<a href="http://www.amazon.cn/Pro-Git-Chacon-Scott/dp/1430218339/ref=sr_1_2?ie=UTF8&amp;qid=1412999771&amp;sr=8-2&amp;keywords=pro+git" target="_blank" rel="external">亚马逊</a>地址</p>
+<hr>
+<h2 id="Git-内部原理"><a href="#Git-内部原理" class="headerlink" title="Git 内部原理"></a>Git 内部原理</h2><p>直接跳到这里吧,git的使用实在不想多写了。<br>从根本上来讲 Git 是一套内容寻址 (content-addressable) 文件系统，在此之上提供了一个 VCS 用户界面。<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/objects.jpg" alt="image"><br>每个目录都创建了 tree对象 (包括根目录), 每个文件都创建了一个对应的 blob对象 . 最后有一个 commit对象 来指向根tree对象(root of trees), 这样我们就可以追踪项目每一项提交内容.</p>
+<ul>
+<li>blob </li>
+</ul>
+<p>存储的并不是文件名而仅仅是文件内容。这种对象类型称为 blob 。（git会为每一个改动后的文件生成一个blob,也就是一些文章中所说的快照）</p>
+<ul>
+<li>tree </li>
+</ul>
+<p>tree对象可以存储文件名，同时也允许存储一组文件。Git 以一种类似 UNIX 文件系统但更简单的方式来存储内容。所有内容以 tree 或 blob<br>对象存储，其中 tree 对象对应于 UNIX 中的目录，blob 对象则大致对应于 inodes 或文件内容。一个单独的 tree 对象包含一条或多条<br>tree 记录，每一条记录含有一个指向 blob 或子 tree 对象的 SHA-1 指针，并附有该对象的权限模式 (mode)、类型和文件名信息</p>
+<ul>
+<li>commit </li>
+</ul>
+<p>commit对象格式很简单：指明了该时间点项目快照的顶层树对象、作者/提交者信息（从 Git 设理发店的 user.name 和user.email中获得)<br>以及当前时间戳、一个空行，以及提交注释信息。</p>
+<p>这三类 Git 对象 ── blob，tree 以及 tree ── 都各自以文件的方式保存在.git/objects 目录下。<br>可以在 objects 目录下看到这些文件。这便是 Git 存储数据内容的方式──为每份内容生成一个文件，取得该内容与头信息的 SHA-1 校验和，创建以该校验和前2个字符为名称的子目录，并以 (校验和) 剩下 38 个字符为文件命名 (保存至子目录下)。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>下面来尝试解释一下git的运行吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git init #初始化git</div><div class="line">$ ls -al #可以看到当前目录下产生了一个.git目录</div></pre></td></tr></table></figure></p>
+<p>看一下.git的目录结构<br>git 的本地化配置(git config –local 产生的配置会写到.git/config<br>.git/objects 里面会存储SHA-1码的一些东西<br>.git/HEAD 存储的是当前工作中的分支指针<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">$ find .git/ </div><div class="line">.git/</div><div class="line">.git/hooks</div><div class="line">.git/hooks/post-update.sample</div><div class="line">.git/hooks/pre-rebase.sample</div><div class="line">.git/hooks/pre-applypatch.sample</div><div class="line">.git/hooks/commit-msg.sample</div><div class="line">.git/hooks/applypatch-msg.sample</div><div class="line">.git/hooks/pre-push.sample</div><div class="line">.git/hooks/pre-commit.sample</div><div class="line">.git/hooks/prepare-commit-msg.sample</div><div class="line">.git/hooks/update.sample</div><div class="line">.git/config </div><div class="line">.git/description</div><div class="line">.git/objects </div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack </div><div class="line">.git/info</div><div class="line">.git/info/exclude</div><div class="line">.git/refs</div><div class="line">.git/refs/heads</div><div class="line">.git/refs/tags</div><div class="line">.git/branches</div><div class="line">.git/HEAD</div></pre></td></tr></table></figure></p>
+<p>创建README并写入hello world<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$echo &apos;hello word&apos; &gt; README.md</div></pre></td></tr></table></figure></p>
+<p>添加到暂存区<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ git add README.md</div><div class="line">$ git commit -m &apos;first commit&apos;</div><div class="line">[master （根提交） d2a03d1] first commit</div><div class="line"> 1 file changed, 1 insertion(+)</div><div class="line"> create mode 100644 README.md</div></pre></td></tr></table></figure></p>
+<p>查看暂存区中的提交<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$git log</div><div class="line">commit d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">Author: ericwang &lt;orange.king@qq.com&gt;</div><div class="line">Date:   Sat Oct 11 18:31:36 2014 +0800</div><div class="line"></div><div class="line">    first commit</div></pre></td></tr></table></figure></p>
+<p>查看.git/objects<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">$ find .git/objects/</div><div class="line">.git/objects/</div><div class="line">.git/objects/73</div><div class="line">.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack</div><div class="line">.git/objects/7f</div><div class="line">.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">.git/objects/d2</div><div class="line">.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7</div></pre></td></tr></table></figure></p>
+<p>生成了3个文件</p>
+<ul>
+<li>.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7 </li>
+<li>.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</li>
+<li>.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a </li>
+</ul>
+<p>可以看到 commit d2a03d1cece536133c49d3ea8f6c503c778307f7 对应的是.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7文件<br>其SHA-1码被拆分成2部分,第一部分是SHA-1码的前两位作为目录名,第二部分是剩下的38位作为文件名</p>
+<p>查看commit对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ git cat-file  -p d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">tree 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413023496 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413023496 +0800</div><div class="line"></div><div class="line">first commit</div></pre></td></tr></table></figure></p>
+<p>tree对象的SHA-1码为 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a<br>对应的是 .git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a<br>继续查看tree对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">100644 blob 7fd5222177e8ffadda6437dc9cfa0630a2777673    README.md</div></pre></td></tr></table></figure></p>
+<p>blob对象的SHA-1码为7fd5222177e8ffadda6437dc9cfa0630a2777673<br>对应的是.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673文件<br>查看blob对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 7fd5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">hello word</div></pre></td></tr></table></figure></p>
+<p>其存储的是就是我们最初写入的文本内容<br>下面继续向README.md中写入内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ echo 2 &gt;&gt;README.md</div><div class="line">$ git add .</div><div class="line">$ git commit -m &apos;second commit&apos;</div><div class="line">[master 897276c] second commit</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure></p>
+<p>生成了新的commit 对象 897276c61b6e00005f66a6b16477e872835b5408<br>查看新的commit对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 897276c61b6e00005f66a6b16477e872835b5408</div><div class="line">tree 6f44b87201208be6247b73708470d2b6266b7063</div><div class="line">parent d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413027193 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413027193 +0800</div><div class="line"></div><div class="line">second commit</div></pre></td></tr></table></figure></p>
+<p>其父commit是我们第一次的commit,tree对象是6f44b87201208be6247b73708470d2b6266b7063,<br>查看tree对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 6f44b87201208be6247b73708470d2b6266b7063</div><div class="line">100644 blob d0a2ec18682f4d54a2507c0d0275248dc2d8dad2    README.md</div></pre></td></tr></table></figure></p>
+<p>查看blob对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p d0a2ec18682f4d54a2507c0d0275248dc2d8dad2</div><div class="line">hello word</div><div class="line">2</div></pre></td></tr></table></figure></p>
+<p>可以看到,git为改动后的README.md生成了新的blob,区别于第一次提交产生的blob<br>查看.git/objects/下也可以看到，git为改动后的该文件新生成了1个commit,1个tree,1个blob<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">$ find .git/objects/</div><div class="line">.git/objects/</div><div class="line">.git/objects/73</div><div class="line">.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">.git/objects/6f</div><div class="line">.git/objects/6f/44b87201208be6247b73708470d2b6266b7063</div><div class="line">.git/objects/89</div><div class="line">.git/objects/89/7276c61b6e00005f66a6b16477e872835b5408</div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack</div><div class="line">.git/objects/d0</div><div class="line">.git/objects/d0/a2ec18682f4d54a2507c0d0275248dc2d8dad2</div><div class="line">.git/objects/7f</div><div class="line">.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">.git/objects/d2</div><div class="line">.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7</div></pre></td></tr></table></figure></p>
+<p>接着 新建文件并写入内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">$ echo &apos;new file content&apos; &gt;newfile</div><div class="line">$ git add .</div><div class="line">$ git commit -m &apos;third commit&apos;</div><div class="line">[master e1107b4] third commit</div><div class="line"> 1 file changed, 1 insertion(+)</div><div class="line"> create mode 100644 newfile</div><div class="line">$ git cat-file -p e1107b460be89af8d508ac972270237d2f1c530f</div><div class="line">tree 4c4d45c5a7485c475fd8fd1b53d26fddcf18f0cd</div><div class="line">parent 897276c61b6e00005f66a6b16477e872835b5408</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413028137 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413028137 +0800</div><div class="line"></div><div class="line">third commit</div><div class="line">$ git cat-file -p 4c4d45c5a7485c475fd8fd1b53d26fddcf18f0cd</div><div class="line">100644 blob d0a2ec18682f4d54a2507c0d0275248dc2d8dad2    README.md</div><div class="line">100644 blob 8e66654a5477b1bf4765946147c49509a431f963    newfile</div></pre></td></tr></table></figure></p>
+<p>第三次提交中对应的tree对象有两个blob,我们没有对README.md进行修改,所以git并没有为它新生成一个blob,而是继续使用原有的blob<br>画个图比较直观一些，画风不怎么样,哈哈<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/commits.png" alt="image"><br>实际上,项目中的git对象关系远比这复杂的多,很多tree对象有很多子tree,子tree中又包含很多blob,blob存储的是某次文件修改生成的快照</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/git/">git</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2015/08/10/pro_git/" data-title="git | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/08/10/nginx_01/" title="nginx安装">
+  <strong>上一篇：</strong><br/>
+  <span>
+  nginx安装</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/08/10/linux_02/"  title="awk简单使用">
+ <strong>下一篇：</strong><br/> 
+ <span>awk简单使用
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Pro-Git"><span class="toc-number">1.</span> <span class="toc-text">Pro Git</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Git-内部原理"><span class="toc-number">2.</span> <span class="toc-text">Git 内部原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#示例"><span class="toc-number">3.</span> <span class="toc-text">示例</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

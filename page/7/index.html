@@ -1,0 +1,1041 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+<meta property="og:type" content="website">
+<meta property="og:title" content="艾瑞克">
+<meta property="og:url" content="http://magnetoeric.github.io/page/7/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="艾瑞克">
+<meta name="twitter:description" content="精通java,php,c,c++,andriod,ios等单词的拼写,精通windows,linux,osx等系统的开关机,求一份扫地的工作">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/20/patterns/" title="范型方法的反模式" itemprop="url">范型方法的反模式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-20T02:16:00.000Z" itemprop="datePublished"> 发表于 2015-07-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="范型方法的反模式"><a href="#范型方法的反模式" class="headerlink" title="范型方法的反模式"></a>范型方法的反模式</h2><p><a href="http://it.deepinmind.com/java/2015/05/07/this-common-api-technique-is-actually-an-anti-pattern.html" target="_blank" rel="external">原文地址</a><br><a href="http://blog.jooq.org/2015/04/30/this-common-api-technique-is-actually-an-anti-pattern/" target="_blank" rel="external">英文地址</a></p>
+<p>我承认，我自己也忍不住用过这项技术。它简直太方便了，可以省去一次不必要的类型转化。这就是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">interface SomeWrapper &#123;</div><div class="line">  &lt;T&gt; T get();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在你便可以安全地将包装类转换成任意类型了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">SomeWrapper wrapper = ...</div><div class="line"> </div><div class="line">// Obviously</div><div class="line">Object a = wrapper.get();</div><div class="line"> </div><div class="line">// Well...</div><div class="line">Number b = wrapper.get();</div><div class="line"> </div><div class="line">// Risky</div><div class="line">String[][] c = wrapper.get();</div><div class="line"> </div><div class="line">// Unprobable</div><div class="line">javax.persistence.SqlResultSetMapping d = </div><div class="line">    wrapper.get();</div><div class="line">    </div><div class="line">`</div></pre></td></tr></table></figure>
+<p>这也正是你在使用JOOR时所用到的API，jOOR是我们开发并开源的一个反射工具库，它可以提升我们编写集成测试的效率。有了jOOR，你可以这么编写代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">Employee[] employees = on(department)</div><div class="line">    .call(&quot;getEmployees&quot;).get();</div><div class="line">  </div><div class="line">for (Employee employee : employees) &#123;</div><div class="line">    Street street = on(employee)</div><div class="line">        .call(&quot;getAddress&quot;)</div><div class="line">        .call(&quot;getStreet&quot;)</div><div class="line">        .get();</div><div class="line">    System.out.println(street);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个API非常简单。on()方法会对某个对象或类进行封装。call()方法会通过反射去调用这个对象上的方法（不需要签名正确，也不需要方法声明成public，同时也不会抛出任何的受检查异常）。同时你也不需要强制类型转换，便能通过get()方法将结果转换成任意的类型。</p>
+<p>对于一款像jOOR这样的反射库而言，这么做是没问题的，因为这个库本身就不是类型安全的。当然不会安全了，因为本来就是反射。</p>
+<p>不过这还是会让人感到有些不爽。感觉就是在调用点这里承诺会返回某个类型，但实际上却无法兑现，这很可能会导致ClassCastException异常——在有了Java 5以及泛型之后才开始写Java的开发人员是很难体会到这种感觉的</p>
+<h4 id="但JDK也是这么做的。。"><a href="#但JDK也是这么做的。。" class="headerlink" title="但JDK也是这么做的。。"></a>但JDK也是这么做的。。</h4><p>没错，JDK是这么干了。不过这样的情况并不多，并且只是在泛型参数的类型并不那么重要的情况下才会这么做。比如说，当你通过Collection.emptyList()获取一个空列表的时候，这个方法的实现是这样的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">@SuppressWarnings(&quot;unchecked&quot;)</div><div class="line">public static final &lt;T&gt; List&lt;T&gt; emptyList() &#123;</div><div class="line">    return (List&lt;T&gt;) EMPTY_LIST;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>没错，EMPTY_LIST从List强转成List是挺不安全的。但从语义层面来说，这样的强转是安全的。你不能修改这个列表，因为这是个空列表。List中也不会有任何一个方法会返回给你一个非目标类型的T或者T[]的实例。因此，这些做法都是合法的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">// perfectly fine</div><div class="line">List&lt;?&gt; a = emptyList();</div><div class="line"> </div><div class="line">// yep</div><div class="line">List&lt;Object&gt; b = emptyList();</div><div class="line"> </div><div class="line">// alright</div><div class="line">List&lt;Number&gt; c = emptyList();</div><div class="line"> </div><div class="line">// no problem</div><div class="line">List&lt;String[][]&gt; d = emptyList();</div><div class="line"> </div><div class="line">// if you must</div><div class="line">List&lt;javax.persistence.SqlResultSetMapping&gt; e = emptyList();</div></pre></td></tr></table></figure>
+<p>JDK的开发人员从来都会非常小心地不去对你所可能获取到的泛型类型做出任何无法兑现的承诺。也就是说，即便存在一个更适合的类型的时候，通常返回给你的也都是Object类型。</p>
+<p>哪个类型更适合只有你知道，编译器可不了解。类型擦除是有代价的，代价就是当包装类或者集合为空的时候。像这样的一个表达式编译器是无法得知它的类型的，它可不能不懂装懂。也就是说：</p>
+<p><em>不要使用这种只为了省一次类型转化的泛型方法的反模式。</em></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java/">java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/patterns/">patterns</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/20/bower/" title="30天了解30种技术（一)" itemprop="url">30天了解30种技术（一)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-20T02:08:00.000Z" itemprop="datePublished"> 发表于 2015-07-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="关于30种技术"><a href="#关于30种技术" class="headerlink" title="关于30种技术"></a>关于30种技术</h2><p>这是<a href="http://segmentfault.com/a/1190000000349384" target="_blank" rel="external">segmentfault</a>上的一个系列,做业务做累了就该找点东西玩玩,不是么?<br>但是说实话,这仅仅是了解,熟悉真谈不上,业务中没有真正使用到,都是纸上谈兵</p>
+<hr>
+<h2 id="第一天-Bower"><a href="#第一天-Bower" class="headerlink" title="第一天 Bower"></a>第一天 Bower</h2><p>原文地址:<a href="http://segmentfault.com/a/1190000000349555" target="_blank" rel="external">Day 1: Bower —— 管理你的客户端依赖关系</a><br>英文原文在<a href="https://www.openshift.com/blogs/day-1-bower-manage-your-client-side-dependencies" target="_blank" rel="external">这里</a><br>由于环境的千差万别,遇到的问题肯定会不一样,所以我在跟着原文使用时也会遇到一些问题,我会将我遇到的问题整理出来<br>Bower是一个客户端技术的软件包管理器，它可用于搜索、安装和卸载如JavaScript、HTML、CSS之类的网络资源。其他一些建立在Bower基础之上的开发工具，如YeoMan和Grunt，这个会跟着写 :)</p>
+<hr>
+<h2 id="为什么我会在意Bower"><a href="#为什么我会在意Bower" class="headerlink" title="为什么我会在意Bower?"></a>为什么我会在意Bower?</h2><ul>
+<li>节省时间。为什么要学习Bower的第一个原因，就是它会为你节省寻找客户端的依赖关系的时间。每次我需要安装jQuery的时候，我都需要去jQuery网站下载包或使用CDN版本。但是有了Bower，你只需要输入一个命令，jquery就会安装在本地计算机上，你不需要去记版本号之类的东西，你也可以通过Bower的info命令去查看任意库的信息。</li>
+<li>脱机工作。Bower会在用户主目录下创建一个。bower的文件夹，这个文件夹会下载所有的资源、并安装一个软件包使它们可以离线使用。如果你熟悉Java，Bower即是一个类似于现在流行的Maven构建系统的。m2仓库。每次你下载任何资源库都将被安装在两个文件夹中一个在的应用程序文件夹，另一个在用户主目录下的。bower文件夹。因此，下一次你需要这个仓库时，就会用那个用户主目录下.bower中的版本。</li>
+<li>可以很容易地展现客户端的依赖关系。你可以创建一个名为bower。json的文件，在这个文件里你可以指定所有客户端的依赖关系，任何时候你需要弄清楚你正在使用哪些库，你可以参考这个文件。</li>
+<li>让升级变得简单。假设某个库的新版本发布了一个重要的安全修补程序，为了安装新版本，你只需要运行一个命令，bower会自动更新所有有关新版本的依赖关系。</li>
+</ul>
+<hr>
+<h2 id="前提准备"><a href="#前提准备" class="headerlink" title="前提准备"></a>前提准备</h2><p>为了安装bower，你首先需要安装如下文件：</p>
+<ul>
+<li>node.js + npm  安装步骤看<a href="http://magnetoeric.github.io/2014/09/24/second/">这里</a></li>
+<li>git 需要从github上下载代码包，github都不会用也不会找到我的博客 :)</li>
+</ul>
+<hr>
+<h2 id="安装bower"><a href="#安装bower" class="headerlink" title="安装bower"></a>安装bower</h2><p>安装好准备的东西,就可以安装bower了<br><code>sudo npm install -g bower</code><br>-g 表示全局安装</p>
+<hr>
+<h2 id="运行bower"><a href="#运行bower" class="headerlink" title="运行bower"></a>运行bower</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">$ bower help</div><div class="line">Usage:</div><div class="line"></div><div class="line">    bower &lt;command&gt; [&lt;args&gt;] [&lt;options&gt;]</div><div class="line">Commands:</div><div class="line"></div><div class="line">    cache                   Manage bower cache</div><div class="line">    help                    Display help information about Bower</div><div class="line">    home                    Opens a package homepage into your favorite browser</div><div class="line">    info                    Info of a particular package</div><div class="line">    init                    Interactively create a bower.json file</div><div class="line">    install                 Install a package locally</div><div class="line">    link                    Symlink a package folder</div><div class="line">    list                    List local packages - and possible updates</div><div class="line">    lookup                  Look up a package URL by name</div><div class="line">    prune                   Removes local extraneous packages</div><div class="line">    register                Register a package</div><div class="line">    search                  Search for a package by name</div><div class="line">    update                  Update a local package</div><div class="line">    uninstall               Remove a local package</div><div class="line">    version                 Bump a package version</div><div class="line">Options:</div><div class="line"></div><div class="line">    -f, --force             Makes various commands more forceful</div><div class="line">    -j, --json              Output consumable JSON</div><div class="line">    -l, --log-level         What level of logs to report</div><div class="line">    -o, --offline           Do not hit the network</div><div class="line">    -q, --quiet             Only output important information</div><div class="line">    -s, --silent            Do not output anything, besides errors</div><div class="line">    -V, --verbose           Makes output more verbose</div><div class="line">    --allow-root            Allows running commands as root</div><div class="line">    --version               Output Bower version</div><div class="line">See &apos;bower help &lt;command&gt;&apos; for more information on a specific command.</div></pre></td></tr></table></figure>
+<p>运行bower help 时遇到了如下错误<br>/usr/bin/env: node: 没有那个文件或目录</p>
+<p>修改/usr/local/bin/bower中的第一行，<br><code>#!/usr/bin/env node</code> 改成<code>#!/usr/bin/env nodejs</code> 再启动就好了 </p>
+<hr>
+<h2 id="包的安装"><a href="#包的安装" class="headerlink" title="包的安装"></a>包的安装</h2><p>Bower是一个软件包管理器，所以你可以在应用程序中用它来安装新的软件包。举例来看一下来如何使用Bower安装JQuery，在你想要安装该包的地方创建一个新的文件夹，键入如下命令：<br><code>bower install jquery</code><br>由于没有权限 安装出现错误<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">$ bower install jquery</div><div class="line">bower jquery#*              not-cached git://github.com/jquery/jquery.git#*</div><div class="line">bower jquery#*                 resolve git://github.com/jquery/jquery.git#*</div><div class="line">bower jquery#*                download https://github.com/jquery/jquery/archive/2.1.1.tar.gz</div><div class="line">bower jquery#*                 extract archive.tar.gz</div><div class="line">bower jquery#*                resolved git://github.com/jquery/jquery.git#2.1.1</div><div class="line">bower                           EACCES EACCES, mkdir &apos;/usr/bin/bower_components&apos;</div><div class="line"></div><div class="line">Stack trace:</div><div class="line">Error: EACCES, mkdir &apos;/usr/bin/bower_components&apos;</div><div class="line">....</div></pre></td></tr></table></figure></p>
+<p>然后使用sudo = =#<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">$ sudo bower install jquery</div><div class="line">[sudo] password for ericwang: </div><div class="line">bower ESUDO         Cannot be run with sudo</div><div class="line"></div><div class="line">Additional error details:</div><div class="line">Since bower is a user command, there is no need to execute it with superuser permissions.</div><div class="line">If you&apos;re having permission errors when using bower without sudo, please spend a few minutes learning more about how your system should work and make any necessary repairs.</div><div class="line"></div><div class="line">http://www.joyent.com/blog/installing-node-and-npm</div><div class="line">https://gist.github.com/isaacs/579814</div><div class="line"></div><div class="line">You can however run a command with sudo using --allow-root option</div></pre></td></tr></table></figure></p>
+<p>提示就不翻译了,使用如下命令 安装成功<br><code>$ bower --allow-root install jquery</code><br>引起这个的原因是因为bower是在当前文件夹下创建bower_components文件夹,而bower是没有root权限的（我是因为改动/usr/local/bin/bower进入到/usr/local/bin/下的,所以运行命令时就会遇到权限问题），所以在root权限文件夹下使用该命令就会导致这种问题,如果你一定要在该文件夹下创建,可以使用–allow-root参数,或者修改文件夹的权限</p>
+<hr>
+<h2 id="包的使用"><a href="#包的使用" class="headerlink" title="包的使用"></a>包的使用</h2><p>现在就可以在应用程序中使用jQuery包了，在jQuery里创建一个简单的html5文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&lt;!doctype html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">&lt;head&gt;</div><div class="line">    &lt;title&gt;Learning Bower&lt;/title&gt;</div><div class="line">&lt;/head&gt;</div><div class="line">&lt;body&gt;</div><div class="line"></div><div class="line">&lt;button&gt;Animate Me!!&lt;/button&gt;</div><div class="line">&lt;div style=&quot;background:red;height:100px;width:100px;position:absolute;&quot;&gt;</div><div class="line">&lt;/div&gt;</div><div class="line"></div><div class="line">&lt;script type=&quot;text/javascript&quot; src=&quot;bower_components/jquery/jquery.min.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;script type=&quot;text/javascript&quot;&gt;</div><div class="line"></div><div class="line">    $(document).ready(function()&#123;</div><div class="line">        $(&quot;button&quot;).click(function()&#123;</div><div class="line">            $(&quot;div&quot;).animate(&#123;left:&apos;250px&apos;&#125;);</div><div class="line">        &#125;);</div><div class="line">    &#125;);</div><div class="line">&lt;/script&gt;</div><div class="line">&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure></p>
+<p>正如你所看到的，你刚刚引用jquery.min.js文件，现阶段完成。</p>
+<h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">bower list //所有安装过的包的列表</div><div class="line">      search bootstrap //假如你想在你的应用程序中使用twitter的bootstrap框架，但你不确定包的名字，这时你可以使用search 命令</div><div class="line">      info bootstrap //如果你想看到关于特定的包的信息，可以使用info 命令来查看该包的所有信息 还可以这样</div><div class="line">      uninstall jquery //卸载包可以使用uninstall 命令</div><div class="line">      install //安装包  (bower install  bootstrap#2.1.1 --save </div><div class="line">                        安装指定版本,不过如果之前安装了某版本,会提示冲突,跟着提示走就可以了，bower.json也会被更新)</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="bower-json文件的使用"><a href="#bower-json文件的使用" class="headerlink" title="bower.json文件的使用"></a>bower.json文件的使用</h2><p>bower.json文件的使用可以让包的安装更容易，你可以在应用程序的根目录下创建一个名为“bower.json”的文件，并定义它的依赖关系。使用bower init 命令来创建bower.json文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">$ bower init</div><div class="line">? name: bower-test</div><div class="line">? version: 0.0.1</div><div class="line">? description: Add bower.json</div><div class="line">? main file: </div><div class="line">? what types of modules does this package expose?: </div><div class="line">? keywords: </div><div class="line">? authors: ericwang</div><div class="line">? license: MIT</div><div class="line">? homepage: </div><div class="line">? set currently installed components as dependencies?: Yes</div><div class="line">? add commonly ignored files to ignore list?: Yes</div><div class="line">? would you like to mark this package as private which prevents it from being accidentally published to the registry?: Yes</div><div class="line"></div><div class="line">&#123;</div><div class="line">  name: &apos;bower-test&apos;,</div><div class="line">  version: &apos;0.0.1&apos;,</div><div class="line">  description: &apos;Add bower.json&apos;,</div><div class="line">  authors: [</div><div class="line">    &apos;ericwang&apos;</div><div class="line">  ],</div><div class="line">  license: &apos;MIT&apos;,</div><div class="line">  private: true,</div><div class="line">  ignore: [</div><div class="line">    &apos;**/.*&apos;,</div><div class="line">    &apos;node_modules&apos;,</div><div class="line">    &apos;bower_components&apos;,</div><div class="line">    &apos;test&apos;,</div><div class="line">    &apos;tests&apos;</div><div class="line">  ],</div><div class="line">  dependencies: &#123;</div><div class="line">    jquery: &apos;~2.1.1&apos;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">? Looks good?: Yes</div></pre></td></tr></table></figure></p>
+<p>可以查看该文件<code>view bower.json</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;name&quot;: &quot;bower-test&quot;,</div><div class="line">  &quot;version&quot;: &quot;0.0.1&quot;,</div><div class="line">  &quot;description&quot;: &quot;Add bower.json&quot;,</div><div class="line">  &quot;authors&quot;: [</div><div class="line">    &quot;ericwang&quot;</div><div class="line">  ],</div><div class="line">  &quot;license&quot;: &quot;MIT&quot;,</div><div class="line">  &quot;private&quot;: true,</div><div class="line">  &quot;ignore&quot;: [</div><div class="line">    &quot;**/.*&quot;,</div><div class="line">    &quot;node_modules&quot;,</div><div class="line">    &quot;bower_components&quot;,</div><div class="line">    &quot;test&quot;,</div><div class="line">    &quot;tests&quot;</div><div class="line">  ],</div><div class="line">  &quot;dependencies&quot;: &#123;</div><div class="line">    &quot;jquery&quot;: &quot;~2.1.1&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>已经加入了jQuery依赖关系<br>现在假设也想用twitter bootstrap，我们可以用下面的命令安装twitter bootstrap并更新bower.json文件：<br><code>$ bower install bootstrap --save</code><br>它会自动安装最新版本的bootstrap并更新bower.json文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;name&quot;: &quot;bower-test&quot;,</div><div class="line">  &quot;version&quot;: &quot;0.0.1&quot;,</div><div class="line">  &quot;description&quot;: &quot;Add bower.json&quot;,</div><div class="line">  &quot;authors&quot;: [</div><div class="line">    &quot;ericwang&quot;</div><div class="line">  ],</div><div class="line">  &quot;license&quot;: &quot;MIT&quot;,</div><div class="line">  &quot;private&quot;: true,</div><div class="line">  &quot;ignore&quot;: [</div><div class="line">    &quot;**/.*&quot;,</div><div class="line">    &quot;node_modules&quot;,</div><div class="line">    &quot;bower_components&quot;,</div><div class="line">    &quot;test&quot;,</div><div class="line">    &quot;tests&quot;</div><div class="line">  ],</div><div class="line">  &quot;dependencies&quot;: &#123;</div><div class="line">    &quot;jquery&quot;: &quot;~2.1.1&quot;,</div><div class="line">    &quot;bootstrap&quot;: &quot;~3.2.0&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="玩完了"><a href="#玩完了" class="headerlink" title="玩完了"></a>玩完了</h2><p>原谅我这一生不羁放纵爱自由,上班时间写博客,罪过罪过。<br>用过java的maven管理,理解起来这个就相对简单了。<br>搭建依赖库时,最讨厌的就是到处找依赖包不是么，而有了这些工具之后,都省掉了。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/nodejs/">nodejs</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/bower/">bower</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/18/mysql_02/" title="php如何获取pdo执行的sql语句" itemprop="url">php如何获取pdo执行的sql语句</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T11:15:23.000Z" itemprop="datePublished"> 发表于 2015-07-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>这大概是很多人都想知道的吧,开发的时候,能看到程序真正执行的是什么可以减少很多时间去调试。<br>尤其是在当今IOC,MVC框架中,很多只懂得复制粘贴的程序员们遇到问题就只能问,根本不去深究为什么可以这样<br>废话真多,不说了,先来看这段代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&lt;?php </div><div class="line">class PDO_TEST&#123;</div><div class="line">    public function test($config,$id)&#123;</div><div class="line">        $pdo = new PDO($config[&apos;host&apos;],$config[&apos;user&apos;],$config[&apos;pass&apos;],$config[&apos;init_statements&apos;]);</div><div class="line">        $sql = &apos;SELECT  * FROM book WHERE `id` = :id&apos;;</div><div class="line">        $stmt = $pdo-&gt;prepare($sql);</div><div class="line">        $stmt-&gt;bindParam(&apos;:id&apos;,$id);</div><div class="line">        $stmt-&gt;execute();</div><div class="line">        return $stmt-&gt;fetchAll();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">$config = array(</div><div class="line">    &apos;host&apos;=&gt;&apos;mysql:host=192.168.188.48;dbname=test&apos;,</div><div class="line">    &apos;user&apos; =&gt; &apos;admin&apos;,</div><div class="line">    &apos;pass&apos; =&gt; &apos;admin&apos;,</div><div class="line">    &apos;init_statements&apos; =&gt; array(</div><div class="line">        &apos;SET CHARACTER SET utf8&apos;,</div><div class="line">        &apos;SET NAMES utf8&apos;</div><div class="line">    ),</div><div class="line">    &apos;default_fetch_mode&apos; =&gt; PDO::FETCH_ASSOC</div><div class="line">);</div><div class="line">$id =1;</div><div class="line">$test = new PDO_TEST();</div><div class="line">$result =$test-&gt;test($config,$id);</div><div class="line">var_dump($result);exit;</div><div class="line">?&gt;</div></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h2><p>如果直接var_dump($sql);返回的只是绑定的sql,即一个不完整的sql,还要去var_dump($id)，才能完整地显示出来sql语句，而有时候,这种调试显得异常笨拙。<br>我们急需一种方法来快速定位并解决sql问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo tcpdump -n -X -S -i eth0 port 3306 and host 192.168.188.48</div></pre></td></tr></table></figure>
+<p>使用man tcpdump可以查看tcpdump工具的具体使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">-n Don&apos;t convert addresses (i.e., host addresses, port numbers, etc.) to names. #不要对地址进行转换</div><div class="line">-X  When parsing and printing, in addition to printing the headers of each packet, print the data of each packet (minus its link level  </div><div class="line">    header) in hex and ASCII.  This  is  very handy for analysing new protocols.</div><div class="line">    #-x/-xx/-X/-XX：以十六进制显示包内容，几个选项只有细微的差别，详见man手册。</div><div class="line">-S  Print absolute, rather than relative, TCP sequence numbers. #显示绝对的Sequence Number</div><div class="line">-i  Listen on interface.  #我本地的网卡是eth0</div></pre></td></tr></table></figure></p>
+<p>其他的就不多解释了,也不会，跟着干货师傅学到的~<br>这样就能在本地看到有一部分包中包含如下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">0x0000:  4500 005d af32 4000 4006 8d5a c0a8 c08c  E..].2@.@..Z....</div><div class="line">0x0010:  c0a8 bc30 e48e 0cea 7929 223b 4f09 64ca  ...0....y)&quot;;O.d.</div><div class="line">0x0020:  8018 00e5 fe5d 0000 0101 080a 005f 8ee6  .....]......._..</div><div class="line">0x0030:  0069 7c2c 2500 0000 0353 454c 4543 5420  .i|,%....SELECT.</div><div class="line">0x0040:  202a 2046 524f 4d20 626f 6f6b 2057 4845  .*.FROM.book.WHE</div><div class="line">0x0050:  5245 2060 6964 6020 3d20 2731 27         RE.`id`.=.&apos;1&apos;</div></pre></td></tr></table></figure>
+<p>实际上能看到发送的包是因为mysql的预处理机制<br><a href="http://www.oschina.net/translate/php-pdo-how-to" target="_blank" rel="external">这里</a>有一些关于预处理的翻译<br>这里的note也不错<br>With PDO_MYSQL you need to remember about the PDO::ATTR_EMULATE_PREPARES option.</p>
+<p>The default value is TRUE, like<br>$dbh-&gt;setAttribute(PDO::ATTR_EMULATE_PREPARES,true); </p>
+<p>This means that no prepared statement is created with $dbh-&gt;prepare() call. With exec() call PDO replaces the placeholders with values itself and sends MySQL a generic query string.</p>
+<p>The first consequence is that the call  $dbh-&gt;prepare(‘garbage’);<br>reports no error. You will get an SQL error during the $dbh-&gt;exec() call.<br>The second one is the SQL injection risk in special cases, like using a placeholder for the table name.</p>
+<p>The reason for emulation is a poor performance of MySQL with prepared statements. Emulation works significantly faster.</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>如果添加如下改动,这种方式放弃了预编译<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">         $pdo = new PDO($config[&apos;dsn&apos;],$config[&apos;username&apos;],$config[&apos;password&apos;],$config[&apos;init_statements&apos;]);</div><div class="line">+        $pdo-&gt;setAttribute(PDO::ATTR_EMULATE_PREPARES, false);</div><div class="line">         $sql = &apos;SELECT  * FROM book WHERE `id` = :id&apos;;</div></pre></td></tr></table></figure></p>
+<p>两个包的接收片段<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">0x0000:  4500 005b a449 4000 4006 9845 c0a8 c08c  E..[.I@.@..E....</div><div class="line">0x0010:  c0a8 bc30 e73c 0cea a759 8d95 4b69 5fc7  ...0.&lt;...Y..Ki_.</div><div class="line">0x0020:  8018 00e5 fe5b 0000 0101 080a 0064 2962  .....[.......d)b</div><div class="line">0x0030:  006e 16a6 2300 0000 1653 454c 4543 5420  .n..#....SELECT.</div><div class="line">0x0040:  202a 2046 524f 4d20 626f 6f6b 2057 4845  .*.FROM.book.WHE</div><div class="line">0x0050:  5245 2060 6964 6020 3d20 3f              RE.`id`.=.?</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">0x0000:  4500 0048 a44a 4000 4006 9857 c0a8 c08c  E..H.J@.@..W....</div><div class="line">0x0010:  c0a8 bc30 e73c 0cea a759 8dbc 4b69 608e  ...0.&lt;...Y..Ki`.</div><div class="line">0x0020:  8018 00ed fe48 0000 0101 080a 0064 2962  .....H.......d)b</div><div class="line">0x0030:  006e 16a6 1000 0000 1701 0000 0000 0100  .n..............</div><div class="line">0x0040:  0000 0001 fd00 0131                      .......1</div></pre></td></tr></table></figure>
+<p> 尽管exec方法和查询在PHP中仍然被大量使用和支持，但是PHP官网上还是要求大家用预处理语句的方式来替代。为什么呢？主要是因为：它更安全。预处理语句不会直接在实际查询中插入参数，这就避免了许多潜在的SQL注入。</p>
+<p>然而出于某种原因，PDO实际上并没有真正的使用预处理，它是在模拟预处理方式，在将语句传给SQL服务器之前会把参数数据插入到语句中，这使得某些系统容易受到SQL注入。<br>实际上$pdo-&gt;setAttribute(PDO::ATTR_EMULATE_PREPARES,true); 使得pdo将语句进行了本地处理,并直接向mysql提交了sql语句。<br>而$pdo-&gt;setAttribute(PDO::ATTR_EMULATE_PREPARES,false);则是先向sql服务器发送prepare中的语句,接受到服务器返回的一些数据(meta data)，再发送参数<br>这样做安全,但是速度变慢了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/18/mysql_01/" title="mysql  null" itemprop="url">mysql  null</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T11:08:00.000Z" itemprop="datePublished"> 发表于 2015-07-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>今天在处理dbrt时，类似的建表语句如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `xxx`(</div><div class="line">     ...</div><div class="line">    `column1` int(11) not null</div><div class="line">    ...</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>对于这种字段，需要赋予默认值,然后有人说,我设置的不为null，就是不希望有空值插入进去,所以这里不需要设置default。</p>
+<hr>
+<h2 id="深入探究null-和-not-null"><a href="#深入探究null-和-not-null" class="headerlink" title="深入探究null 和 not null"></a>深入探究null 和 not null</h2><p>首先，我们要搞清楚“空值” 和 “NULL” 的概念:</p>
+<ul>
+<li>空值是不占用空间的</li>
+<li>mysql中的NULL其实是占用空间的，下面是来自于MYSQL官方的解释</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NULL columns require additional space in the row to record whether their values are NULL. For MyISAM tables, each NULL column takes one bit extra, rounded up to the nearest byte</div></pre></td></tr></table></figure>
+<p>所以空值还是会被插入到db中，只有NULL列才不会被插入。</p>
+<h2 id="为什么要设置NOT-NULL"><a href="#为什么要设置NOT-NULL" class="headerlink" title="为什么要设置NOT NULL"></a>为什么要设置NOT NULL</h2><p>NULL列需要更多的存储空间，还需要mysql内部进行特殊处理。NULL列被索引后，每条记录都需要一个额外的字节，还能导致MYisam 中固定大小的索引变成可变大小的索引。这在《高性能mysql》中有介绍的,<br>所以为了尽量避免NULL，我们指定列为NOT NULL。<br>可以看出，在MySQL中，含有NULL的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用0、一个特殊的值或者一个空串代替空值。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/mysql/">mysql</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/18/pdo_lastinsert/" title="pdo lastInserId问题" itemprop="url">pdo lastInserId问题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T11:05:55.000Z" itemprop="datePublished"> 发表于 2015-07-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>##问题<br>同事问了一个问题:<br>框架底层对executeSql进行了封装(对sql进行了处理，做主从分离),在执行insert xxx values xxx on duplicate key update语句后，使用lastInsertId时返回结果是0。  </p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>由于要判断是否插入失败，所以分析了一下框架executeSql，除了select，desc 其他语句使用master进行处理(主要是为了实现框架级别的主从分离),在PDOStatement::execute之后，<br>对操作语句的类型进行了判断,对于insert的返回，执行成功的结果都是返回PDO::lastInsertId,如果执行失败，则返回false.<br>查看了PDO::lastInsertId 的说明手册<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">string PDO::lastInsertId ([ string $name = NULL ] )</div><div class="line">返回最后插入行的ID，或者是一个序列对象最后的值，取决于底层的驱动。比如，PDO_PGSQL() 要求为 name 参数指定序列对象的名称。 </div><div class="line">    Note:</div><div class="line"></div><div class="line">   在不同的 PDO 驱动之间，此方法可能不会返回一个有意义或一致的结果，因为底层数据库可能不支持自增字段或序列的概念。</div></pre></td></tr></table></figure></p>
+<p>但是我的数据库底层支持自增字段或序列啊，不应该返回0，结果仔细看表发现，由于表是从其他表中获取有效数据同步过来的,所以没有自增字段(auto-increment)，<br>这样，判断executeSql是否执行失败，需要使用result === false来判断了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a><a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/18/singleton/" title="单例模式" itemprop="url">单例模式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T11:02:19.000Z" itemprop="datePublished"> 发表于 2015-07-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>经过良好设计的系统一般通过方法调用传递对象实例。通常单例使用与如下背景环境：<br>1.对象会被系统中的任何对象使用<br>2.对象不应该储存在会被修改的全局变量中<br>3.系统中不应该超过一个该对象，也就是说Y设置了X对象的属性，Z可以不通过其他对象，直接获取到该属性的值  </p>
+<p>因此，单例对象的构造方法应该是私有的  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Singleton&#123;</div><div class="line">	private $props = array();</div><div class="line">	private function __construct()&#123;</div><div class="line">	&#125;</div><div class="line">	public function setProperty($key,$value)&#123;</div><div class="line">	$this-&gt;props[$key] = $value;</div><div class="line">	&#125;</div><div class="line">	public function getProperty($key)&#123;</div><div class="line">	return $this-&gt;pros[$key];</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>但是这样是不能用的，因为构造方法是私有的。所以需要静态方法和静态属性来间接完成实例化。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Singleton&#123;</div><div class="line">	private $props = array();</div><div class="line">	private  static $instance;</div><div class="line">	private function __construct()&#123;</div><div class="line">	&#125;</div><div class="line">	public function setProperty($key,$value)&#123;</div><div class="line">	    $this-&gt;props[$key] = $value;</div><div class="line">	&#125;</div><div class="line">	public function getProperty($key)&#123;</div><div class="line">	    return $this-&gt;props[$key];</div><div class="line">	&#125;</div><div class="line">	public static function getInstance()&#123;</div><div class="line">	if(empty(self::$instance))&#123;</div><div class="line">		self::$instance = new Singleton();</div><div class="line">	&#125;</div><div class="line">	return self::$instance;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>单例模式和全局变量依然会被误用，因为它可以在任何地方被使用，所以很难调试它的依赖关系（比如公司的框架，对pdo进行了封装，而在对某些语句进行跟踪调试时，就变的困难了，因为不只是一处去调用该模块）<br>关于单例模式，java中有很多种实现方式，每一种都有自己的优缺点，另外java中有时候单例模式有时候会失效，这些都是语言层级了，就不多写了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/patterns/">patterns</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/singleton/">singleton</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/17/varnish/" title="varnish" itemprop="url">varnish</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-17T03:45:00.000Z" itemprop="datePublished"> 发表于 2015-07-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="关于Varnish"><a href="#关于Varnish" class="headerlink" title="关于Varnish"></a>关于Varnish</h2><ul>
+<li>高性能的开源HTTP加速器</li>
+<li>基于内存进行缓存，重启后数据将消失</li>
+<li>利用虚拟内存方式，I/O性能好</li>
+<li>配置语言VCL(Varnish Configuration Language) 灵活管理配置.<br>  在程序启动时，varnish就把VCL转换成二进制代码，因此性能非常高</li>
+</ul>
+<hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>略。注意安装依赖，有些命令需要安装依赖   </p>
+<hr>
+<h2 id="varnish-启动"><a href="#varnish-启动" class="headerlink" title="varnish 启动"></a>varnish 启动</h2><ul>
+<li><p>一个启动的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sudo /usr/local/varnish/sbin/varnishd \</div><div class="line">-u www -g www \</div><div class="line">-f /usr/local/varnish/etc/varnish/default.vcl \</div><div class="line">-a 127.0.0.1:8080 \</div><div class="line">-s file,/var/www/varnish_cache.data,1G \</div><div class="line">-w 1024,2048,10 \</div><div class="line">-t 3600 \</div><div class="line">-T 127.0.0.1:2000</div></pre></td></tr></table></figure>
+</li>
+<li><p>说明</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">u 用户名</div><div class="line">g 所属组</div><div class="line">f 配置文件地址</div><div class="line">a 绑定地址及端口</div><div class="line">s 缓存文件地址及大小</div><div class="line">w 最大最小线程 及超时时间</div><div class="line">T 管理端口  主要用来清除缓存</div><div class="line">t 默认缓存时间</div></pre></td></tr></table></figure>
+</li>
+<li><p>结束 </p>
+<pre><code>`sudo pkill varnishd`
+</code></pre></li>
+</ul>
+<hr>
+<h2 id="管理命令-varnishadm"><a href="#管理命令-varnishadm" class="headerlink" title="管理命令 varnishadm"></a>管理命令 varnishadm</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/usr/local/varnish/bin/varnishadm -T 127.0.0.1:2000 -S /etc/varnish/secret help 查看可用的命令列表 -S 参数为指定密码文件</div><div class="line">vcl.load default.vcl /etc/varnish/default.vcl 载入新vcl配置文件</div><div class="line">vcl.list 查看已有的配置列表</div><div class="line">vcl.use default.vcl 使用加载的配置文件</div><div class="line">ban.url ^hello.php$ 清除hello.php的缓存</div><div class="line">start 启动</div><div class="line">stop 关闭</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">varnishlog 日志</div><div class="line">varnishstat 状态 ：命中等</div></pre></td></tr></table></figure>
+<hr>
+<h2 id="VCL"><a href="#VCL" class="headerlink" title="VCL"></a>VCL</h2><p>1.三个重要的数据结构  </p>
+<blockquote>
+<ul>
+<li>req<br>  请求头信息  当varnish接收到请求的时候 req会被创建</li>
+<li>beresp<br>  后端返回对象  包含从backend返回的头信息 </li>
+<li>obj<br>  缓存了的对象。大多数是驻留在内存中的只读对象。obj.ttl是可以写的，剩下的都是只读的</li>
+</ul>
+</blockquote>
+<p>更多变量点<a href="https://www.varnish-cache.org/docs/3.0/reference/vcl.html#variables" target="_blank" rel="external">这里</a></p>
+<p>2.子程序<br>VCL 文件被分为多个子程序 常用子程序</p>
+<blockquote>
+<ul>
+<li>vcl_recv 当有访问时，varnish会执行该子程序，该程序通过对req的一些参数进行处理，决定接下来的动作 这里只能访问到req数据结构<br>   一般以以下3种动作结束<ul>
+<li>pass：执行pass动作,把请求交给vcl_pass模块处理。</li>
+<li>pipe：执行pipe动作，把请求交给vcl_pipe模块处理。</li>
+<li>error code [reason]：表示把错误标识返回给客户端，并放弃处理该请求。错误标识包括200、405等。”reason”是对错误的提示信息。</li>
+</ul>
+</li>
+<li>vcl_fetch  当varnish成功从后端返回数据时,执行该子程序 这里既能访问req 也能访问beresp</li>
+<li>vcl_pipe 执行pipe动作时调用,用于将请求直接传递至后端主机，在请求和返回的内容没有改变的情况下，<br>  也就是在当前连接未关闭时，服务器将不变的内容返回给客户端，直到该连接被关闭</li>
+<li>lookup 一个请求在vcl_recv中被lookup后，Varnish将在缓存中提取数据。<br>  如果缓存中有相应的数据，就把控制权交给vcl_hit子程序；<br>  如果缓存中没有相应的数据，请求将被设置为pass并将其交给vcl_miss子程序</li>
+</ul>
+</blockquote>
+<p>varnish 将在不同阶段执行它的子程序代码，因为它的代码是一行一行执行的，不存在优先级问题。随时可以调用这个子程序中的功能并且当他执行完成后就退出。</p>
+<p>3.动作(action)：</p>
+<blockquote>
+<ul>
+<li>pass： 当一个请求被 pass 后，这个请求将通过 varnish 转发到后端服务器，但是它不会被缓存。pass 可以放在 vcl_recv 和 vcl_fetch 中。</li>
+<li>lookup： 当一个请求在 vcl_recv 中被 lookup 后，varnish 将从缓存中提取数据，如果缓存中没有数据，将被设置为 pass，不能在 vcl_fetch 中设置 lookup。</li>
+<li>pipe： pipe 和 pass 相似，都要访问后端服务器，不过当进入 pipe     模式后，在此连接未关闭前，后续的所有请求都发到后端服务器，而pass只对当前的传输有效，后续的请求会根据策略决定是否发送到客户端</li>
+<li>deliver： 请求的目标被缓存，然后发送给客户端。</li>
+<li>esi： ESI-process the fetched document (Edge Side Includes ，使用varnish+esi<br>  可以对用户个性化相关的进行缓存，而我们通常的做法是使用ajax+memcache对用户个性化的内容进行缓存 <a href="https://www.varnish-cache.org/trac/wiki/VCLExampleCachingLoggedInUsers" target="_blank" rel="external">官方文档</a>）</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="处理流程"><a href="#处理流程" class="headerlink" title="处理流程"></a>处理流程</h2><p>  <img src="http://githubforericwang.qiniudn.com/hexo/eric/process.jpg" alt="image"></p>
+<hr>
+<h2 id="http头信息"><a href="#http头信息" class="headerlink" title="http头信息"></a>http头信息</h2><p>HTTP协议定义了四个可以用来控制浏览器缓存的HTTP头，它们是：</p>
+<blockquote>
+<ul>
+<li>Last-Modified</li>
+<li>Expires</li>
+<li>Pragma: no-cache</li>
+<li>Cache-Control</li>
+</ul>
+</blockquote>
+<p>在HTTP/1.0协议中:</p>
+<blockquote>
+<ul>
+<li>Last-Modified是控制缓存的一个非常重要的HTTP头。<br>  如果需要控制浏览器的缓存，服务器首先必须发送一个 以UTC时间为值的Last-Modifeid头，<br>  当第二次访问这个页面时，浏览器会发送一个If-Modified-Since头给服务器，让服务器判断是否有必要更新内容，<br>  这个If-Modified-Since头的值就是上次访问页面时，浏览器发送的Last-Modifeid头的值。</li>
+<li>Expires是HTTP/1.0中另外一个很重要的HTTP头，它表示缓存的存在时间，<br>  告诉客户端浏览器在这个时间之前不对服务器发送请求，而直接使用浏览器的缓存。<br>  在HTTP/1.0中，可以使用Pragma: no-cache头来告诉浏览器不要缓存内容，<br>  它相当于HTTP/1.1中的Cache-Control:no-cache</li>
+</ul>
+</blockquote>
+<p>HTTP/1.0协议的这种实现方式的缺点是，服务器和客户端的时间有可能是不同步的，<br>这样会造成缓存的实现达不到预期效果。HTTP/1.1协议用Cache-Control头解决了这个问题</p>
+<p>在http 1.1中<br>Cache-Control响应头的语法为：Cache-Control = “Cache-Control” “:”{缓存响应指令}<br>缓存响应指令为一下几个中的任意一个：</p>
+<ul>
+<li><p>public 指示响应数据可以被任何客户端缓存</p>
+</li>
+<li><p>private 指示响应数据可以被非共享缓存所缓存。这表明响应的数据可以被发送请求的浏览器缓存，而不能被中介所缓存</p>
+</li>
+<li><p>no-cache  指示响应数据不能被任何接受响应的客户端所缓存</p>
+</li>
+<li><p>no-store 指示所传送的响应数据除了不能被缓存，也不能存入磁盘。一般用于敏感数据，以免数据被复制。</p>
+</li>
+<li><p>must-revalidate 指示所有的缓存都必须重新验证，<br>在这个过程中，浏览器会发送一个If-Modified-Since头。<br>如果服务器程序验证得出当前的响应数据为最新的数 据，那么服务器应当返回一个304</p>
+</li>
+<li><p>proxy-revalidate 与must-revalidate相似，不同的是用来指示共享缓存</p>
+</li>
+<li><p>max-age=时间  数据经过max-age设置的秒数后就会失效，<br> 相当于HTTP/1.0中的Expires头。<br> 如果在一次响应中同时设置了max-age和Expires，那么max-age将具有较高的优先级</p>
+</li>
+<li><p>s-maxage=时间 与max-age相似，不同的是用来指示共享缓存。<br>注：通过POST方法发送的请求不能以如上所述的方式缓存</p>
+</li>
+</ul>
+<p>可以在使用浏览器发送如下信息头</p>
+<blockquote>
+<ul>
+<li><p>当我们在浏览器中输入url网址时，如果有过该网址的访问记录，浏览器会判断 max-age，如果没有会发送If-Modified-Since头信息，服务器去处理是否有更新<br>  有些内容有max-age，浏览器不会发送请求，使用浏览器缓存,Chrome返回的状态码是200 OK (from cache)，firefox没有请求。</p>
+</li>
+<li><p>当我们按下F5时,浏览器会发送If-Modified-Since，max-age=0 头信息 这样服务器就会返回其最新内容(如果有varnish缓存的话,只返回varnish缓存)</p>
+</li>
+<li><p>当我们按下Control + F5，强刷，浏览器会发送 Pragma: no-cache，Cache-Control: no-cache信息头 如果在vcl中对这类信息头做处理，就可以刷新varnish缓存<br>  这在生产环境中很适用，但是在线上环境中所有人都可以通过强制刷新varnish.所以需要使用白名单允许一些ip可以清除缓存,通常Cache-Control:nocache 是被varnish忽略的,根据自身需要处理</p>
+</li>
+</ul>
+</blockquote>
+<p>当然也可以写代码发送请求，或是使用浏览器插件比如livehttpheader或者使用curl命令</p>
+<hr>
+<h2 id="清除缓存"><a href="#清除缓存" class="headerlink" title="清除缓存"></a>清除缓存</h2><p> 1.这两个规则定义了允许哪些主机通过HTTP来执行PURGE进行缓存删除。如果不是指定的IP，就会出现HTTP 405错误，提示Not allowed错误字样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"> acl purge &#123;  </div><div class="line">       &quot;localhost&quot;;  </div><div class="line">       &quot;127.0.0.1&quot;;  </div><div class="line">    &#125;  </div><div class="line">if (req.request == &quot;PURGE&quot;) &#123;  </div><div class="line">               if (!client.ip ～ purge) &#123;  </div><div class="line">                       error 405 &quot;Not allowed.&quot;;  </div><div class="line">               &#125;  </div><div class="line">               return(lookup);  </div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p> 2.varnishadm ban.url [regexp] 不需要加域名</p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
+<li><p>如果backend返回的头信息中包含setcookie,varnish不会对此缓存，一般会在vcl中unset掉backend header产生的cookie <a href="https://www.varnish-cache.org/docs/3.0/tutorial/increasing_your_hitrate.html#tutorial-increasing-your-hitrate" target="_blank" rel="external">更多请看这里</a></p>
+<p>  php中有两种set cookie方法：<br>  一种是header(string,replace,http_response_code),<br>  一种是setCookie(name,value,expire,path,domain,secure)<br>  setCookie设置的cookie,Varnish会缓存吗?（其实是一样的）</p>
+</li>
+<li><p>如果varnish看到授权头信息(Authorization)时，它会pass该请求。可以unset这个头信息</p>
+</li>
+<li><p>当几个客户端正访问相同页面时，varnish会发送一个请求到后端，然后让那个其他几个请求挂起等待返回结果，<br>  返回结果后，复制请求的结果发送给客户端并且让其他请求等待,<br>  但是如果，每秒上千的请求同时呢?（这个队列很庞大），这时候我们期待的应该是，返回过期的cache给用户<br>  为了使用过期的cache给用户提供服务，我们需要增加他们的TTL，保存所有cache中的内容在TTL过期以后30分钟不删除，<br>  使用以下VCL：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sub vcl_fetch &#123;</div><div class="line">  set beresp.grace = 30m;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>  Varnish还不会使用过期的目标给用户提供服务，所以我们需要配置以下代码，在cache过期后的15秒内，使用旧的内容提供服务：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sub vcl_recv &#123;</div><div class="line">    set req.grace = 15s;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果后端出了问题，是不是不应该返回问题的页面，而应该返回就版本的正常页面，可以开启健康检查，如果后端出问题了，可以长时间提供旧版本的内容</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">if (! req.backend.healthy) &#123;</div><div class="line">   set req.grace = 5m;</div><div class="line">&#125; else &#123;</div><div class="line">   set req.grace = 15s;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>说一下我遇到的一些坑吧,毕竟不是运维人员,很多监控还不是很懂，所以只是说一些代码层面上的。</p>
+<ul>
+<li><p>一般来说varnish是要将后端返回的header头的cookie信息重置掉,这样可以高效地利用缓存。<br>这种方式带来的后果就是：<br>由于Varnish 是一个HTTP缓存服务器,也就是说它是直接和浏览器打交道的,更通俗点,Varnish缓存的内容是直接被浏览器解析的!<br>所以 不要在后端服务器中返回带有状态的代码！Varnish对于所有用户访问的同一链接,返回的都是同一个内容。<br>如果你在后端返回的信息存在cookie,并且在Varnish中将cookie干掉了,就会导致,一个用户的行为被Varnish缓存住了,其他用户也被动地进行了这个行为。<br>通常解决这种方式的做法是使用ajax。</p>
+</li>
+<li><p>varnish 配置文件是允许重复配置同一个动作的,但是只是先加载的有效= =#。所以注意这个坑(已测试)</p>
+</li>
+<li><p>由于我们的业务需要,测试环境是穿透varnish的，也就是白名单,所以很多时候,内网会泄漏掉varnish的很多东西<br>这时候需要使用一些外网IP，挂代理取检测网站内容了（不过要小心,外网代理的策略有可能是把整个网页缓存了）</p>
+</li>
+<li>由于Varnish会对每一个url地址做缓存,为了不必要的浪费,一般是对某个url做截断处理<br>(比如:http:www.baidu.com/?a=1&amp;b=1 和http:www.baidu.com/ 缓存的应该是同一个副本)</li>
+</ul>
+<hr>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><blockquote>
+<ul>
+<li><a href="http://anykoro.sinaapp.com/2012/01/31/varnish3-0中文入门教程/" target="_blank" rel="external">http://anykoro.sinaapp.com/2012/01/31/varnish3-0中文入门教程/</a></li>
+<li><a href="https://www.varnish-cache.org/docs/3.0/" target="_blank" rel="external">https://www.varnish-cache.org/docs/3.0/</a></li>
+<li><a href="https://www.varnish-software.com/static/book/HTTP.html" target="_blank" rel="external">https://www.varnish-software.com/static/book/HTTP.html</a></li>
+</ul>
+</blockquote>
+<p>以前分享的文章， 放到博客里吧</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/http/">http</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/varnish/">varnish</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/17/maven/" title="maven" itemprop="url">maven</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-16T19:37:00.000Z" itemprop="datePublished"> 发表于 2015-07-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近重新认识了maven，尝试自己去从0开始<br>包括搭建maven私有仓库，配置maven，上传，编译，打包，脚本，构建自己的archtype等等<br>推荐maven的书 maven权威实战中文版  书是免费的 </p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/java/">java</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/maven/">maven</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/6/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/linux-shell/" style="font-size: 10px;">linux,shell</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>6</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

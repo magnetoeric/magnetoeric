@@ -1,0 +1,508 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>rabbitmq笔记 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="rabbitmq clusterqueue 的信息只在一台node上存储，其他节点不会存储，所有节点只知道queue的信息在这个node上，当这个node 挂掉之后，message将进入黑洞。单节点的rabbitmq是disk模式的，集群模式下，可以设置至少一个disk节点，其他节点设置为RAM模式，这样可以提高路由的性能，如果只有一个disk节点并且disk节点挂掉，创建queue，exchan">
+<meta name="keywords" content="rabbitmq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rabbitmq笔记">
+<meta property="og:url" content="http://magnetoeric.github.io/2017/03/03/rabbitmq_01/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="rabbitmq clusterqueue 的信息只在一台node上存储，其他节点不会存储，所有节点只知道queue的信息在这个node上，当这个node 挂掉之后，message将进入黑洞。单节点的rabbitmq是disk模式的，集群模式下，可以设置至少一个disk节点，其他节点设置为RAM模式，这样可以提高路由的性能，如果只有一个disk节点并且disk节点挂掉，创建queue，exchan">
+<meta property="og:updated_time" content="2017-04-12T05:19:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="rabbitmq笔记">
+<meta name="twitter:description" content="rabbitmq clusterqueue 的信息只在一台node上存储，其他节点不会存储，所有节点只知道queue的信息在这个node上，当这个node 挂掉之后，message将进入黑洞。单节点的rabbitmq是disk模式的，集群模式下，可以设置至少一个disk节点，其他节点设置为RAM模式，这样可以提高路由的性能，如果只有一个disk节点并且disk节点挂掉，创建queue，exchan">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/03/rabbitmq_01/" title="rabbitmq笔记" itemprop="url">rabbitmq笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-03T14:01:00.000Z" itemprop="datePublished"> Published 2017-03-03</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-cluster"><span class="toc-number">1.</span> <span class="toc-text">rabbitmq cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-reply-to"><span class="toc-number">2.</span> <span class="toc-text">rabbitmq reply_to</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-三种分布式方案"><span class="toc-number">3.</span> <span class="toc-text">rabbitmq 三种分布式方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-一些参数说明"><span class="toc-number">4.</span> <span class="toc-text">rabbitmq 一些参数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-number">5.</span> <span class="toc-text">其他</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="rabbitmq-cluster"><a href="#rabbitmq-cluster" class="headerlink" title="rabbitmq cluster"></a>rabbitmq cluster</h3><p>queue 的信息只在一台node上存储，其他节点不会存储，所有节点只知道queue的信息在这个node上，当这个node 挂掉之后，message将进入黑洞。<br>单节点的rabbitmq是disk模式的，集群模式下，可以设置至少一个disk节点，其他节点设置为RAM模式，这样可以提高路由的性能，<br>如果只有一个disk节点并且disk节点挂掉，创建queue，exchange，bings，添加user，修改permission，添加删除节点将会失败，直到disk节点恢复</p>
+<h3 id="rabbitmq-reply-to"><a href="#rabbitmq-reply-to" class="headerlink" title="rabbitmq reply_to"></a>rabbitmq reply_to</h3><p>rabbitmq 屏蔽了生产者和消费者，生产者不知道消费者是谁，同样消费者也不知道生产者是谁<br>但是如果生产者如果需要一个回复该如何解决？<br>在header中设置reply_to</p>
+<p>生产者声明临时匿名队列为exclusive，同时设置reply_to为接受队列名称。当然有时候计算比较大，消费者还需要确定生产者是否还在监听，<a href="http://www.rabbitmq.com/direct-reply-to.html" target="_blank" rel="external">direct-reply-to</a>中给出了一些建议</p>
+<h3 id="rabbitmq-三种分布式方案"><a href="#rabbitmq-三种分布式方案" class="headerlink" title="rabbitmq 三种分布式方案"></a>rabbitmq 三种分布式方案</h3><p>规约：<br>exchange 交换机<br>queue      队列<br>broker      中间服务器/服务器<br>cluster     集群<br>node       节点<br>route       路由</p>
+<p>RabbitMQ可以通过三种方法部署分布式系统：集群、联盟（federation）和shovel。</p>
+<p>集群通过连接多个机器组成单个逻辑中间服务器。机器之间通信要借助于Erlang的消息传输，要求集群中所有节点必须有相同的Erlang cookie；节点之间的网络必须是可靠的，且运行相同版本的RabbitMQ和Erlang。<br>虚拟主机、交换机、用户信息和权限会自动镜像到集群中各个节点。队列可能位于单个节点或镜像到多个节点。连接到任意节点的客户端能够看到集群中所有队列，即使该队列不位于连接节点上。<br>通常可以使用集群来提高可靠性和吞吐量，前提是在分布同一个区域内的机器，不支持网络分段。</p>
+<p>联盟允许单台服务器上的交换机或队列接收发布到另一台服务器上交换机或队列的消息，可以是单独机器或集群。服务器之间通过AMQP协议通信，因此两个联盟交换机或联盟队列要求设置相应的用户权限。<br>联盟交换机之间由单向点对点链接关联，默认消息只会由联盟链接转发一次，但允许有更复杂的路由拓扑来提高转发次数。消息也可以不进行转发；如果消息到达联盟交换机之后不会路由到队列，那么它再也不会被转发。<br>联盟队列类似于单向点对点连接，消息会在联盟队列之间转发任意次，直到被消费者接受。<br>通常使用联盟来连接internet上的中间服务器，用作订阅分发消息或工作队列。</p>
+<p>shovel连接方式与联盟的连接方式类似，但它工作在更低层次。shovel接受队列上的消息，转发到另一台服务器上的交换机。<br>shovel和联盟类似，但它比联盟提供更多控制。</p>
+<p>联盟/shovel vs 集群：<br>1）前者中间服务器逻辑分离，后者组成一个逻辑中间服务器；<br>2）前者可以运行不同版本RabbitMQ和Erlang，后者要求RabbitMQ和Erlang的版本保持一致；<br>3）前者可以分布在WAN上，采用AMQP协议通信，要求设置权限，后者必须分布在LAN上，结合Erlang内部节点通信，要求有相同的Erlang cookie；<br>4）前者的拓扑结构可自行设计，链接可以单向或双向，后者要求节点之间必须保持双向链接；<br>5）前者遵循CAP理论的可用性和分区容错性，后者遵循CAP理论的一致性和可用性（可选择一致性和分布容错性）；<br>6）前者服务器中的交换机可以选择联盟或本地，后者孤注一掷；<br>7）前者客户端只能看到所连接服务器上的队列，后者客户端可以看到所有节点的队列。</p>
+<p>Federation / Shovel 属于AP 系统(高可用性)   cluster属于CP系统(强一致性)</p>
+<p>参考：<a href="https://www.rabbitmq.com/distributed.html" target="_blank" rel="external">https://www.rabbitmq.com/distributed.html</a></p>
+<h3 id="rabbitmq-一些参数说明"><a href="#rabbitmq-一些参数说明" class="headerlink" title="rabbitmq 一些参数说明"></a>rabbitmq 一些参数说明</h3><p>为队列设置唯一消费者,设置exclusive参数,如果想设置临时队列，可以加入auto_delete参数<br>声明队列时，如果声明参数相同，rabbit不会做任何动作，如果参数不同，则会报错<br>生产者投递消息到exchange中后，如果没有被路由将会被抛弃(black holed)<br>消费者无法在订阅一个queue的时在同一个channel中声明其他queue<br>exchange type :fanout,direct,topic,header(性能问题，不常用)<br>重启后queue和exchange都会消失，原因是durable默认时false<br>message需要persitant参数，queue和exchange durable参数设置为true才能保证重启后不丢失<br>可以通过basic.ack做好事务,auto_ack会在消息到达后自动删除，所以消费者无法做事务</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>amqp connection 是建立在tcp之上的,由于tcp建立握手需要耗费过多的资源，所以引入了channel的概念，一个amqp connection可以建立无数个channels。<br>从queue中消费有两种方式，一种是basic.consume 一种是basic.get,consume会一直消费消息直到停止订阅，而get一次只消费一个消息，直到再次调用get才会消费下一个消息，<br>不要再循环中使用get，因为它每次都是订阅队列-&gt;消费一个消息-&gt;取消订阅<br>一个队列有多个消费者时，采用的是round robin方式分配消息</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/rabbitmq/">rabbitmq</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2017/03/03/rabbitmq_01/" data-title="rabbitmq笔记 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/02/10/nginx/" title="nginx笔记">
+  <strong>上一篇：</strong><br/>
+  <span>
+  nginx笔记</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/04/05/STOMP/"  title="STOMP">
+ <strong>下一篇：</strong><br/> 
+ <span>STOMP
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-cluster"><span class="toc-number">1.</span> <span class="toc-text">rabbitmq cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-reply-to"><span class="toc-number">2.</span> <span class="toc-text">rabbitmq reply_to</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-三种分布式方案"><span class="toc-number">3.</span> <span class="toc-text">rabbitmq 三种分布式方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rabbitmq-一些参数说明"><span class="toc-number">4.</span> <span class="toc-text">rabbitmq 一些参数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-number">5.</span> <span class="toc-text">其他</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">Tag Cloud</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

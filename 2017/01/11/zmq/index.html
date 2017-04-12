@@ -1,0 +1,497 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>0mq的一些尝试 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="安装http://zeromq.org/bindings:php需要libzmq-dev包 简单模式server12345678910111213141516171819202122232425&amp;lt;?php/**  Hello World server*  Binds REP socket to tcp://*:5555*  Expects &amp;quot;Hello&amp;quot; from cli">
+<meta name="keywords">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0mq的一些尝试">
+<meta property="og:url" content="http://magnetoeric.github.io/2017/01/11/zmq/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="安装http://zeromq.org/bindings:php需要libzmq-dev包 简单模式server12345678910111213141516171819202122232425&amp;lt;?php/**  Hello World server*  Binds REP socket to tcp://*:5555*  Expects &amp;quot;Hello&amp;quot; from cli">
+<meta property="og:updated_time" content="2017-04-12T04:52:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="0mq的一些尝试">
+<meta name="twitter:description" content="安装http://zeromq.org/bindings:php需要libzmq-dev包 简单模式server12345678910111213141516171819202122232425&amp;lt;?php/**  Hello World server*  Binds REP socket to tcp://*:5555*  Expects &amp;quot;Hello&amp;quot; from cli">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/01/11/zmq/" title="0mq的一些尝试" itemprop="url">0mq的一些尝试</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-11T12:30:00.000Z" itemprop="datePublished"> Published 2017-01-11</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装"><span class="toc-number">1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#简单模式"><span class="toc-number">2.</span> <span class="toc-text">简单模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#server"><span class="toc-number">2.1.</span> <span class="toc-text">server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#client"><span class="toc-number">2.2.</span> <span class="toc-text">client</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取0mq版本号"><span class="toc-number">3.</span> <span class="toc-text">获取0mq版本号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#发布-订阅模式"><span class="toc-number">4.</span> <span class="toc-text">发布-订阅模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#server-1"><span class="toc-number">4.1.</span> <span class="toc-text">server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#client-1"><span class="toc-number">4.2.</span> <span class="toc-text">client</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p><a href="http://zeromq.org/bindings:php" target="_blank" rel="external">http://zeromq.org/bindings:php</a><br>需要libzmq-dev包</p>
+<h2 id="简单模式"><a href="#简单模式" class="headerlink" title="简单模式"></a>简单模式</h2><h3 id="server"><a href="#server" class="headerlink" title="server"></a>server</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/*</div><div class="line">*  Hello World server</div><div class="line">*  Binds REP socket to tcp://*:5555</div><div class="line">*  Expects &quot;Hello&quot; from client, replies with &quot;World&quot;</div><div class="line">* @author Ian Barber &lt;ian(dot)barber(at)gmail(dot)com&gt;</div><div class="line">*/</div><div class="line"></div><div class="line">$context = new ZMQContext(1);</div><div class="line"></div><div class="line">//  Socket to talk to clients</div><div class="line">$responder = new ZMQSocket($context, ZMQ::SOCKET_REP);</div><div class="line">$responder-&gt;bind(&quot;tcp://*:5555&quot;);</div><div class="line"></div><div class="line">while (true) &#123;</div><div class="line">    //  Wait for next request from client</div><div class="line">    $request = $responder-&gt;recv();</div><div class="line">    printf (&quot;Received request: [%s]\n&quot;, $request);</div><div class="line"></div><div class="line">    //  Do some &apos;work&apos;</div><div class="line">    sleep (1);</div><div class="line"></div><div class="line">    //  Send reply back to client</div><div class="line">    $responder-&gt;send(&quot;World&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="client"><a href="#client" class="headerlink" title="client"></a>client</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/*</div><div class="line">*  Hello World client</div><div class="line">*  Connects REQ socket to tcp://localhost:5555</div><div class="line">*  Sends &quot;Hello&quot; to server, expects &quot;World&quot; back</div><div class="line">* @author Ian Barber &lt;ian(dot)barber(at)gmail(dot)com&gt;</div><div class="line">*/</div><div class="line"></div><div class="line">$context = new ZMQContext();</div><div class="line"></div><div class="line">//  Socket to talk to server</div><div class="line">echo &quot;Connecting to hello world server…\n&quot;;</div><div class="line">$requester = new ZMQSocket($context, ZMQ::SOCKET_REQ);</div><div class="line">$requester-&gt;connect(&quot;tcp://localhost:5555&quot;);</div><div class="line"></div><div class="line">for ($request_nbr = 0; $request_nbr != 10; $request_nbr++) &#123;</div><div class="line">    printf (&quot;Sending request %d…\n&quot;, $request_nbr);</div><div class="line">    $requester-&gt;send(&quot;Hello&quot;);</div><div class="line"></div><div class="line">    $reply = $requester-&gt;recv();</div><div class="line">    printf (&quot;Received reply %d: [%s]\n&quot;, $request_nbr, $reply);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="获取0mq版本号"><a href="#获取0mq版本号" class="headerlink" title="获取0mq版本号"></a>获取0mq版本号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/* Report 0MQ version</div><div class="line">*</div><div class="line">* @author Ian Barber &lt;ian(dot)barber(at)gmail(dot)com&gt;</div><div class="line">*/</div><div class="line"></div><div class="line">if (class_exists(&quot;ZMQ&quot;) &amp;&amp; defined(&quot;ZMQ::LIBZMQ_VER&quot;)) &#123;</div><div class="line">    echo ZMQ::LIBZMQ_VER, PHP_EOL;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="发布-订阅模式"><a href="#发布-订阅模式" class="headerlink" title="发布-订阅模式"></a>发布-订阅模式</h2><h3 id="server-1"><a href="#server-1" class="headerlink" title="server"></a>server</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/*</div><div class="line">*  Weather update server</div><div class="line">*  Binds PUB socket to tcp://*:5556</div><div class="line">*  Publishes random weather updates</div><div class="line">* @author Ian Barber &lt;ian(dot)barber(at)gmail(dot)com&gt;</div><div class="line">*/</div><div class="line"></div><div class="line">//  Prepare our context and publisher</div><div class="line">$context = new ZMQContext();</div><div class="line">$publisher = $context-&gt;getSocket(ZMQ::SOCKET_PUB);</div><div class="line">$publisher-&gt;bind(&quot;tcp://*:5556&quot;);</div><div class="line">$publisher-&gt;bind(&quot;ipc://weather.ipc&quot;);</div><div class="line"></div><div class="line">while (true) &#123;</div><div class="line">    //  Get values that will fool the boss</div><div class="line">    $zipcode     = mt_rand(0, 100000);</div><div class="line">    $temperature = mt_rand(-80, 135);</div><div class="line">    $relhumidity = mt_rand(10, 60);</div><div class="line"></div><div class="line">    //  Send message to all subscribers</div><div class="line">    $update = sprintf (&quot;%05d %d %d&quot;, $zipcode, $temperature, $relhumidity);</div><div class="line">    $publisher-&gt;send($update);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="client-1"><a href="#client-1" class="headerlink" title="client"></a>client</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/*</div><div class="line">*  Weather update client</div><div class="line">*  Connects SUB socket to tcp://localhost:5556</div><div class="line">*  Collects weather updates and finds avg temp in zipcode</div><div class="line">* @author Ian Barber &lt;ian(dot)barber(at)gmail(dot)com&gt;</div><div class="line">*/</div><div class="line"></div><div class="line">$context = new ZMQContext();</div><div class="line"></div><div class="line">//  Socket to talk to server</div><div class="line">echo &quot;Collecting updates from weather server…&quot;, PHP_EOL;</div><div class="line">$subscriber = new ZMQSocket($context, ZMQ::SOCKET_SUB);</div><div class="line">$subscriber-&gt;connect(&quot;tcp://localhost:5556&quot;);</div><div class="line"></div><div class="line">//  Subscribe to zipcode, default is NYC, 10001</div><div class="line">$filter = $_SERVER[&apos;argc&apos;] &gt; 1 ? $_SERVER[&apos;argv&apos;][1] : &quot;10001&quot;;</div><div class="line">$subscriber-&gt;setSockOpt(ZMQ::SOCKOPT_SUBSCRIBE, $filter);</div><div class="line"></div><div class="line">//  Process 100 updates</div><div class="line">$total_temp = 0;</div><div class="line">for ($update_nbr = 0; $update_nbr &lt; 100; $update_nbr++) &#123;</div><div class="line">    $string = $subscriber-&gt;recv();</div><div class="line">    sscanf ($string, &quot;%d %d %d&quot;, $zipcode, $temperature, $relhumidity);</div><div class="line">    $total_temp += $temperature;</div><div class="line">&#125;</div><div class="line">printf (&quot;Average temperature for zipcode &apos;%s&apos; was %dF\n&quot;,</div><div class="line">    $filter, (int) ($total_temp / $update_nbr));</div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>速度最快的消息中间件,支持各种客户端，缺点是不能保证消息丢失</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2017/01/11/zmq/" data-title="0mq的一些尝试 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/01/04/search/" title="常见搜索引擎的分布式解决方法">
+  <strong>上一篇：</strong><br/>
+  <span>
+  常见搜索引擎的分布式解决方法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/02/10/nginx/"  title="nginx笔记">
+ <strong>下一篇：</strong><br/> 
+ <span>nginx笔记
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装"><span class="toc-number">1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#简单模式"><span class="toc-number">2.</span> <span class="toc-text">简单模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#server"><span class="toc-number">2.1.</span> <span class="toc-text">server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#client"><span class="toc-number">2.2.</span> <span class="toc-text">client</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取0mq版本号"><span class="toc-number">3.</span> <span class="toc-text">获取0mq版本号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#发布-订阅模式"><span class="toc-number">4.</span> <span class="toc-text">发布-订阅模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#server-1"><span class="toc-number">4.1.</span> <span class="toc-text">server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#client-1"><span class="toc-number">4.2.</span> <span class="toc-text">client</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">Tag Cloud</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

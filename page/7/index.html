@@ -80,6 +80,146 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/08/10/linux_01/" title="ssh免密码登录" itemprop="url">ssh免密码登录</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T07:28:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>测试环境机器的密码实在是太复杂了（没有跳板机），每次登录都要去找密码，所以干脆弄个免密码登录吧<br>首先是本地机器，因为装有git，所以已经生成好rsa公钥私钥了<br>如果没有生成过，可以使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -t rsa</div></pre></td></tr></table></figure></p>
+<p>生成，连续回车就可以<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
+<p>会有输出，这就是生成的公钥<br>接下来登录到目标机器<br>执行如下操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo vi ~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<p>将生成的公钥内容粘贴到最下面即可</p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo 公钥内容 &gt;&gt; ~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<p>修改文件权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chmod 600 .ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<p>接下来在本地上就可以ssh免密码登录了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/10/mysqldump/" title="mysqldump" itemprop="url">mysqldump</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T02:28:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="mysqldump"><a href="#mysqldump" class="headerlink" title="mysqldump"></a>mysqldump</h2><p>测试环境数据寥寥无几，测试又不会批量生成数据,只能从备份数据库中拉出来一些小表的数据填充<br>命令行下具体用法如下： </p>
+<p>mysqldump -u用戶名 -p密码 -d 数据库名 表名 &gt; 脚本名</p>
+<ul>
+<li><p>导出整个数据库结构和数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump -h localhost -uroot -p123456 database &gt; dump.sql</div></pre></td></tr></table></figure>
+</li>
+<li><p>导出单个数据表结构和数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump -h localhost -uroot -p123456  database table &gt; dump.sql</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>问题来了,<br>Got error: 1044: Access denied for user ‘<strong>*</strong>‘ to database ‘<em>**</em>‘ when doing LOCK TABLES</p>
+<p>应该是数据库user的锁表权限问题,在导表时会锁表。加上–skip-lock-tables 就可以了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump -h localhost -uroot -p123456  --skip-lock-tables database table  &gt; dump.sql</div></pre></td></tr></table></figure></p>
+<h2 id="information-schema"><a href="#information-schema" class="headerlink" title="information_schema"></a>information_schema</h2><p>在对表做操作时,最好看一下表的一些信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from information_schema. tables where talbe_name = &apos;xxx&apos;;#真是醉了 这个sql竟然不让放到blog里，我把.tables中间加了个空格</div></pre></td></tr></table></figure>
+<p>关于information_schema,具体看<a href="http://en.wikipedia.org/wiki/Information_schema" target="_blank" rel="external">这里</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/mysql/">mysql</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/07/31/php-urlencode/" title="php urlencode" itemprop="url">php urlencode</a>
   </h1>
   <p class="article-author">By
@@ -653,278 +793,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/07/18/singleton/" title="单例模式" itemprop="url">单例模式</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-07-18T11:02:19.000Z" itemprop="datePublished"> Published 2015-07-18</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>经过良好设计的系统一般通过方法调用传递对象实例。通常单例使用与如下背景环境：<br>1.对象会被系统中的任何对象使用<br>2.对象不应该储存在会被修改的全局变量中<br>3.系统中不应该超过一个该对象，也就是说Y设置了X对象的属性，Z可以不通过其他对象，直接获取到该属性的值  </p>
-<p>因此，单例对象的构造方法应该是私有的  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Singleton&#123;</div><div class="line">	private $props = array();</div><div class="line">	private function __construct()&#123;</div><div class="line">	&#125;</div><div class="line">	public function setProperty($key,$value)&#123;</div><div class="line">	$this-&gt;props[$key] = $value;</div><div class="line">	&#125;</div><div class="line">	public function getProperty($key)&#123;</div><div class="line">	return $this-&gt;pros[$key];</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>但是这样是不能用的，因为构造方法是私有的。所以需要静态方法和静态属性来间接完成实例化。  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class Singleton&#123;</div><div class="line">	private $props = array();</div><div class="line">	private  static $instance;</div><div class="line">	private function __construct()&#123;</div><div class="line">	&#125;</div><div class="line">	public function setProperty($key,$value)&#123;</div><div class="line">	    $this-&gt;props[$key] = $value;</div><div class="line">	&#125;</div><div class="line">	public function getProperty($key)&#123;</div><div class="line">	    return $this-&gt;props[$key];</div><div class="line">	&#125;</div><div class="line">	public static function getInstance()&#123;</div><div class="line">	if(empty(self::$instance))&#123;</div><div class="line">		self::$instance = new Singleton();</div><div class="line">	&#125;</div><div class="line">	return self::$instance;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>单例模式和全局变量依然会被误用，因为它可以在任何地方被使用，所以很难调试它的依赖关系（比如公司的框架，对pdo进行了封装，而在对某些语句进行跟踪调试时，就变的困难了，因为不只是一处去调用该模块）<br>关于单例模式，java中有很多种实现方式，每一种都有自己的优缺点，另外java中有时候单例模式有时候会失效，这些都是语言层级了，就不多写了</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/patterns/">patterns</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/singleton/">singleton</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/07/17/varnish/" title="varnish" itemprop="url">varnish</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-07-17T03:45:00.000Z" itemprop="datePublished"> Published 2015-07-17</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="关于Varnish"><a href="#关于Varnish" class="headerlink" title="关于Varnish"></a>关于Varnish</h2><ul>
-<li>高性能的开源HTTP加速器</li>
-<li>基于内存进行缓存，重启后数据将消失</li>
-<li>利用虚拟内存方式，I/O性能好</li>
-<li>配置语言VCL(Varnish Configuration Language) 灵活管理配置.<br>  在程序启动时，varnish就把VCL转换成二进制代码，因此性能非常高</li>
-</ul>
-<hr>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>略。注意安装依赖，有些命令需要安装依赖   </p>
-<hr>
-<h2 id="varnish-启动"><a href="#varnish-启动" class="headerlink" title="varnish 启动"></a>varnish 启动</h2><ul>
-<li><p>一个启动的例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">sudo /usr/local/varnish/sbin/varnishd \</div><div class="line">-u www -g www \</div><div class="line">-f /usr/local/varnish/etc/varnish/default.vcl \</div><div class="line">-a 127.0.0.1:8080 \</div><div class="line">-s file,/var/www/varnish_cache.data,1G \</div><div class="line">-w 1024,2048,10 \</div><div class="line">-t 3600 \</div><div class="line">-T 127.0.0.1:2000</div></pre></td></tr></table></figure>
-</li>
-<li><p>说明</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">u 用户名</div><div class="line">g 所属组</div><div class="line">f 配置文件地址</div><div class="line">a 绑定地址及端口</div><div class="line">s 缓存文件地址及大小</div><div class="line">w 最大最小线程 及超时时间</div><div class="line">T 管理端口  主要用来清除缓存</div><div class="line">t 默认缓存时间</div></pre></td></tr></table></figure>
-</li>
-<li><p>结束 </p>
-<pre><code>`sudo pkill varnishd`
-</code></pre></li>
-</ul>
-<hr>
-<h2 id="管理命令-varnishadm"><a href="#管理命令-varnishadm" class="headerlink" title="管理命令 varnishadm"></a>管理命令 varnishadm</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">/usr/local/varnish/bin/varnishadm -T 127.0.0.1:2000 -S /etc/varnish/secret help 查看可用的命令列表 -S 参数为指定密码文件</div><div class="line">vcl.load default.vcl /etc/varnish/default.vcl 载入新vcl配置文件</div><div class="line">vcl.list 查看已有的配置列表</div><div class="line">vcl.use default.vcl 使用加载的配置文件</div><div class="line">ban.url ^hello.php$ 清除hello.php的缓存</div><div class="line">start 启动</div><div class="line">stop 关闭</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="其他命令"><a href="#其他命令" class="headerlink" title="其他命令"></a>其他命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">varnishlog 日志</div><div class="line">varnishstat 状态 ：命中等</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="VCL"><a href="#VCL" class="headerlink" title="VCL"></a>VCL</h2><p>1.三个重要的数据结构  </p>
-<blockquote>
-<ul>
-<li>req<br>  请求头信息  当varnish接收到请求的时候 req会被创建</li>
-<li>beresp<br>  后端返回对象  包含从backend返回的头信息 </li>
-<li>obj<br>  缓存了的对象。大多数是驻留在内存中的只读对象。obj.ttl是可以写的，剩下的都是只读的</li>
-</ul>
-</blockquote>
-<p>更多变量点<a href="https://www.varnish-cache.org/docs/3.0/reference/vcl.html#variables" target="_blank" rel="external">这里</a></p>
-<p>2.子程序<br>VCL 文件被分为多个子程序 常用子程序</p>
-<blockquote>
-<ul>
-<li>vcl_recv 当有访问时，varnish会执行该子程序，该程序通过对req的一些参数进行处理，决定接下来的动作 这里只能访问到req数据结构<br>   一般以以下3种动作结束<ul>
-<li>pass：执行pass动作,把请求交给vcl_pass模块处理。</li>
-<li>pipe：执行pipe动作，把请求交给vcl_pipe模块处理。</li>
-<li>error code [reason]：表示把错误标识返回给客户端，并放弃处理该请求。错误标识包括200、405等。”reason”是对错误的提示信息。</li>
-</ul>
-</li>
-<li>vcl_fetch  当varnish成功从后端返回数据时,执行该子程序 这里既能访问req 也能访问beresp</li>
-<li>vcl_pipe 执行pipe动作时调用,用于将请求直接传递至后端主机，在请求和返回的内容没有改变的情况下，<br>  也就是在当前连接未关闭时，服务器将不变的内容返回给客户端，直到该连接被关闭</li>
-<li>lookup 一个请求在vcl_recv中被lookup后，Varnish将在缓存中提取数据。<br>  如果缓存中有相应的数据，就把控制权交给vcl_hit子程序；<br>  如果缓存中没有相应的数据，请求将被设置为pass并将其交给vcl_miss子程序</li>
-</ul>
-</blockquote>
-<p>varnish 将在不同阶段执行它的子程序代码，因为它的代码是一行一行执行的，不存在优先级问题。随时可以调用这个子程序中的功能并且当他执行完成后就退出。</p>
-<p>3.动作(action)：</p>
-<blockquote>
-<ul>
-<li>pass： 当一个请求被 pass 后，这个请求将通过 varnish 转发到后端服务器，但是它不会被缓存。pass 可以放在 vcl_recv 和 vcl_fetch 中。</li>
-<li>lookup： 当一个请求在 vcl_recv 中被 lookup 后，varnish 将从缓存中提取数据，如果缓存中没有数据，将被设置为 pass，不能在 vcl_fetch 中设置 lookup。</li>
-<li>pipe： pipe 和 pass 相似，都要访问后端服务器，不过当进入 pipe     模式后，在此连接未关闭前，后续的所有请求都发到后端服务器，而pass只对当前的传输有效，后续的请求会根据策略决定是否发送到客户端</li>
-<li>deliver： 请求的目标被缓存，然后发送给客户端。</li>
-<li>esi： ESI-process the fetched document (Edge Side Includes ，使用varnish+esi<br>  可以对用户个性化相关的进行缓存，而我们通常的做法是使用ajax+memcache对用户个性化的内容进行缓存 <a href="https://www.varnish-cache.org/trac/wiki/VCLExampleCachingLoggedInUsers" target="_blank" rel="external">官方文档</a>）</li>
-</ul>
-</blockquote>
-<hr>
-<h2 id="处理流程"><a href="#处理流程" class="headerlink" title="处理流程"></a>处理流程</h2><p>  <img src="http://githubforericwang.qiniudn.com/hexo/eric/process.jpg" alt="image"></p>
-<hr>
-<h2 id="http头信息"><a href="#http头信息" class="headerlink" title="http头信息"></a>http头信息</h2><p>HTTP协议定义了四个可以用来控制浏览器缓存的HTTP头，它们是：</p>
-<blockquote>
-<ul>
-<li>Last-Modified</li>
-<li>Expires</li>
-<li>Pragma: no-cache</li>
-<li>Cache-Control</li>
-</ul>
-</blockquote>
-<p>在HTTP/1.0协议中:</p>
-<blockquote>
-<ul>
-<li>Last-Modified是控制缓存的一个非常重要的HTTP头。<br>  如果需要控制浏览器的缓存，服务器首先必须发送一个 以UTC时间为值的Last-Modifeid头，<br>  当第二次访问这个页面时，浏览器会发送一个If-Modified-Since头给服务器，让服务器判断是否有必要更新内容，<br>  这个If-Modified-Since头的值就是上次访问页面时，浏览器发送的Last-Modifeid头的值。</li>
-<li>Expires是HTTP/1.0中另外一个很重要的HTTP头，它表示缓存的存在时间，<br>  告诉客户端浏览器在这个时间之前不对服务器发送请求，而直接使用浏览器的缓存。<br>  在HTTP/1.0中，可以使用Pragma: no-cache头来告诉浏览器不要缓存内容，<br>  它相当于HTTP/1.1中的Cache-Control:no-cache</li>
-</ul>
-</blockquote>
-<p>HTTP/1.0协议的这种实现方式的缺点是，服务器和客户端的时间有可能是不同步的，<br>这样会造成缓存的实现达不到预期效果。HTTP/1.1协议用Cache-Control头解决了这个问题</p>
-<p>在http 1.1中<br>Cache-Control响应头的语法为：Cache-Control = “Cache-Control” “:”{缓存响应指令}<br>缓存响应指令为一下几个中的任意一个：</p>
-<ul>
-<li><p>public 指示响应数据可以被任何客户端缓存</p>
-</li>
-<li><p>private 指示响应数据可以被非共享缓存所缓存。这表明响应的数据可以被发送请求的浏览器缓存，而不能被中介所缓存</p>
-</li>
-<li><p>no-cache  指示响应数据不能被任何接受响应的客户端所缓存</p>
-</li>
-<li><p>no-store 指示所传送的响应数据除了不能被缓存，也不能存入磁盘。一般用于敏感数据，以免数据被复制。</p>
-</li>
-<li><p>must-revalidate 指示所有的缓存都必须重新验证，<br>在这个过程中，浏览器会发送一个If-Modified-Since头。<br>如果服务器程序验证得出当前的响应数据为最新的数 据，那么服务器应当返回一个304</p>
-</li>
-<li><p>proxy-revalidate 与must-revalidate相似，不同的是用来指示共享缓存</p>
-</li>
-<li><p>max-age=时间  数据经过max-age设置的秒数后就会失效，<br> 相当于HTTP/1.0中的Expires头。<br> 如果在一次响应中同时设置了max-age和Expires，那么max-age将具有较高的优先级</p>
-</li>
-<li><p>s-maxage=时间 与max-age相似，不同的是用来指示共享缓存。<br>注：通过POST方法发送的请求不能以如上所述的方式缓存</p>
-</li>
-</ul>
-<p>可以在使用浏览器发送如下信息头</p>
-<blockquote>
-<ul>
-<li><p>当我们在浏览器中输入url网址时，如果有过该网址的访问记录，浏览器会判断 max-age，如果没有会发送If-Modified-Since头信息，服务器去处理是否有更新<br>  有些内容有max-age，浏览器不会发送请求，使用浏览器缓存,Chrome返回的状态码是200 OK (from cache)，firefox没有请求。</p>
-</li>
-<li><p>当我们按下F5时,浏览器会发送If-Modified-Since，max-age=0 头信息 这样服务器就会返回其最新内容(如果有varnish缓存的话,只返回varnish缓存)</p>
-</li>
-<li><p>当我们按下Control + F5，强刷，浏览器会发送 Pragma: no-cache，Cache-Control: no-cache信息头 如果在vcl中对这类信息头做处理，就可以刷新varnish缓存<br>  这在生产环境中很适用，但是在线上环境中所有人都可以通过强制刷新varnish.所以需要使用白名单允许一些ip可以清除缓存,通常Cache-Control:nocache 是被varnish忽略的,根据自身需要处理</p>
-</li>
-</ul>
-</blockquote>
-<p>当然也可以写代码发送请求，或是使用浏览器插件比如livehttpheader或者使用curl命令</p>
-<hr>
-<h2 id="清除缓存"><a href="#清除缓存" class="headerlink" title="清除缓存"></a>清除缓存</h2><p> 1.这两个规则定义了允许哪些主机通过HTTP来执行PURGE进行缓存删除。如果不是指定的IP，就会出现HTTP 405错误，提示Not allowed错误字样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"> acl purge &#123;  </div><div class="line">       &quot;localhost&quot;;  </div><div class="line">       &quot;127.0.0.1&quot;;  </div><div class="line">    &#125;  </div><div class="line">if (req.request == &quot;PURGE&quot;) &#123;  </div><div class="line">               if (!client.ip ～ purge) &#123;  </div><div class="line">                       error 405 &quot;Not allowed.&quot;;  </div><div class="line">               &#125;  </div><div class="line">               return(lookup);  </div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
-<p> 2.varnishadm ban.url [regexp] 不需要加域名</p>
-<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
-<li><p>如果backend返回的头信息中包含setcookie,varnish不会对此缓存，一般会在vcl中unset掉backend header产生的cookie <a href="https://www.varnish-cache.org/docs/3.0/tutorial/increasing_your_hitrate.html#tutorial-increasing-your-hitrate" target="_blank" rel="external">更多请看这里</a></p>
-<p>  php中有两种set cookie方法：<br>  一种是header(string,replace,http_response_code),<br>  一种是setCookie(name,value,expire,path,domain,secure)<br>  setCookie设置的cookie,Varnish会缓存吗?（其实是一样的）</p>
-</li>
-<li><p>如果varnish看到授权头信息(Authorization)时，它会pass该请求。可以unset这个头信息</p>
-</li>
-<li><p>当几个客户端正访问相同页面时，varnish会发送一个请求到后端，然后让那个其他几个请求挂起等待返回结果，<br>  返回结果后，复制请求的结果发送给客户端并且让其他请求等待,<br>  但是如果，每秒上千的请求同时呢?（这个队列很庞大），这时候我们期待的应该是，返回过期的cache给用户<br>  为了使用过期的cache给用户提供服务，我们需要增加他们的TTL，保存所有cache中的内容在TTL过期以后30分钟不删除，<br>  使用以下VCL：</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sub vcl_fetch &#123;</div><div class="line">  set beresp.grace = 30m;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p>  Varnish还不会使用过期的目标给用户提供服务，所以我们需要配置以下代码，在cache过期后的15秒内，使用旧的内容提供服务：</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sub vcl_recv &#123;</div><div class="line">    set req.grace = 15s;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>如果后端出了问题，是不是不应该返回问题的页面，而应该返回就版本的正常页面，可以开启健康检查，如果后端出问题了，可以长时间提供旧版本的内容</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">if (! req.backend.healthy) &#123;</div><div class="line">   set req.grace = 5m;</div><div class="line">&#125; else &#123;</div><div class="line">   set req.grace = 15s;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>说一下我遇到的一些坑吧,毕竟不是运维人员,很多监控还不是很懂，所以只是说一些代码层面上的。</p>
-<ul>
-<li><p>一般来说varnish是要将后端返回的header头的cookie信息重置掉,这样可以高效地利用缓存。<br>这种方式带来的后果就是：<br>由于Varnish 是一个HTTP缓存服务器,也就是说它是直接和浏览器打交道的,更通俗点,Varnish缓存的内容是直接被浏览器解析的!<br>所以 不要在后端服务器中返回带有状态的代码！Varnish对于所有用户访问的同一链接,返回的都是同一个内容。<br>如果你在后端返回的信息存在cookie,并且在Varnish中将cookie干掉了,就会导致,一个用户的行为被Varnish缓存住了,其他用户也被动地进行了这个行为。<br>通常解决这种方式的做法是使用ajax。</p>
-</li>
-<li><p>varnish 配置文件是允许重复配置同一个动作的,但是只是先加载的有效= =#。所以注意这个坑(已测试)</p>
-</li>
-<li><p>由于我们的业务需要,测试环境是穿透varnish的，也就是白名单,所以很多时候,内网会泄漏掉varnish的很多东西<br>这时候需要使用一些外网IP，挂代理取检测网站内容了（不过要小心,外网代理的策略有可能是把整个网页缓存了）</p>
-</li>
-<li>由于Varnish会对每一个url地址做缓存,为了不必要的浪费,一般是对某个url做截断处理<br>(比如:http:www.baidu.com/?a=1&amp;b=1 和http:www.baidu.com/ 缓存的应该是同一个副本)</li>
-</ul>
-<hr>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><blockquote>
-<ul>
-<li><a href="http://anykoro.sinaapp.com/2012/01/31/varnish3-0中文入门教程/" target="_blank" rel="external">http://anykoro.sinaapp.com/2012/01/31/varnish3-0中文入门教程/</a></li>
-<li><a href="https://www.varnish-cache.org/docs/3.0/" target="_blank" rel="external">https://www.varnish-cache.org/docs/3.0/</a></li>
-<li><a href="https://www.varnish-software.com/static/book/HTTP.html" target="_blank" rel="external">https://www.varnish-software.com/static/book/HTTP.html</a></li>
-</ul>
-</blockquote>
-<p>以前分享的文章， 放到博客里吧</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/http/">http</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/varnish/">varnish</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/6/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/8/">Next<span></span></a>
@@ -941,7 +809,7 @@
   <div class="tagcloudlist">
     <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
@@ -992,6 +860,10 @@
 		  
 		
 		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
 		  
 		
@@ -1000,7 +872,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
 		  
 		
 		  

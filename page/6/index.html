@@ -80,6 +80,133 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/08/10/linux_04/" title="如何正确删除大文件" itemprop="url">如何正确删除大文件</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T09:47:01.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="小记"><a href="#小记" class="headerlink" title="小记"></a>小记</h2><p>今天在迁移脚本时发现了一个运行了2个月的脚本，死循环了- -。写了一大堆垃圾日志<br>然后无脑地去vim log文件，shell挂掉了。。。<br>重新登录到服务器，ll看了下，25G，难怪。停掉了脚本，删除日志。<br><code>rm xxx.log</code>，用时2分钟。shell就卡在那里。<br>后来问了一下马大神，如何提高删除的姿势，马大神说：’echo‘。<br>在自己机器上写了个30G的垃圾文件,然后<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">echo &apos;&apos;&gt;xxx.log</div><div class="line">rm xxx.log</div></pre></td></tr></table></figure></p>
+<p>秒删。</p>
+<p>rm删除的原理是通过释放文件占用的索引节点和数据块达到 “删除”，所以在删除大文件时做的‘工作’会很多。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/10/php_02/" title="php strtotime" itemprop="url">php strtotime</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T09:41:53.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="2014的最后一天"><a href="#2014的最后一天" class="headerlink" title="2014的最后一天"></a>2014的最后一天</h2><p>2014最后一天,写点有意思的吧</p>
+<h2 id="strtotime"><a href="#strtotime" class="headerlink" title="strtotime"></a>strtotime</h2><p>Parse about any English textual datetime description into a Unix timestamp<br>它是将英文文本转换成时间戳，说一下以前在循环生成当前月份的前36个月均价时遇到的问题,刚好今天是31号，很容易就会发现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php -r &apos;echo date(&quot;Ym&quot;,strtotime(&quot;-1 month&quot;,time()));&apos;</div></pre></td></tr></table></figure></p>
+<p>显示的是201412 而不是期望的201411</p>
+<p>strtotime在月份为31天的月里，都会出现问题,所以在寻找当前月份的前几月时，需要指定当前月的第一天<br>第一种是我当时的写法，今天发现第二种方式也可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">date(&apos;Ym&apos;,strtotime(&quot;$i months &quot;.date(&apos;Y-m-01&apos;, time())));</div><div class="line">date(&quot;Ym&quot;,strtotime(&quot;first day of -$i month&quot;,time()))</div></pre></td></tr></table></figure>
+<p>stackoverflow上也有同样的问题,解决方式是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">strtotime(date(&apos;Y-m&apos;,time()) . &apos;-01 00:00:01&apos;)</div></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/08/10/php_01/" title="生成N个不重复的随机数" itemprop="url">生成N个不重复的随机数</a>
   </h1>
   <p class="article-author">By
@@ -440,105 +567,6 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/08/10/pro_git/" title="git" itemprop="url">git</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>买个kindle,下了点书,上下班路上就可以看书了.来到ajk后,版本控制一直使用的是git</p>
-<h2 id="Pro-Git"><a href="#Pro-Git" class="headerlink" title="Pro Git"></a>Pro Git</h2><p><img src="http://githubforericwang.qiniudn.com//hexo/eric/pro_git.jpg" alt="image"><br>强烈推荐这本书,解释的很详尽透彻。附上<a href="http://www.amazon.cn/Pro-Git-Chacon-Scott/dp/1430218339/ref=sr_1_2?ie=UTF8&amp;qid=1412999771&amp;sr=8-2&amp;keywords=pro+git" target="_blank" rel="external">亚马逊</a>地址</p>
-<hr>
-<h2 id="Git-内部原理"><a href="#Git-内部原理" class="headerlink" title="Git 内部原理"></a>Git 内部原理</h2><p>直接跳到这里吧,git的使用实在不想多写了。<br>从根本上来讲 Git 是一套内容寻址 (content-addressable) 文件系统，在此之上提供了一个 VCS 用户界面。<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/objects.jpg" alt="image"><br>每个目录都创建了 tree对象 (包括根目录), 每个文件都创建了一个对应的 blob对象 . 最后有一个 commit对象 来指向根tree对象(root of trees), 这样我们就可以追踪项目每一项提交内容.</p>
-<ul>
-<li>blob </li>
-</ul>
-<p>存储的并不是文件名而仅仅是文件内容。这种对象类型称为 blob 。（git会为每一个改动后的文件生成一个blob,也就是一些文章中所说的快照）</p>
-<ul>
-<li>tree </li>
-</ul>
-<p>tree对象可以存储文件名，同时也允许存储一组文件。Git 以一种类似 UNIX 文件系统但更简单的方式来存储内容。所有内容以 tree 或 blob<br>对象存储，其中 tree 对象对应于 UNIX 中的目录，blob 对象则大致对应于 inodes 或文件内容。一个单独的 tree 对象包含一条或多条<br>tree 记录，每一条记录含有一个指向 blob 或子 tree 对象的 SHA-1 指针，并附有该对象的权限模式 (mode)、类型和文件名信息</p>
-<ul>
-<li>commit </li>
-</ul>
-<p>commit对象格式很简单：指明了该时间点项目快照的顶层树对象、作者/提交者信息（从 Git 设理发店的 user.name 和user.email中获得)<br>以及当前时间戳、一个空行，以及提交注释信息。</p>
-<p>这三类 Git 对象 ── blob，tree 以及 tree ── 都各自以文件的方式保存在.git/objects 目录下。<br>可以在 objects 目录下看到这些文件。这便是 Git 存储数据内容的方式──为每份内容生成一个文件，取得该内容与头信息的 SHA-1 校验和，创建以该校验和前2个字符为名称的子目录，并以 (校验和) 剩下 38 个字符为文件命名 (保存至子目录下)。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>下面来尝试解释一下git的运行吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git init #初始化git</div><div class="line">$ ls -al #可以看到当前目录下产生了一个.git目录</div></pre></td></tr></table></figure></p>
-<p>看一下.git的目录结构<br>git 的本地化配置(git config –local 产生的配置会写到.git/config<br>.git/objects 里面会存储SHA-1码的一些东西<br>.git/HEAD 存储的是当前工作中的分支指针<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">$ find .git/ </div><div class="line">.git/</div><div class="line">.git/hooks</div><div class="line">.git/hooks/post-update.sample</div><div class="line">.git/hooks/pre-rebase.sample</div><div class="line">.git/hooks/pre-applypatch.sample</div><div class="line">.git/hooks/commit-msg.sample</div><div class="line">.git/hooks/applypatch-msg.sample</div><div class="line">.git/hooks/pre-push.sample</div><div class="line">.git/hooks/pre-commit.sample</div><div class="line">.git/hooks/prepare-commit-msg.sample</div><div class="line">.git/hooks/update.sample</div><div class="line">.git/config </div><div class="line">.git/description</div><div class="line">.git/objects </div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack </div><div class="line">.git/info</div><div class="line">.git/info/exclude</div><div class="line">.git/refs</div><div class="line">.git/refs/heads</div><div class="line">.git/refs/tags</div><div class="line">.git/branches</div><div class="line">.git/HEAD</div></pre></td></tr></table></figure></p>
-<p>创建README并写入hello world<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$echo &apos;hello word&apos; &gt; README.md</div></pre></td></tr></table></figure></p>
-<p>添加到暂存区<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ git add README.md</div><div class="line">$ git commit -m &apos;first commit&apos;</div><div class="line">[master （根提交） d2a03d1] first commit</div><div class="line"> 1 file changed, 1 insertion(+)</div><div class="line"> create mode 100644 README.md</div></pre></td></tr></table></figure></p>
-<p>查看暂存区中的提交<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$git log</div><div class="line">commit d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">Author: ericwang &lt;orange.king@qq.com&gt;</div><div class="line">Date:   Sat Oct 11 18:31:36 2014 +0800</div><div class="line"></div><div class="line">    first commit</div></pre></td></tr></table></figure></p>
-<p>查看.git/objects<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">$ find .git/objects/</div><div class="line">.git/objects/</div><div class="line">.git/objects/73</div><div class="line">.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack</div><div class="line">.git/objects/7f</div><div class="line">.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">.git/objects/d2</div><div class="line">.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7</div></pre></td></tr></table></figure></p>
-<p>生成了3个文件</p>
-<ul>
-<li>.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7 </li>
-<li>.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</li>
-<li>.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a </li>
-</ul>
-<p>可以看到 commit d2a03d1cece536133c49d3ea8f6c503c778307f7 对应的是.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7文件<br>其SHA-1码被拆分成2部分,第一部分是SHA-1码的前两位作为目录名,第二部分是剩下的38位作为文件名</p>
-<p>查看commit对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ git cat-file  -p d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">tree 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413023496 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413023496 +0800</div><div class="line"></div><div class="line">first commit</div></pre></td></tr></table></figure></p>
-<p>tree对象的SHA-1码为 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a<br>对应的是 .git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a<br>继续查看tree对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">100644 blob 7fd5222177e8ffadda6437dc9cfa0630a2777673    README.md</div></pre></td></tr></table></figure></p>
-<p>blob对象的SHA-1码为7fd5222177e8ffadda6437dc9cfa0630a2777673<br>对应的是.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673文件<br>查看blob对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 7fd5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">hello word</div></pre></td></tr></table></figure></p>
-<p>其存储的是就是我们最初写入的文本内容<br>下面继续向README.md中写入内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ echo 2 &gt;&gt;README.md</div><div class="line">$ git add .</div><div class="line">$ git commit -m &apos;second commit&apos;</div><div class="line">[master 897276c] second commit</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure></p>
-<p>生成了新的commit 对象 897276c61b6e00005f66a6b16477e872835b5408<br>查看新的commit对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 897276c61b6e00005f66a6b16477e872835b5408</div><div class="line">tree 6f44b87201208be6247b73708470d2b6266b7063</div><div class="line">parent d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413027193 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413027193 +0800</div><div class="line"></div><div class="line">second commit</div></pre></td></tr></table></figure></p>
-<p>其父commit是我们第一次的commit,tree对象是6f44b87201208be6247b73708470d2b6266b7063,<br>查看tree对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 6f44b87201208be6247b73708470d2b6266b7063</div><div class="line">100644 blob d0a2ec18682f4d54a2507c0d0275248dc2d8dad2    README.md</div></pre></td></tr></table></figure></p>
-<p>查看blob对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p d0a2ec18682f4d54a2507c0d0275248dc2d8dad2</div><div class="line">hello word</div><div class="line">2</div></pre></td></tr></table></figure></p>
-<p>可以看到,git为改动后的README.md生成了新的blob,区别于第一次提交产生的blob<br>查看.git/objects/下也可以看到，git为改动后的该文件新生成了1个commit,1个tree,1个blob<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">$ find .git/objects/</div><div class="line">.git/objects/</div><div class="line">.git/objects/73</div><div class="line">.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">.git/objects/6f</div><div class="line">.git/objects/6f/44b87201208be6247b73708470d2b6266b7063</div><div class="line">.git/objects/89</div><div class="line">.git/objects/89/7276c61b6e00005f66a6b16477e872835b5408</div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack</div><div class="line">.git/objects/d0</div><div class="line">.git/objects/d0/a2ec18682f4d54a2507c0d0275248dc2d8dad2</div><div class="line">.git/objects/7f</div><div class="line">.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">.git/objects/d2</div><div class="line">.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7</div></pre></td></tr></table></figure></p>
-<p>接着 新建文件并写入内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">$ echo &apos;new file content&apos; &gt;newfile</div><div class="line">$ git add .</div><div class="line">$ git commit -m &apos;third commit&apos;</div><div class="line">[master e1107b4] third commit</div><div class="line"> 1 file changed, 1 insertion(+)</div><div class="line"> create mode 100644 newfile</div><div class="line">$ git cat-file -p e1107b460be89af8d508ac972270237d2f1c530f</div><div class="line">tree 4c4d45c5a7485c475fd8fd1b53d26fddcf18f0cd</div><div class="line">parent 897276c61b6e00005f66a6b16477e872835b5408</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413028137 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413028137 +0800</div><div class="line"></div><div class="line">third commit</div><div class="line">$ git cat-file -p 4c4d45c5a7485c475fd8fd1b53d26fddcf18f0cd</div><div class="line">100644 blob d0a2ec18682f4d54a2507c0d0275248dc2d8dad2    README.md</div><div class="line">100644 blob 8e66654a5477b1bf4765946147c49509a431f963    newfile</div></pre></td></tr></table></figure></p>
-<p>第三次提交中对应的tree对象有两个blob,我们没有对README.md进行修改,所以git并没有为它新生成一个blob,而是继续使用原有的blob<br>画个图比较直观一些，画风不怎么样,哈哈<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/commits.png" alt="image"><br>实际上,项目中的git对象关系远比这复杂的多,很多tree对象有很多子tree,子tree中又包含很多blob,blob存储的是某次文件修改生成的快照</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/git/">git</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
       <a href="/2015/08/10/nginx_01/" title="nginx安装" itemprop="url">nginx安装</a>
   </h1>
   <p class="article-author">By
@@ -695,26 +723,59 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/08/10/linux_01/" title="ssh免密码登录" itemprop="url">ssh免密码登录</a>
+      <a href="/2015/08/10/pro_git/" title="git" itemprop="url">git</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T07:28:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p>测试环境机器的密码实在是太复杂了（没有跳板机），每次登录都要去找密码，所以干脆弄个免密码登录吧<br>首先是本地机器，因为装有git，所以已经生成好rsa公钥私钥了<br>如果没有生成过，可以使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -t rsa</div></pre></td></tr></table></figure></p>
-<p>生成，连续回车就可以<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
-<p>会有输出，这就是生成的公钥<br>接下来登录到目标机器<br>执行如下操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo vi ~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
-<p>将生成的公钥内容粘贴到最下面即可</p>
-<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo 公钥内容 &gt;&gt; ~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
-<p>修改文件权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chmod 600 .ssh/authorized_keys</div></pre></td></tr></table></figure></p>
-<p>接下来在本地上就可以ssh免密码登录了</p>
+        <p>买个kindle,下了点书,上下班路上就可以看书了.来到ajk后,版本控制一直使用的是git</p>
+<h2 id="Pro-Git"><a href="#Pro-Git" class="headerlink" title="Pro Git"></a>Pro Git</h2><p><img src="http://githubforericwang.qiniudn.com//hexo/eric/pro_git.jpg" alt="image"><br>强烈推荐这本书,解释的很详尽透彻。附上<a href="http://www.amazon.cn/Pro-Git-Chacon-Scott/dp/1430218339/ref=sr_1_2?ie=UTF8&amp;qid=1412999771&amp;sr=8-2&amp;keywords=pro+git" target="_blank" rel="external">亚马逊</a>地址</p>
+<hr>
+<h2 id="Git-内部原理"><a href="#Git-内部原理" class="headerlink" title="Git 内部原理"></a>Git 内部原理</h2><p>直接跳到这里吧,git的使用实在不想多写了。<br>从根本上来讲 Git 是一套内容寻址 (content-addressable) 文件系统，在此之上提供了一个 VCS 用户界面。<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/objects.jpg" alt="image"><br>每个目录都创建了 tree对象 (包括根目录), 每个文件都创建了一个对应的 blob对象 . 最后有一个 commit对象 来指向根tree对象(root of trees), 这样我们就可以追踪项目每一项提交内容.</p>
+<ul>
+<li>blob </li>
+</ul>
+<p>存储的并不是文件名而仅仅是文件内容。这种对象类型称为 blob 。（git会为每一个改动后的文件生成一个blob,也就是一些文章中所说的快照）</p>
+<ul>
+<li>tree </li>
+</ul>
+<p>tree对象可以存储文件名，同时也允许存储一组文件。Git 以一种类似 UNIX 文件系统但更简单的方式来存储内容。所有内容以 tree 或 blob<br>对象存储，其中 tree 对象对应于 UNIX 中的目录，blob 对象则大致对应于 inodes 或文件内容。一个单独的 tree 对象包含一条或多条<br>tree 记录，每一条记录含有一个指向 blob 或子 tree 对象的 SHA-1 指针，并附有该对象的权限模式 (mode)、类型和文件名信息</p>
+<ul>
+<li>commit </li>
+</ul>
+<p>commit对象格式很简单：指明了该时间点项目快照的顶层树对象、作者/提交者信息（从 Git 设理发店的 user.name 和user.email中获得)<br>以及当前时间戳、一个空行，以及提交注释信息。</p>
+<p>这三类 Git 对象 ── blob，tree 以及 tree ── 都各自以文件的方式保存在.git/objects 目录下。<br>可以在 objects 目录下看到这些文件。这便是 Git 存储数据内容的方式──为每份内容生成一个文件，取得该内容与头信息的 SHA-1 校验和，创建以该校验和前2个字符为名称的子目录，并以 (校验和) 剩下 38 个字符为文件命名 (保存至子目录下)。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>下面来尝试解释一下git的运行吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git init #初始化git</div><div class="line">$ ls -al #可以看到当前目录下产生了一个.git目录</div></pre></td></tr></table></figure></p>
+<p>看一下.git的目录结构<br>git 的本地化配置(git config –local 产生的配置会写到.git/config<br>.git/objects 里面会存储SHA-1码的一些东西<br>.git/HEAD 存储的是当前工作中的分支指针<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">$ find .git/ </div><div class="line">.git/</div><div class="line">.git/hooks</div><div class="line">.git/hooks/post-update.sample</div><div class="line">.git/hooks/pre-rebase.sample</div><div class="line">.git/hooks/pre-applypatch.sample</div><div class="line">.git/hooks/commit-msg.sample</div><div class="line">.git/hooks/applypatch-msg.sample</div><div class="line">.git/hooks/pre-push.sample</div><div class="line">.git/hooks/pre-commit.sample</div><div class="line">.git/hooks/prepare-commit-msg.sample</div><div class="line">.git/hooks/update.sample</div><div class="line">.git/config </div><div class="line">.git/description</div><div class="line">.git/objects </div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack </div><div class="line">.git/info</div><div class="line">.git/info/exclude</div><div class="line">.git/refs</div><div class="line">.git/refs/heads</div><div class="line">.git/refs/tags</div><div class="line">.git/branches</div><div class="line">.git/HEAD</div></pre></td></tr></table></figure></p>
+<p>创建README并写入hello world<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$echo &apos;hello word&apos; &gt; README.md</div></pre></td></tr></table></figure></p>
+<p>添加到暂存区<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ git add README.md</div><div class="line">$ git commit -m &apos;first commit&apos;</div><div class="line">[master （根提交） d2a03d1] first commit</div><div class="line"> 1 file changed, 1 insertion(+)</div><div class="line"> create mode 100644 README.md</div></pre></td></tr></table></figure></p>
+<p>查看暂存区中的提交<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$git log</div><div class="line">commit d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">Author: ericwang &lt;orange.king@qq.com&gt;</div><div class="line">Date:   Sat Oct 11 18:31:36 2014 +0800</div><div class="line"></div><div class="line">    first commit</div></pre></td></tr></table></figure></p>
+<p>查看.git/objects<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">$ find .git/objects/</div><div class="line">.git/objects/</div><div class="line">.git/objects/73</div><div class="line">.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack</div><div class="line">.git/objects/7f</div><div class="line">.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">.git/objects/d2</div><div class="line">.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7</div></pre></td></tr></table></figure></p>
+<p>生成了3个文件</p>
+<ul>
+<li>.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7 </li>
+<li>.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</li>
+<li>.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a </li>
+</ul>
+<p>可以看到 commit d2a03d1cece536133c49d3ea8f6c503c778307f7 对应的是.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7文件<br>其SHA-1码被拆分成2部分,第一部分是SHA-1码的前两位作为目录名,第二部分是剩下的38位作为文件名</p>
+<p>查看commit对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ git cat-file  -p d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">tree 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413023496 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413023496 +0800</div><div class="line"></div><div class="line">first commit</div></pre></td></tr></table></figure></p>
+<p>tree对象的SHA-1码为 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a<br>对应的是 .git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a<br>继续查看tree对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 73928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">100644 blob 7fd5222177e8ffadda6437dc9cfa0630a2777673    README.md</div></pre></td></tr></table></figure></p>
+<p>blob对象的SHA-1码为7fd5222177e8ffadda6437dc9cfa0630a2777673<br>对应的是.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673文件<br>查看blob对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 7fd5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">hello word</div></pre></td></tr></table></figure></p>
+<p>其存储的是就是我们最初写入的文本内容<br>下面继续向README.md中写入内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$ echo 2 &gt;&gt;README.md</div><div class="line">$ git add .</div><div class="line">$ git commit -m &apos;second commit&apos;</div><div class="line">[master 897276c] second commit</div><div class="line"> 1 file changed, 1 insertion(+)</div></pre></td></tr></table></figure></p>
+<p>生成了新的commit 对象 897276c61b6e00005f66a6b16477e872835b5408<br>查看新的commit对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 897276c61b6e00005f66a6b16477e872835b5408</div><div class="line">tree 6f44b87201208be6247b73708470d2b6266b7063</div><div class="line">parent d2a03d1cece536133c49d3ea8f6c503c778307f7</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413027193 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413027193 +0800</div><div class="line"></div><div class="line">second commit</div></pre></td></tr></table></figure></p>
+<p>其父commit是我们第一次的commit,tree对象是6f44b87201208be6247b73708470d2b6266b7063,<br>查看tree对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p 6f44b87201208be6247b73708470d2b6266b7063</div><div class="line">100644 blob d0a2ec18682f4d54a2507c0d0275248dc2d8dad2    README.md</div></pre></td></tr></table></figure></p>
+<p>查看blob对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git cat-file -p d0a2ec18682f4d54a2507c0d0275248dc2d8dad2</div><div class="line">hello word</div><div class="line">2</div></pre></td></tr></table></figure></p>
+<p>可以看到,git为改动后的README.md生成了新的blob,区别于第一次提交产生的blob<br>查看.git/objects/下也可以看到，git为改动后的该文件新生成了1个commit,1个tree,1个blob<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">$ find .git/objects/</div><div class="line">.git/objects/</div><div class="line">.git/objects/73</div><div class="line">.git/objects/73/928f2dd793cbc72fcc2b1ba7d0585bfa91886a</div><div class="line">.git/objects/6f</div><div class="line">.git/objects/6f/44b87201208be6247b73708470d2b6266b7063</div><div class="line">.git/objects/89</div><div class="line">.git/objects/89/7276c61b6e00005f66a6b16477e872835b5408</div><div class="line">.git/objects/info</div><div class="line">.git/objects/pack</div><div class="line">.git/objects/d0</div><div class="line">.git/objects/d0/a2ec18682f4d54a2507c0d0275248dc2d8dad2</div><div class="line">.git/objects/7f</div><div class="line">.git/objects/7f/d5222177e8ffadda6437dc9cfa0630a2777673</div><div class="line">.git/objects/d2</div><div class="line">.git/objects/d2/a03d1cece536133c49d3ea8f6c503c778307f7</div></pre></td></tr></table></figure></p>
+<p>接着 新建文件并写入内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">$ echo &apos;new file content&apos; &gt;newfile</div><div class="line">$ git add .</div><div class="line">$ git commit -m &apos;third commit&apos;</div><div class="line">[master e1107b4] third commit</div><div class="line"> 1 file changed, 1 insertion(+)</div><div class="line"> create mode 100644 newfile</div><div class="line">$ git cat-file -p e1107b460be89af8d508ac972270237d2f1c530f</div><div class="line">tree 4c4d45c5a7485c475fd8fd1b53d26fddcf18f0cd</div><div class="line">parent 897276c61b6e00005f66a6b16477e872835b5408</div><div class="line">author ericwang &lt;orange.king@qq.com&gt; 1413028137 +0800</div><div class="line">committer ericwang &lt;orange.king@qq.com&gt; 1413028137 +0800</div><div class="line"></div><div class="line">third commit</div><div class="line">$ git cat-file -p 4c4d45c5a7485c475fd8fd1b53d26fddcf18f0cd</div><div class="line">100644 blob d0a2ec18682f4d54a2507c0d0275248dc2d8dad2    README.md</div><div class="line">100644 blob 8e66654a5477b1bf4765946147c49509a431f963    newfile</div></pre></td></tr></table></figure></p>
+<p>第三次提交中对应的tree对象有两个blob,我们没有对README.md进行修改,所以git并没有为它新生成一个blob,而是继续使用原有的blob<br>画个图比较直观一些，画风不怎么样,哈哈<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/commits.png" alt="image"><br>实际上,项目中的git对象关系远比这复杂的多,很多tree对象有很多子tree,子tree中又包含很多blob,blob存储的是某次文件修改生成的快照</p>
 
         
         
@@ -733,81 +794,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/linux/">linux</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/10/mysqldump/" title="mysqldump" itemprop="url">mysqldump</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-10T02:28:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="mysqldump"><a href="#mysqldump" class="headerlink" title="mysqldump"></a>mysqldump</h2><p>测试环境数据寥寥无几，测试又不会批量生成数据,只能从备份数据库中拉出来一些小表的数据填充<br>命令行下具体用法如下： </p>
-<p>mysqldump -u用戶名 -p密码 -d 数据库名 表名 &gt; 脚本名</p>
-<ul>
-<li><p>导出整个数据库结构和数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump -h localhost -uroot -p123456 database &gt; dump.sql</div></pre></td></tr></table></figure>
-</li>
-<li><p>导出单个数据表结构和数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump -h localhost -uroot -p123456  database table &gt; dump.sql</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>问题来了,<br>Got error: 1044: Access denied for user ‘<strong>*</strong>‘ to database ‘<em>**</em>‘ when doing LOCK TABLES</p>
-<p>应该是数据库user的锁表权限问题,在导表时会锁表。加上–skip-lock-tables 就可以了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump -h localhost -uroot -p123456  --skip-lock-tables database table  &gt; dump.sql</div></pre></td></tr></table></figure></p>
-<h2 id="information-schema"><a href="#information-schema" class="headerlink" title="information_schema"></a>information_schema</h2><p>在对表做操作时,最好看一下表的一些信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from information_schema. tables where talbe_name = &apos;xxx&apos;;#真是醉了 这个sql竟然不让放到blog里，我把.tables中间加了个空格</div></pre></td></tr></table></figure>
-<p>关于information_schema,具体看<a href="http://en.wikipedia.org/wiki/Information_schema" target="_blank" rel="external">这里</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/mysql/">mysql</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/mysql/">mysql</a>
+  <span></span> <a href="/tags/git/">git</a>
   </div>
 
 </div>
@@ -845,7 +832,7 @@
   <div class="tagcloudlist">
     <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
@@ -896,6 +883,10 @@
 		  
 		
 		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
 		  
 		
@@ -904,7 +895,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
 		  
 		
 		  

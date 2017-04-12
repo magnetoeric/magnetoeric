@@ -1,0 +1,502 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+  <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
+  <meta charset="UTF-8">
+  
+    <title>nginx笔记 | 艾瑞克</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="ericwang">
+    
+
+    
+    <meta name="description" content="nginx deny all仅允许某个网段访问，其他全部拒绝123456server &amp;#123;    […]    allow 192.168.0.0/16;    deny all;    error_page 403 /error403.html;&amp;#125; 尽管允许某个网段访问，依然无法访问，原因是/error403.html页面也被deny了，正确的如下 1234567891011s">
+<meta name="keywords" content="C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx笔记">
+<meta property="og:url" content="http://magnetoeric.github.io/2017/02/10/nginx/index.html">
+<meta property="og:site_name" content="艾瑞克">
+<meta property="og:description" content="nginx deny all仅允许某个网段访问，其他全部拒绝123456server &amp;#123;    […]    allow 192.168.0.0/16;    deny all;    error_page 403 /error403.html;&amp;#125; 尽管允许某个网段访问，依然无法访问，原因是/error403.html页面也被deny了，正确的如下 1234567891011s">
+<meta property="og:updated_time" content="2017-04-12T04:57:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx笔记">
+<meta name="twitter:description" content="nginx deny all仅允许某个网段访问，其他全部拒绝123456server &amp;#123;    […]    allow 192.168.0.0/16;    deny all;    error_page 403 /error403.html;&amp;#125; 尽管允许某个网段访问，依然无法访问，原因是/error403.html页面也被deny了，正确的如下 1234567891011s">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="艾瑞克" title="艾瑞克"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
+				<h2 class="blog-motto">艾瑞克的小站</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:magnetoeric.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/02/10/nginx/" title="nginx笔记" itemprop="url">nginx笔记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-02-10T14:01:00.000Z" itemprop="datePublished"> Published 2017-02-10</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx-deny-all"><span class="toc-number">1.</span> <span class="toc-text">nginx deny all</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx-400-bad-request-客户端发送cookies过大"><span class="toc-number">2.</span> <span class="toc-text">nginx 400 bad request 客户端发送cookies过大</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多条件rewrite"><span class="toc-number">3.</span> <span class="toc-text">多条件rewrite</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="nginx-deny-all"><a href="#nginx-deny-all" class="headerlink" title="nginx deny all"></a>nginx deny all</h3><p>仅允许某个网段访问，其他全部拒绝<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    […]</div><div class="line">    allow 192.168.0.0/16;</div><div class="line">    deny all;</div><div class="line">    error_page 403 /error403.html;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>尽管允许某个网段访问，依然无法访问，原因是/error403.html页面也被deny了，正确的如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    […]</div><div class="line">    location / &#123;</div><div class="line">        error_page 403 /error403.html;</div><div class="line">        allow 192.168.0.0/16;</div><div class="line">        deny all;</div><div class="line">    &#125;</div><div class="line">    location = /error403.html &#123;</div><div class="line">        allow all;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果想配置多个错误页</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    […]</div><div class="line">    location / &#123;</div><div class="line">        error_page 403 /error403.html;</div><div class="line">        error_page 404 /error404.html;</div><div class="line">        allow 192.168.0.0/16;</div><div class="line">        deny all;</div><div class="line">    &#125;</div><div class="line">    location ~ &quot;^/error[0-9]&#123;3&#125;\.html$&quot; &#123;</div><div class="line">        allow all;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="nginx-400-bad-request-客户端发送cookies过大"><a href="#nginx-400-bad-request-客户端发送cookies过大" class="headerlink" title="nginx 400 bad request 客户端发送cookies过大"></a>nginx 400 bad request 客户端发送cookies过大</h3><p>调整large_client_header_buffers大小</p>
+<h3 id="多条件rewrite"><a href="#多条件rewrite" class="headerlink" title="多条件rewrite"></a>多条件rewrite</h3><p>nginx 只有if指令没有else指令， 如果存在多重条件，可以通过多个变量实现</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/nginx/">nginx</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://magnetoeric.github.io/2017/02/10/nginx/" data-title="nginx笔记 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/01/11/zmq/" title="0mq的一些尝试">
+  <strong>上一篇：</strong><br/>
+  <span>
+  0mq的一些尝试</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/03/03/rabbitmq_01/"  title="rabbitmq笔记">
+ <strong>下一篇：</strong><br/> 
+ <span>rabbitmq笔记
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx-deny-all"><span class="toc-number">1.</span> <span class="toc-text">nginx deny all</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx-400-bad-request-客户端发送cookies过大"><span class="toc-number">2.</span> <span class="toc-text">nginx 400 bad request 客户端发送cookies过大</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多条件rewrite"><span class="toc-number">3.</span> <span class="toc-text">多条件rewrite</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">Tag Cloud</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+    </div>
+  </div>
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/arch/" title="arch">arch<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/books/" title="books">books<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/docker/" title="docker">docker<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/git/" title="git">git<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/http/" title="http">http<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/java/" title="java">java<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/mysql/" title="mysql">mysql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nosql/" title="nosql">nosql<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/shell/" title="shell">shell<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="ericwang">ericwang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-47898532-4', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

@@ -5,24 +5,24 @@
   <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
   <meta charset="UTF-8">
   
-    <title>php glob | 艾瑞克</title>
+    <title>观察者模式 | 艾瑞克</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="ericwang">
     
 
     
-    <meta name="description" content="php查找符合某些规则的文件通常实现查找目录下某些规则的文件，用shell实现起来很容易，但是php呢,个人想到的是遍历目录下所有文件并再用正则筛选.然而php有现成的函数已经为我们做好了 12345678910111213141516171819202122232425262728说明array glob ( string $pattern [, int $flags = 0 ] )glob()">
-<meta name="keywords" content="php">
+    <meta name="description" content="###Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#">
+<meta name="keywords" content="patterns">
 <meta property="og:type" content="article">
-<meta property="og:title" content="php glob">
-<meta property="og:url" content="http://magnetoeric.github.io/2016/05/11/php-glob/index.html">
+<meta property="og:title" content="观察者模式">
+<meta property="og:url" content="http://magnetoeric.github.io/2017/04/14/patterns_01/index.html">
 <meta property="og:site_name" content="艾瑞克">
-<meta property="og:description" content="php查找符合某些规则的文件通常实现查找目录下某些规则的文件，用shell实现起来很容易，但是php呢,个人想到的是遍历目录下所有文件并再用正则筛选.然而php有现成的函数已经为我们做好了 12345678910111213141516171819202122232425262728说明array glob ( string $pattern [, int $flags = 0 ] )glob()">
-<meta property="og:updated_time" content="2017-04-10T02:00:40.000Z">
+<meta property="og:description" content="###Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#">
+<meta property="og:updated_time" content="2017-04-14T14:53:37.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="php glob">
-<meta name="twitter:description" content="php查找符合某些规则的文件通常实现查找目录下某些规则的文件，用shell实现起来很容易，但是php呢,个人想到的是遍历目录下所有文件并再用正则筛选.然而php有现成的函数已经为我们做好了 12345678910111213141516171819202122232425262728说明array glob ( string $pattern [, int $flags = 0 ] )glob()">
+<meta name="twitter:title" content="观察者模式">
+<meta name="twitter:description" content="###Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#">
 
     
     
@@ -80,14 +80,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/05/11/php-glob/" title="php glob" itemprop="url">php glob</a>
+      <a href="/2017/04/14/patterns_01/" title="观察者模式" itemprop="url">观察者模式</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-11T06:13:00.000Z" itemprop="datePublished"> Published 2016-05-11</time>
+    <time datetime="2017-04-14T14:35:00.000Z" itemprop="datePublished"> Published 2017-04-14</time>
     
   </p>
 </header>
@@ -96,27 +96,25 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#php查找符合某些规则的文件"><span class="toc-number">1.</span> <span class="toc-text">php查找符合某些规则的文件</span></a></li></ol>
+			
 		
 		</div>
 		
-		<h2 id="php查找符合某些规则的文件"><a href="#php查找符合某些规则的文件" class="headerlink" title="php查找符合某些规则的文件"></a>php查找符合某些规则的文件</h2><p>通常实现查找目录下某些规则的文件，用shell实现起来很容易，但是php呢,个人想到的是遍历目录下所有文件并再用正则筛选.<br>然而php有现成的函数已经为我们做好了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">说明</div><div class="line">array glob ( string $pattern [, int $flags = 0 ] )</div><div class="line"></div><div class="line">glob() 函数依照 libc glob() 函数使用的规则寻找所有与 pattern 匹配的文件路径，类似于一般 shells 所用的规则一样。不进行缩写扩展或参数替代。</div><div class="line">参数</div><div class="line"></div><div class="line">pattern</div><div class="line"></div><div class="line">    The pattern. No tilde expansion or parameter substitution is done.</div><div class="line">flags</div><div class="line"></div><div class="line">    有效标记有：</div><div class="line"></div><div class="line">        GLOB_MARK - 在每个返回的项目中加一个斜线</div><div class="line">        GLOB_NOSORT - 按照文件在目录中出现的原始顺序返回（不排序）</div><div class="line">        GLOB_NOCHECK - 如果没有文件匹配则返回用于搜索的模式</div><div class="line">        GLOB_NOESCAPE - 反斜线不转义元字符</div><div class="line">        GLOB_BRACE - 扩充 &#123;a,b,c&#125; 来匹配 &apos;a&apos;，&apos;b&apos; 或 &apos;c&apos;</div><div class="line">        GLOB_ONLYDIR - 仅返回与模式匹配的目录项</div><div class="line">        GLOB_ERR - 停止并读取错误信息（比如说不可读的目录），默认的情况下忽略所有错误</div><div class="line"></div><div class="line">返回值</div><div class="line"></div><div class="line">返回一个包含有匹配文件／目录的数组。如果出错返回 FALSE。</div><div class="line"></div><div class="line">    Note:</div><div class="line"></div><div class="line">    On some systems it is impossible to distinguish between empty match and an error.</div></pre></td></tr></table></figure>
-<p>比如查找某目录下的txt文件并显示其大小<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">&lt;?php</div><div class="line">foreach (glob(&quot;*.txt&quot;) as $filename) &#123;</div><div class="line">    echo &quot;$filename size &quot; . filesize($filename) . &quot;\n&quot;;</div><div class="line">&#125;</div><div class="line">?&gt;</div></pre></td></tr></table></figure></p>
-  
+		<p>###<br>Spl中提供了两个接口来实现观察者模式<br>Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者<br>Observer需要实现一个接口，更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">class ConcertSubject implements SplSubject&#123;</div><div class="line">    private $obeservers;</div><div class="line"></div><div class="line">    private $value;</div><div class="line"></div><div class="line">    public function __construct()</div><div class="line">    &#123;</div><div class="line">        $this-&gt;obeservers = new SplObjectStorage();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function attach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;attach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    public function detach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;detach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function notify ()&#123;</div><div class="line">        foreach ($this-&gt;obeservers as $obeserver)&#123;</div><div class="line">            $obeserver-&gt;update($this);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    public function setValue($value)&#123;</div><div class="line">        $this-&gt;value = $value;</div><div class="line">        $this-&gt;notify();</div><div class="line">    &#125;</div><div class="line">    public function getValue()&#123;</div><div class="line">        return $this-&gt;value;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">class ConcertObserver implements SplObserver&#123;</div><div class="line"></div><div class="line">    public function update (SplSubject $subject)&#123;</div><div class="line">            var_dump($subject-&gt;getValue());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$subject = new ConcertSubject();</div><div class="line">$observer =  new ConcertObserver();</div><div class="line">$subject-&gt;attach($observer);</div><div class="line">$subject-&gt;setValue(666);</div></pre></td></tr></table></figure>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/php/">php</a>
+  <a class="article-category-link" href="/categories/patterns/">patterns</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/php/">php</a>
+  <span></span> <a href="/tags/patterns/">patterns</a>
   </div>
 
 </div>
@@ -125,7 +123,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://magnetoeric.github.io/2016/05/11/php-glob/" data-title="php glob | 艾瑞克" data-tsina="null" class="share clearfix">
+	  <div data-url="http://magnetoeric.github.io/2017/04/14/patterns_01/" data-title="观察者模式 | 艾瑞克" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -139,21 +137,13 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2016/05/09/php-curl-file-get-contents比较/" title="php curl file_get_contents比较">
+ <a href="/2017/04/12/parse_url/" title="php 解析url">
   <strong>上一篇：</strong><br/>
   <span>
-  php curl file_get_contents比较</span>
+  php 解析url</span>
 </a>
 </div>
 
-
-<div class="next">
-<a href="/2016/05/18/shell/"  title="shell 编程之语法基础">
- <strong>下一篇：</strong><br/> 
- <span>shell 编程之语法基础
-</span>
-</a>
-</div>
 
 </nav>
 
@@ -165,7 +155,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#php查找符合某些规则的文件"><span class="toc-number">1.</span> <span class="toc-text">php查找符合某些规则的文件</span></a></li></ol>
+ 
  
   </div>
 

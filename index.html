@@ -80,6 +80,138 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/04/14/patterns_01/" title="观察者模式" itemprop="url">观察者模式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-14T14:35:00.000Z" itemprop="datePublished"> Published 2017-04-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>###<br>Spl中提供了两个接口来实现观察者模式<br>Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者<br>Observer需要实现一个接口，更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">class ConcertSubject implements SplSubject&#123;</div><div class="line">    private $obeservers;</div><div class="line"></div><div class="line">    private $value;</div><div class="line"></div><div class="line">    public function __construct()</div><div class="line">    &#123;</div><div class="line">        $this-&gt;obeservers = new SplObjectStorage();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function attach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;attach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    public function detach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;detach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function notify ()&#123;</div><div class="line">        foreach ($this-&gt;obeservers as $obeserver)&#123;</div><div class="line">            $obeserver-&gt;update($this);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    public function setValue($value)&#123;</div><div class="line">        $this-&gt;value = $value;</div><div class="line">        $this-&gt;notify();</div><div class="line">    &#125;</div><div class="line">    public function getValue()&#123;</div><div class="line">        return $this-&gt;value;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">class ConcertObserver implements SplObserver&#123;</div><div class="line"></div><div class="line">    public function update (SplSubject $subject)&#123;</div><div class="line">            var_dump($subject-&gt;getValue());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$subject = new ConcertSubject();</div><div class="line">$observer =  new ConcertObserver();</div><div class="line">$subject-&gt;attach($observer);</div><div class="line">$subject-&gt;setValue(666);</div></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/patterns/">patterns</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/patterns/">patterns</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/04/12/parse_url/" title="php 解析url" itemprop="url">php 解析url</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-12T11:35:00.000Z" itemprop="datePublished"> Published 2017-04-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="parse-url"><a href="#parse-url" class="headerlink" title="parse_url"></a>parse_url</h3><p>很多人喜欢用正则提取url中的domain,path及参数信息<br>实际上php已经提供了对url解析的方法:<a href="http://php.net/manual/en/function.parse-url.php" target="_blank" rel="external">parse_url</a><br>一个url可以分解成如下几个部分</p>
+<ul>
+<li>scheme  协议</li>
+<li>host  主机</li>
+<li>port  端口</li>
+<li>user  用户名</li>
+<li>pass  密码</li>
+<li>path  路径</li>
+<li>query 参数</li>
+<li>fragment </li>
+</ul>
+<p>直接调用parse_url<br>可以将url解析成一个数组,可以通过索引名称获取到对应的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">$url = &apos;http://username:password@hostname:9090/path?arg=value#anchor&apos;;</div><div class="line"></div><div class="line">var_dump(parse_url($url));</div><div class="line">var_dump(parse_url($url, PHP_URL_SCHEME));</div><div class="line">var_dump(parse_url($url, PHP_URL_USER));</div><div class="line">var_dump(parse_url($url, PHP_URL_PASS));</div><div class="line">var_dump(parse_url($url, PHP_URL_HOST));</div><div class="line">var_dump(parse_url($url, PHP_URL_PORT));</div><div class="line">var_dump(parse_url($url, PHP_URL_PATH));</div><div class="line">var_dump(parse_url($url, PHP_URL_QUERY));</div><div class="line">var_dump(parse_url($url, PHP_URL_FRAGMENT));</div><div class="line">?&gt;</div></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/04/05/STOMP/" title="STOMP" itemprop="url">STOMP</a>
   </h1>
   <p class="article-author">By
@@ -356,6 +488,92 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/01/04/rabbitmq/" title="rabbitmq" itemprop="url">rabbitmq</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-01-04T11:59:00.000Z" itemprop="datePublished"> Published 2017-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><p>从AMQP协议可以看出，MessageQueue、Exchange和Binding构成了AMQP协议的核心，下面我们就围绕这三个主要组件    从应用使用的角度全面的介绍如何利用Rabbit MQ构建消息队列以及使用过程中的注意事项。</p>
+<h3 id="MessageQueue"><a href="#MessageQueue" class="headerlink" title="MessageQueue"></a>MessageQueue</h3><p>在Rabbit MQ中，无论是生产者发送消息还是消费者接受消息，都首先需要声明一个MessageQueue。这就存在一个问题，是生产者声明还是消费者声明呢？要解决这个问题，首先需要明确：</p>
+<p>a)消费者是无法订阅或者获取不存在的MessageQueue中信息。</p>
+<p>b)消息被Exchange接受以后，如果没有匹配的Queue，则会被丢弃。<br>在明白了上述两点以后，就容易理解如果是消费者去声明Queue，就有可能会出现在声明Queue之 前，生产者已发送的消息被丢弃的隐患。如果应用能够通过消息重发的机制允许消息丢失，则使用此方案没有任何问题。但是如果不能接受该方案，这就需要无论是 生产者还是消费者，在发送或者接受消息前，都需要去尝试建立消息队列。这里有一点需要明确，如果客户端尝试建立一个已经存在的消息队列，Rabbit MQ不会做任何事情，并返回客户端建立成功的。</p>
+<p>如果一个消费者在一个信道中正在监听某一个队列的消息，Rabbit MQ是不允许该消费者在同一个channel去声明其他队列的。Rabbit MQ中，可以通过queue.declare命令声明一个队列，可以设置该队列以下属性:</p>
+<p>a) Exclusive： 排他队列，如果一个队列被声明为排他队列，该队列仅对首次声明它的连接可见，并在连接断开时自动删除。这里需要注意三点：其一，排他队列是基于连接可见 的，同一连接的不同信道是可以同时访问同一个连接创建的排他队列的。其二，“首次”，如果一个连接已经声明了一个排他队列，其他连接是不允许建立同名的排 他队列的，这个与普通队列不同。其三，即使该队列是持久化的，一旦连接关闭或者客户端退出，该排他队列都会被自动删除的。这种队列适用于只限于一个客户端 发送读取消息的应用场景。</p>
+<p>b)   Auto-delete:自动删除，如果该队列没有任何订阅的消费者的话，该队列会被自动删除。这种队列适用于临时队列。</p>
+<p>c)   Durable:持久化，这个会在后面作为专门一个章节讨论。</p>
+<p>d)  其他选项，例如如果用户仅仅想查询某一个队列是否已存在，如果不存在，不想建立该队列，仍然可以调用queue.declare，只不过需要将参数passive设为true，传给queue.declare，如果该队列已存在，则会返回true；如果不存在，则会返回Error，但是不会创建新的队列。</p>
+<h3 id="生产者发送消息"><a href="#生产者发送消息" class="headerlink" title="生产者发送消息"></a>生产者发送消息</h3><p>在AMQP模型中，Exchange是接受生产者消息并将消息路由到消息队列的关键组件。ExchangeType和Binding决定了消息的路由规 则。所以生产者想要发送消息，首先必须要声明一个Exchange和该Exchange对应的Binding。可以通过 ExchangeDeclare和BindingDeclare完成。在Rabbit MQ中，声明一个Exchange需要三个参数：ExchangeName，ExchangeType和Durable。ExchangeName是该 Exchange的名字，该属性在创建Binding和生产者通过publish推送消息时需要指定。ExchangeType，指Exchange的类 型，在RabbitMQ中，有三种类型的Exchange：direct ，fanout和topic，不同的Exchange会表现出不同路由行为。Durable是该Exchange的持久化属性，这个会在消息持久化章节讨 论。声明一个Binding需要提供一个QueueName，ExchangeName和BindingKey。下面我们就分析一下不同的 ExchangeType表现出的不同路由规则。</p>
+<p>生产者在发送消息时，都需要指定一个RoutingKey和Exchange，Exchange在接到该RoutingKey以后，会判断该ExchangeType:</p>
+<p>a) 如果是Direct类型，则会将消息中的RoutingKey与该Exchange关联的所有Binding中的BindingKey进行比较，如果相等，则发送到该Binding对应的Queue中。</p>
+<p>b) 如果是Fanout类型，则会将消息发送给所有与该Exchange定义过Binding的所有Queues中去，其实是一种广播行为。</p>
+<p>c)如果是Topic类型，则会按照正则表达式，对RoutingKey与BindingKey进行匹配，如果匹配成功，则发送到对应的Queue中。</p>
+<h3 id="消费者订阅消息"><a href="#消费者订阅消息" class="headerlink" title="消费者订阅消息"></a>消费者订阅消息</h3><p>在RabbitMQ中消费者有2种方式获取队列中的消息:</p>
+<p>a)  一种是通过basic.consume命令，订阅某一个队列中的消息,channel会自动在处理完上一条消息之后，接收下一条消息。（同一个channel消息处理是串行的）。除非关闭channel或者取消订阅，否则客户端将会一直接收队列的消息。</p>
+<p>b)  另外一种方式是通过basic.get命令主动获取队列中的消息，但是绝对不可以通过循环调用basic.get来代替basic.consume，这是因为basic.get RabbitMQ在实际执行的时候，是首先consume某一个队列，然后检索第一条消息，然后再取消订阅。如果是高吞吐率的消费者，最好还是建议使用basic.consume。</p>
+<p>如果有多个消费者同时订阅同一个队列的话，RabbitMQ是采用循环的方式分发消息的，每一条消息只能被一个订阅者接收。例如，有队列Queue，其中ClientA和ClientB都Consume了该队列，MessageA到达队列后，被分派到ClientA，ClientA回复服务器收到响应，服务器删除MessageA；再有一条消息MessageB抵达队列，服务器根据“循环推送”原则，将消息会发给ClientB，然后收到ClientB的确认后，删除MessageB；等到再下一条消息时，服务器会再将消息发送给ClientA。</p>
+<p>这里我们可以看出，消费者再接到消息以后，都需要给服务器发送一条确认命令，这个即可以在handleDelivery里显示的调用basic.ack实现，也可以在Consume某个队列的时候，设置autoACK属性为true实现。这个ACK仅仅是通知服务器可以安全的删除该消息，而不是通知生产者，与RPC不同。 如果消费者在接到消息以后还没来得及返回ACK就断开了连接，消息服务器会重传该消息给下一个订阅者，如果没有订阅者就会存储该消息。</p>
+<p>既然RabbitMQ提供了ACK某一个消息的命令，当然也提供了Reject某一个消息的命令。当客户端发生错误，调用basic.reject命令拒绝某一个消息时，可以设置一个requeue的属性，如果为true，则消息服务器会重传该消息给下一个订阅者；如果为false，则会直接删除该消息。当然，也可以通过ack，让消息服务器直接删除该消息并且不会重传。</p>
+<h2 id="持久化："><a href="#持久化：" class="headerlink" title="持久化："></a>持久化：</h2><p>Rabbit MQ默认是不持久队列、Exchange、Binding以及队列中的消息的，这意味着一旦消息服务器重启，所有已声明的队列，Exchange，Binding以及队列中的消息都会丢失。通过设置Exchange和MessageQueue的durable属性为true，可以使得队列和Exchange持久化，但是这还不能使得队列中的消息持久化，这需要生产者在发送消息的时候，将delivery mode设置为2，只有这3个全部设置完成后，才能保证服务器重启不会对现有的队列造成影响。这里需要注意的是，只有durable为true的Exchange和durable为true的Queues才能绑定，否则在绑定时，RabbitMQ都会抛错的。持久化会对RabbitMQ的性能造成比较大的影响，可能会下降10倍不止。</p>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>对事务的支持是AMQP协议的一个重要特性。假设当生产者将一个持久化消息发送给服务器时，因为consume命令本身没有任何Response返回，所以即使服务器崩溃，没有持久化该消息，生产者也无法获知该消息已经丢失。如果此时使用事务，即通过txSelect()开启一个事务，然后发送消息给服务器，然后通过txCommit()提交该事务，即可以保证，如果txCommit()提交了，则该消息一定会持久化，如果txCommit()还未提交即服务器崩溃，则该消息不会服务器就收。当然Rabbit MQ也提供了txRollback()命令用于回滚某一个事务。</p>
+<h2 id="confirm机制"><a href="#confirm机制" class="headerlink" title="confirm机制"></a>confirm机制</h2><p>使用事务固然可以保证只有提交的事务，才会被服务器执行。但是这样同时也将客户端与消息服务器同步起来，这背离了消息队列解耦的本质。Rabbit MQ提供了一个更加轻量级的机制来保证生产者可以感知服务器消息是否已被路由到正确的队列中——Confirm。如果设置channel为confirm状态，则通过该channel发送的消息都会被分配一个唯一的ID，然后一旦该消息被正确的路由到匹配的队列中后，服务器会返回给生产者一个Confirm，该Confirm包含该消息的ID，这样生产者就会知道该消息已被正确分发。对于持久化消息，只有该消息被持久化后，才会返回Confirm。Confirm机制的最大优点在于异步，生产者在发送消息以后，即可继续执行其他任务。而服务器返回Confirm后，会触发生产者的回调函数，生产者在回调函数中处理Confirm信息。如果消息服务器发生异常，导致该消息丢失，会返回给生产者一个nack，表示消息已经丢失，这样生产者就可以通过重发消息，保证消息不丢失。Confirm机制在性能上要比事务优越很多。但是Confirm机制，无法进行回滚，就是一旦服务器崩溃，生产者无法得到Confirm信息，生产者其实本身也不知道该消息吃否已经被持久化，只有继续重发来保证消息不丢失，但是如果原先已经持久化的消息，并不会被回滚，这样队列中就会存在两条相同的消息，系统需要支持去重。</p>
+<p>1.什么情况会导致 blackhole？</p>
+<p>两种情况：</p>
+<pre><code>声明 exchange 后未绑定任何 queue ，此时发送到该 exchange 上的 message 均被 blackholed ；
+声明 exchange 后绑定了 queue ，但发送到该 exchange 上的 message 所使用的 routing_key 不匹配任何 binding_key ，则 blackholed 。
+</code></pre>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/rabbitmq/">rabbitmq</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/01/04/search/" title="常见搜索引擎的分布式解决方法" itemprop="url">常见搜索引擎的分布式解决方法</a>
   </h1>
   <p class="article-author">By
@@ -454,92 +672,6 @@
   <div class="article-tags">
   
   <span></span> <a href="/tags/solr/">solr</a><a href="/tags/elasticsearch/">elasticsearch</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/01/04/rabbitmq/" title="rabbitmq" itemprop="url">rabbitmq</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2017-01-04T11:59:00.000Z" itemprop="datePublished"> Published 2017-01-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><p>从AMQP协议可以看出，MessageQueue、Exchange和Binding构成了AMQP协议的核心，下面我们就围绕这三个主要组件    从应用使用的角度全面的介绍如何利用Rabbit MQ构建消息队列以及使用过程中的注意事项。</p>
-<h3 id="MessageQueue"><a href="#MessageQueue" class="headerlink" title="MessageQueue"></a>MessageQueue</h3><p>在Rabbit MQ中，无论是生产者发送消息还是消费者接受消息，都首先需要声明一个MessageQueue。这就存在一个问题，是生产者声明还是消费者声明呢？要解决这个问题，首先需要明确：</p>
-<p>a)消费者是无法订阅或者获取不存在的MessageQueue中信息。</p>
-<p>b)消息被Exchange接受以后，如果没有匹配的Queue，则会被丢弃。<br>在明白了上述两点以后，就容易理解如果是消费者去声明Queue，就有可能会出现在声明Queue之 前，生产者已发送的消息被丢弃的隐患。如果应用能够通过消息重发的机制允许消息丢失，则使用此方案没有任何问题。但是如果不能接受该方案，这就需要无论是 生产者还是消费者，在发送或者接受消息前，都需要去尝试建立消息队列。这里有一点需要明确，如果客户端尝试建立一个已经存在的消息队列，Rabbit MQ不会做任何事情，并返回客户端建立成功的。</p>
-<p>如果一个消费者在一个信道中正在监听某一个队列的消息，Rabbit MQ是不允许该消费者在同一个channel去声明其他队列的。Rabbit MQ中，可以通过queue.declare命令声明一个队列，可以设置该队列以下属性:</p>
-<p>a) Exclusive： 排他队列，如果一个队列被声明为排他队列，该队列仅对首次声明它的连接可见，并在连接断开时自动删除。这里需要注意三点：其一，排他队列是基于连接可见 的，同一连接的不同信道是可以同时访问同一个连接创建的排他队列的。其二，“首次”，如果一个连接已经声明了一个排他队列，其他连接是不允许建立同名的排 他队列的，这个与普通队列不同。其三，即使该队列是持久化的，一旦连接关闭或者客户端退出，该排他队列都会被自动删除的。这种队列适用于只限于一个客户端 发送读取消息的应用场景。</p>
-<p>b)   Auto-delete:自动删除，如果该队列没有任何订阅的消费者的话，该队列会被自动删除。这种队列适用于临时队列。</p>
-<p>c)   Durable:持久化，这个会在后面作为专门一个章节讨论。</p>
-<p>d)  其他选项，例如如果用户仅仅想查询某一个队列是否已存在，如果不存在，不想建立该队列，仍然可以调用queue.declare，只不过需要将参数passive设为true，传给queue.declare，如果该队列已存在，则会返回true；如果不存在，则会返回Error，但是不会创建新的队列。</p>
-<h3 id="生产者发送消息"><a href="#生产者发送消息" class="headerlink" title="生产者发送消息"></a>生产者发送消息</h3><p>在AMQP模型中，Exchange是接受生产者消息并将消息路由到消息队列的关键组件。ExchangeType和Binding决定了消息的路由规 则。所以生产者想要发送消息，首先必须要声明一个Exchange和该Exchange对应的Binding。可以通过 ExchangeDeclare和BindingDeclare完成。在Rabbit MQ中，声明一个Exchange需要三个参数：ExchangeName，ExchangeType和Durable。ExchangeName是该 Exchange的名字，该属性在创建Binding和生产者通过publish推送消息时需要指定。ExchangeType，指Exchange的类 型，在RabbitMQ中，有三种类型的Exchange：direct ，fanout和topic，不同的Exchange会表现出不同路由行为。Durable是该Exchange的持久化属性，这个会在消息持久化章节讨 论。声明一个Binding需要提供一个QueueName，ExchangeName和BindingKey。下面我们就分析一下不同的 ExchangeType表现出的不同路由规则。</p>
-<p>生产者在发送消息时，都需要指定一个RoutingKey和Exchange，Exchange在接到该RoutingKey以后，会判断该ExchangeType:</p>
-<p>a) 如果是Direct类型，则会将消息中的RoutingKey与该Exchange关联的所有Binding中的BindingKey进行比较，如果相等，则发送到该Binding对应的Queue中。</p>
-<p>b) 如果是Fanout类型，则会将消息发送给所有与该Exchange定义过Binding的所有Queues中去，其实是一种广播行为。</p>
-<p>c)如果是Topic类型，则会按照正则表达式，对RoutingKey与BindingKey进行匹配，如果匹配成功，则发送到对应的Queue中。</p>
-<h3 id="消费者订阅消息"><a href="#消费者订阅消息" class="headerlink" title="消费者订阅消息"></a>消费者订阅消息</h3><p>在RabbitMQ中消费者有2种方式获取队列中的消息:</p>
-<p>a)  一种是通过basic.consume命令，订阅某一个队列中的消息,channel会自动在处理完上一条消息之后，接收下一条消息。（同一个channel消息处理是串行的）。除非关闭channel或者取消订阅，否则客户端将会一直接收队列的消息。</p>
-<p>b)  另外一种方式是通过basic.get命令主动获取队列中的消息，但是绝对不可以通过循环调用basic.get来代替basic.consume，这是因为basic.get RabbitMQ在实际执行的时候，是首先consume某一个队列，然后检索第一条消息，然后再取消订阅。如果是高吞吐率的消费者，最好还是建议使用basic.consume。</p>
-<p>如果有多个消费者同时订阅同一个队列的话，RabbitMQ是采用循环的方式分发消息的，每一条消息只能被一个订阅者接收。例如，有队列Queue，其中ClientA和ClientB都Consume了该队列，MessageA到达队列后，被分派到ClientA，ClientA回复服务器收到响应，服务器删除MessageA；再有一条消息MessageB抵达队列，服务器根据“循环推送”原则，将消息会发给ClientB，然后收到ClientB的确认后，删除MessageB；等到再下一条消息时，服务器会再将消息发送给ClientA。</p>
-<p>这里我们可以看出，消费者再接到消息以后，都需要给服务器发送一条确认命令，这个即可以在handleDelivery里显示的调用basic.ack实现，也可以在Consume某个队列的时候，设置autoACK属性为true实现。这个ACK仅仅是通知服务器可以安全的删除该消息，而不是通知生产者，与RPC不同。 如果消费者在接到消息以后还没来得及返回ACK就断开了连接，消息服务器会重传该消息给下一个订阅者，如果没有订阅者就会存储该消息。</p>
-<p>既然RabbitMQ提供了ACK某一个消息的命令，当然也提供了Reject某一个消息的命令。当客户端发生错误，调用basic.reject命令拒绝某一个消息时，可以设置一个requeue的属性，如果为true，则消息服务器会重传该消息给下一个订阅者；如果为false，则会直接删除该消息。当然，也可以通过ack，让消息服务器直接删除该消息并且不会重传。</p>
-<h2 id="持久化："><a href="#持久化：" class="headerlink" title="持久化："></a>持久化：</h2><p>Rabbit MQ默认是不持久队列、Exchange、Binding以及队列中的消息的，这意味着一旦消息服务器重启，所有已声明的队列，Exchange，Binding以及队列中的消息都会丢失。通过设置Exchange和MessageQueue的durable属性为true，可以使得队列和Exchange持久化，但是这还不能使得队列中的消息持久化，这需要生产者在发送消息的时候，将delivery mode设置为2，只有这3个全部设置完成后，才能保证服务器重启不会对现有的队列造成影响。这里需要注意的是，只有durable为true的Exchange和durable为true的Queues才能绑定，否则在绑定时，RabbitMQ都会抛错的。持久化会对RabbitMQ的性能造成比较大的影响，可能会下降10倍不止。</p>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>对事务的支持是AMQP协议的一个重要特性。假设当生产者将一个持久化消息发送给服务器时，因为consume命令本身没有任何Response返回，所以即使服务器崩溃，没有持久化该消息，生产者也无法获知该消息已经丢失。如果此时使用事务，即通过txSelect()开启一个事务，然后发送消息给服务器，然后通过txCommit()提交该事务，即可以保证，如果txCommit()提交了，则该消息一定会持久化，如果txCommit()还未提交即服务器崩溃，则该消息不会服务器就收。当然Rabbit MQ也提供了txRollback()命令用于回滚某一个事务。</p>
-<h2 id="confirm机制"><a href="#confirm机制" class="headerlink" title="confirm机制"></a>confirm机制</h2><p>使用事务固然可以保证只有提交的事务，才会被服务器执行。但是这样同时也将客户端与消息服务器同步起来，这背离了消息队列解耦的本质。Rabbit MQ提供了一个更加轻量级的机制来保证生产者可以感知服务器消息是否已被路由到正确的队列中——Confirm。如果设置channel为confirm状态，则通过该channel发送的消息都会被分配一个唯一的ID，然后一旦该消息被正确的路由到匹配的队列中后，服务器会返回给生产者一个Confirm，该Confirm包含该消息的ID，这样生产者就会知道该消息已被正确分发。对于持久化消息，只有该消息被持久化后，才会返回Confirm。Confirm机制的最大优点在于异步，生产者在发送消息以后，即可继续执行其他任务。而服务器返回Confirm后，会触发生产者的回调函数，生产者在回调函数中处理Confirm信息。如果消息服务器发生异常，导致该消息丢失，会返回给生产者一个nack，表示消息已经丢失，这样生产者就可以通过重发消息，保证消息不丢失。Confirm机制在性能上要比事务优越很多。但是Confirm机制，无法进行回滚，就是一旦服务器崩溃，生产者无法得到Confirm信息，生产者其实本身也不知道该消息吃否已经被持久化，只有继续重发来保证消息不丢失，但是如果原先已经持久化的消息，并不会被回滚，这样队列中就会存在两条相同的消息，系统需要支持去重。</p>
-<p>1.什么情况会导致 blackhole？</p>
-<p>两种情况：</p>
-<pre><code>声明 exchange 后未绑定任何 queue ，此时发送到该 exchange 上的 message 均被 blackholed ；
-声明 exchange 后绑定了 queue ，但发送到该 exchange 上的 message 所使用的 routing_key 不匹配任何 binding_key ，则 blackholed 。
-</code></pre>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/other/">other</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/rabbitmq/">rabbitmq</a>
   </div>
 
 </div>
@@ -746,156 +878,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/11/17/split/" title="利用shell脚本对大文件进行分割" itemprop="url">利用shell脚本对大文件进行分割</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-11-17T02:52:00.000Z" itemprop="datePublished"> Published 2016-11-17</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="利用shell脚本对大文件进行分割"><a href="#利用shell脚本对大文件进行分割" class="headerlink" title="利用shell脚本对大文件进行分割"></a>利用shell脚本对大文件进行分割</h1><p>日常应用产生的日志是需要做文件分割的,无论是按文件大小还是按时间</p>
-<p>##　利用shell脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash  </div><div class="line">   </div><div class="line">  lines=`wc   -l   xxx.log|   awk   &apos;&#123;print   $1&#125;&apos;`  </div><div class="line">  i=1  </div><div class="line">  file_suffix=1  </div><div class="line">  while   [   $i   -lt   $lines   ]  </div><div class="line">  do  </div><div class="line">                  next=`expr   $i   +   999`  </div><div class="line">                  sed   -n   &quot;$&#123;i&#125;,   $&#123;next&#125;p&quot;   xxx.log &gt;   file_$file_suffix.log    </div><div class="line">                  n1=`expr   $n2   +   1`  </div><div class="line">                  file_suffix=`expr   $file_suffix   +   1`  </div><div class="line">  done</div></pre></td></tr></table></figure></p>
-<p>实现了每1000行来分割文件</p>
-<h2 id="使用工具split"><a href="#使用工具split" class="headerlink" title="使用工具split"></a>使用工具split</h2><p>split 参数：<br>-b  : 后面可接欲分割成的档案大小，可加单位，例如 b, k, m 等；<br>-l  : 以行数来进行分割；<br>-d  : 默认是以字符为后缀的,使用-d 或者–numeric-suffixes  可以改变后缀<br>查看参数更多可以　<code>man split</code></p>
-<p>1.按每个文件1000行来分割除<br>split -l 1000 access.log split<br>会切割成splitaa splitab splitac…</p>
-<p>2.按照每个文件100K来分割<br>split -l 1000 access.log split<br>会切割成httpaa，httpab，httpac ……..</p>
-<p>3.流切割<br>对于流split一样可以做到<br>简单点举例<br>cat access.log | split -l 1000 split<br>这样有些守护进程就可以这样写<br>php xxx.php | split -l 10000 xxx.log.</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/shell/">shell</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/11/17/union/" title="并查集" itemprop="url">并查集</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-11-17T02:47:00.000Z" itemprop="datePublished"> Published 2016-11-17</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="数据结构之并查集"><a href="#数据结构之并查集" class="headerlink" title="数据结构之并查集"></a>数据结构之并查集</h1><p>文章转自<a href="http://dongxicheng.org/structure/union-find-set/" target="_blank" rel="external">数据结构之并查集</a>;</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>并查集（Disjoint set或者Union-find set）是一种树型的数据结构，常用于处理一些不相交集合（Disjoint Sets）的合并及查询问题。</p>
-<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>并查集是一种非常简单的数据结构，它主要涉及两个基本操作，分别为：</p>
-<ul>
-<li><p>合并两个不相交集合</p>
-</li>
-<li><p>判断两个元素是否属于同一个集合</p>
-</li>
-</ul>
-<p>1.合并两个不相交集合（Union(x,y)）</p>
-<p>合并操作很简单：先设置一个数组Father[x]，表示x的“父亲”的编号。那么，合并两个不相交集合的方法就是，找到其中一个集合最父亲的父亲（也就是最久远的祖先），将另外一个集合的最久远的祖先的父亲指向它。<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/union.jpg" alt="union"></p>
-<p>上图为两个不相交集合，b图为合并后Father(b):=Father(g)</p>
-<p>2.判断两个元素是否属于同一集合（Find_Set(x)）</p>
-<p>本操作可转换为寻找两个元素的最久远祖先是否相同。可以采用递归实现。</p>
-<h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>1.Find_Set(x)时，路径压缩</p>
-<p>寻找祖先时，我们一般采用递归查找，但是当元素很多亦或是整棵树变为一条链时，每次Find_Set(x)都是O(n)的复杂度。为了避免这种情况，我们需对路径进行压缩，即当我们经过”递推”找到祖先节点后，”回溯”的时候顺便将它的子孙节点都直接指向祖先，这样以后再次Find_Set(x)时复杂度就变成O(1)了，如下图所示。可见，路径压缩方便了以后的查找。</p>
-<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/optimization.jpg" alt=""></p>
-<p>2.Union(x,y)时，按秩合并</p>
-<p>即合并的时候将元素少的集合合并到元素多的集合中，这样合并之后树的高度会相对较小。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div></pre></td><td class="code"><pre><div class="line">int father[MAX];   /* father[x]表示x的父节点*/</div><div class="line"> </div><div class="line">int rank[MAX];     /*rank[x]表示x的秩*/</div><div class="line"> </div><div class="line">&amp;nbsp;</div><div class="line"> </div><div class="line">void Make_Set(int x)</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">father[x] = x; //根据实际情况指定的父节点可变化</div><div class="line"> </div><div class="line">rank[x] = 0;   //根据实际情况初始化秩也有所变化</div><div class="line"> </div><div class="line">&#125;</div><div class="line"> </div><div class="line">/* 查找x元素所在的集合,回溯时压缩路径*/</div><div class="line"> </div><div class="line">int Find_Set(int x)</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">if (x != father[x])</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">father[x] = Find_Set(father[x]); //这个回溯时的压缩路径是精华</div><div class="line"> </div><div class="line">&#125;</div><div class="line"> </div><div class="line">return father[x];</div><div class="line"> </div><div class="line">&#125;</div><div class="line"> </div><div class="line">/*</div><div class="line"> </div><div class="line">按秩合并x,y所在的集合</div><div class="line"> </div><div class="line">下面的那个if else结构不是绝对的，具体根据情况变化</div><div class="line"> </div><div class="line">但是，宗旨是不变的即，按秩合并，实时更新秩。</div><div class="line"> </div><div class="line">*/</div><div class="line"> </div><div class="line">void Union(int x, int y)</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">x = Find_Set(x);</div><div class="line"> </div><div class="line">y = Find_Set(y);</div><div class="line"> </div><div class="line">if (x == y) return;</div><div class="line"> </div><div class="line">if (rank[x] &gt; rank[y])</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">father[y] = x;</div><div class="line"> </div><div class="line">&#125;</div><div class="line"> </div><div class="line">else</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">if (rank[x] == rank[y])</div><div class="line"> </div><div class="line">&#123;</div><div class="line"> </div><div class="line">rank[y]++;</div><div class="line"> </div><div class="line">&#125;</div><div class="line"> </div><div class="line">father[x] = y;</div><div class="line"> </div><div class="line">&#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><p>空间复杂度为O(N)，建立一个集合的时间复杂度为O(1)，N次合并M查找的时间复杂度为O(M Alpha(N))，这里Alpha是Ackerman函数的某个反函数，在很大的范围内（人类目前观测到的宇宙范围估算有10的80次方个原子，这小于前面所说的范围）这个函数的值可以看成是不大于4的，所以并查集的操作可以看作是线性的。具体复杂度分析过程见参考资料（3）。</p>
-<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>并查集常作为另一种复杂的数据结构或者算法的存储结构。常见的应用有：求无向图的连通分量个数，最近公共祖先（LCA），带限制的作业排序，实现Kruskar算法求最小生成树等。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
-<li><p>并查集：<a href="http://www.nocow.cn/index.php/%E5%B9%B6%E6%9F%A5%E9%9B%86" target="_blank" rel="external">http://www.nocow.cn/index.php/%E5%B9%B6%E6%9F%A5%E9%9B%86</a></p>
-</li>
-<li><p>博文《并查集详解》：<a href="http://www.cnblogs.com/cherish_yimi/" target="_blank" rel="external">http://www.cnblogs.com/cherish_yimi/</a></p>
-</li>
-<li><p>Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein. Introduction to Algorithms, Second Edition. MIT Press and McGraw-Hill, 2001. ISBN 0-262-03293-7. Chapter 21: Data structures for Disjoint Sets, pp. 498–524.</p>
-</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/other/">other</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/数据结构/">数据结构</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
@@ -912,7 +894,7 @@
   <div class="tagcloudlist">
     <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
@@ -979,11 +961,11 @@
 		  
 		
 		  
-			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>2</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>13</sup></a></li>
 		  
 		
 		  

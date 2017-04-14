@@ -80,6 +80,138 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/07/18/mysql_01/" title="mysql  null" itemprop="url">mysql  null</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T11:08:00.000Z" itemprop="datePublished"> Published 2015-07-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>今天在处理dbrt时，类似的建表语句如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `xxx`(</div><div class="line">     ...</div><div class="line">    `column1` int(11) not null</div><div class="line">    ...</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<p>对于这种字段，需要赋予默认值,然后有人说,我设置的不为null，就是不希望有空值插入进去,所以这里不需要设置default。</p>
+<hr>
+<h2 id="深入探究null-和-not-null"><a href="#深入探究null-和-not-null" class="headerlink" title="深入探究null 和 not null"></a>深入探究null 和 not null</h2><p>首先，我们要搞清楚“空值” 和 “NULL” 的概念:</p>
+<ul>
+<li>空值是不占用空间的</li>
+<li>mysql中的NULL其实是占用空间的，下面是来自于MYSQL官方的解释</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NULL columns require additional space in the row to record whether their values are NULL. For MyISAM tables, each NULL column takes one bit extra, rounded up to the nearest byte</div></pre></td></tr></table></figure>
+<p>所以空值还是会被插入到db中，只有NULL列才不会被插入。</p>
+<h2 id="为什么要设置NOT-NULL"><a href="#为什么要设置NOT-NULL" class="headerlink" title="为什么要设置NOT NULL"></a>为什么要设置NOT NULL</h2><p>NULL列需要更多的存储空间，还需要mysql内部进行特殊处理。NULL列被索引后，每条记录都需要一个额外的字节，还能导致MYisam 中固定大小的索引变成可变大小的索引。这在《高性能mysql》中有介绍的,<br>所以为了尽量避免NULL，我们指定列为NOT NULL。<br>可以看出，在MySQL中，含有NULL的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用0、一个特殊的值或者一个空串代替空值。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/mysql/">mysql</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/18/pdo_lastinsert/" title="pdo lastInserId问题" itemprop="url">pdo lastInserId问题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-07-18T11:05:55.000Z" itemprop="datePublished"> Published 2015-07-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>##问题<br>同事问了一个问题:<br>框架底层对executeSql进行了封装(对sql进行了处理，做主从分离),在执行insert xxx values xxx on duplicate key update语句后，使用lastInsertId时返回结果是0。  </p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>由于要判断是否插入失败，所以分析了一下框架executeSql，除了select，desc 其他语句使用master进行处理(主要是为了实现框架级别的主从分离),在PDOStatement::execute之后，<br>对操作语句的类型进行了判断,对于insert的返回，执行成功的结果都是返回PDO::lastInsertId,如果执行失败，则返回false.<br>查看了PDO::lastInsertId 的说明手册<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">string PDO::lastInsertId ([ string $name = NULL ] )</div><div class="line">返回最后插入行的ID，或者是一个序列对象最后的值，取决于底层的驱动。比如，PDO_PGSQL() 要求为 name 参数指定序列对象的名称。 </div><div class="line">    Note:</div><div class="line"></div><div class="line">   在不同的 PDO 驱动之间，此方法可能不会返回一个有意义或一致的结果，因为底层数据库可能不支持自增字段或序列的概念。</div></pre></td></tr></table></figure></p>
+<p>但是我的数据库底层支持自增字段或序列啊，不应该返回0，结果仔细看表发现，由于表是从其他表中获取有效数据同步过来的,所以没有自增字段(auto-increment)，<br>这样，判断executeSql是否执行失败，需要使用result === false来判断了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a><a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/07/18/singleton/" title="单例模式" itemprop="url">单例模式</a>
   </h1>
   <p class="article-author">By
@@ -422,7 +554,7 @@
   <div class="tagcloudlist">
     <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
@@ -489,11 +621,11 @@
 		  
 		
 		  
-			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>2</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>13</sup></a></li>
 		  
 		
 		  

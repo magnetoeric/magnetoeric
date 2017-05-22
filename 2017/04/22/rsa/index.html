@@ -5,24 +5,24 @@
   <meta name="google-site-verification" content="0dfpYjYP37p5-odIMIJFaSXqgC0czlP_NcS4CoK8iew" />
   <meta charset="UTF-8">
   
-    <title>activemq 通信方式总结 | 艾瑞克</title>
+    <title>rsa加密 | 艾瑞克</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="ericwang">
     
 
     
-    <meta name="description" content="简介activemq是JMS消息通信规范的一个实现。总的来说，消息规范里面定义最常见的几种消息通信模式主要有发布-订阅、点对点这两种。 基础流程在讨论具体方式的时候，我们先看看使用activemq需要启动服务的主要过程。按照JMS的规范，我们首先需要获得一个JMS connection factory.，通过这个connection factory来创建connection.在这个基础之上我们再创">
-<meta name="keywords">
+    <meta name="description" content="rsa加密rsa算法相关RSA算法原理（一）RSA算法原理（二） 最近研究百度登陆,发现百度登陆使用到了rsa加密,通过异步获取pubkey后，对password进行了rsa加密具体php实现如下 12345function rsaSign($password,$pubKey) &amp;#123;    openssl_public_encrypt($password,$sign,$pubKey);">
+<meta name="keywords" content="linux">
 <meta property="og:type" content="article">
-<meta property="og:title" content="activemq 通信方式总结">
-<meta property="og:url" content="http://magnetoeric.github.io/2017/01/10/activemq/index.html">
+<meta property="og:title" content="rsa加密">
+<meta property="og:url" content="http://magnetoeric.github.io/2017/04/22/rsa/index.html">
 <meta property="og:site_name" content="艾瑞克">
-<meta property="og:description" content="简介activemq是JMS消息通信规范的一个实现。总的来说，消息规范里面定义最常见的几种消息通信模式主要有发布-订阅、点对点这两种。 基础流程在讨论具体方式的时候，我们先看看使用activemq需要启动服务的主要过程。按照JMS的规范，我们首先需要获得一个JMS connection factory.，通过这个connection factory来创建connection.在这个基础之上我们再创">
-<meta property="og:updated_time" content="2017-04-10T11:39:56.000Z">
+<meta property="og:description" content="rsa加密rsa算法相关RSA算法原理（一）RSA算法原理（二） 最近研究百度登陆,发现百度登陆使用到了rsa加密,通过异步获取pubkey后，对password进行了rsa加密具体php实现如下 12345function rsaSign($password,$pubKey) &amp;#123;    openssl_public_encrypt($password,$sign,$pubKey);">
+<meta property="og:updated_time" content="2017-05-22T09:22:23.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="activemq 通信方式总结">
-<meta name="twitter:description" content="简介activemq是JMS消息通信规范的一个实现。总的来说，消息规范里面定义最常见的几种消息通信模式主要有发布-订阅、点对点这两种。 基础流程在讨论具体方式的时候，我们先看看使用activemq需要启动服务的主要过程。按照JMS的规范，我们首先需要获得一个JMS connection factory.，通过这个connection factory来创建connection.在这个基础之上我们再创">
+<meta name="twitter:title" content="rsa加密">
+<meta name="twitter:description" content="rsa加密rsa算法相关RSA算法原理（一）RSA算法原理（二） 最近研究百度登陆,发现百度登陆使用到了rsa加密,通过异步获取pubkey后，对password进行了rsa加密具体php实现如下 12345function rsaSign($password,$pubKey) &amp;#123;    openssl_public_encrypt($password,$sign,$pubKey);">
 
     
     
@@ -80,14 +80,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/01/10/activemq/" title="activemq 通信方式总结" itemprop="url">activemq 通信方式总结</a>
+      <a href="/2017/04/22/rsa/" title="rsa加密" itemprop="url">rsa加密</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2017-01-10T12:59:00.000Z" itemprop="datePublished"> Published 2017-01-10</time>
+    <time datetime="2017-04-22T11:35:00.000Z" itemprop="datePublished"> Published 2017-04-22</time>
     
   </p>
 </header>
@@ -96,24 +96,13 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基础流程"><span class="toc-number">2.</span> <span class="toc-text">基础流程</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#rsa加密"><span class="toc-number">1.</span> <span class="toc-text">rsa加密</span></a></li></ol>
 		
 		</div>
 		
-		<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>activemq是JMS消息通信规范的一个实现。总的来说，消息规范里面定义最常见的几种消息通信模式主要有发布-订阅、点对点这两种。</p>
-<h2 id="基础流程"><a href="#基础流程" class="headerlink" title="基础流程"></a>基础流程</h2><p>在讨论具体方式的时候，我们先看看使用activemq需要启动服务的主要过程。<br>按照JMS的规范，我们首先需要获得一个JMS connection factory.，通过这个connection factory来创建connection.在这个基础之上我们再创建session, destination, producer和consumer。因此主要的几个步骤如下：</p>
-<ol>
-<li>获得JMS connection factory. 通过我们提供特定环境的连接信息来构造factory。</li>
-<li>利用factory构造JMS connection</li>
-<li>启动connection</li>
-<li>通过connection创建JMS session.</li>
-<li>指定JMS destination.</li>
-<li>创建JMS producer或者创建JMS message并提供destination.</li>
-<li>创建JMS consumer或注册JMS message listener.</li>
-<li>发送和接收JMS message.</li>
-<li>关闭所有JMS资源，包括connection, session, producer, consumer等。</li>
-</ol>
-  
+		<h1 id="rsa加密"><a href="#rsa加密" class="headerlink" title="rsa加密"></a>rsa加密</h1><p>rsa算法相关<br><a href="http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html" target="_blank" rel="external">RSA算法原理（一）</a><br><a href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html" target="_blank" rel="external">RSA算法原理（二）</a></p>
+<p>最近研究百度登陆,发现百度登陆使用到了rsa加密,通过异步获取pubkey后，对password进行了rsa加密<br>具体php实现如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">function rsaSign($password,$pubKey) &#123;</div><div class="line">    openssl_public_encrypt($password,$sign,$pubKey);</div><div class="line">    return base64_encode($sign);</div><div class="line">&#125;</div></pre></td></tr></table></figure>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
@@ -124,13 +113,18 @@
 </div>
 
 
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
 </div>
 
 
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://magnetoeric.github.io/2017/01/10/activemq/" data-title="activemq 通信方式总结 | 艾瑞克" data-tsina="null" class="share clearfix">
+	  <div data-url="http://magnetoeric.github.io/2017/04/22/rsa/" data-title="rsa加密 | 艾瑞克" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -144,18 +138,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/01/04/rabbitmq/" title="rabbitmq">
+ <a href="/2017/04/14/patterns_01/" title="观察者模式">
   <strong>上一篇：</strong><br/>
   <span>
-  rabbitmq</span>
+  观察者模式</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2017/04/05/STOMP/"  title="STOMP">
+<a href="/2017/04/23/baidu_login/"  title="百度 模拟登陆">
  <strong>下一篇：</strong><br/> 
- <span>STOMP
+ <span>百度 模拟登陆
 </span>
 </a>
 </div>
@@ -170,7 +164,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基础流程"><span class="toc-number">2.</span> <span class="toc-text">基础流程</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#rsa加密"><span class="toc-number">1.</span> <span class="toc-text">rsa加密</span></a></li></ol>
  
   </div>
 
@@ -182,7 +176,7 @@
   <div class="tagcloudlist">
     <p class="asidetitle">Tag Cloud</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 11.67px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 10px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
@@ -233,6 +227,10 @@
 		  
 		
 		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/nodejs/" title="nodejs">nodejs<sup>3</sup></a></li>
 		  
 		
@@ -241,15 +239,15 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>9</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>11</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/patterns/" title="patterns">patterns<sup>1</sup></a></li>
+			<li><a href="/categories/patterns/" title="patterns">patterns<sup>2</sup></a></li>
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>12</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>15</sup></a></li>
 		  
 		
 		  

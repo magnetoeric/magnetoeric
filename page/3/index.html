@@ -80,6 +80,340 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/05/18/shell/" title="shell 编程之语法基础" itemprop="url">shell 编程之语法基础</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-18T01:35:00.000Z" itemprop="datePublished"> Published 2016-05-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://liwei.life/2016/05/16/69/" target="_blank" rel="external">SHELL编程之语法基础</a></p>
+<p>微博ID：<strong>orroz</strong></p>
+<p>微信公众号：<strong>Linux系统技术</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在此需要特别注明一下，本文叫做shell编程其实并不准确，更准确的说法是bash编程。考虑到bash的流行程度，姑且将bash编程硬说成shell编程也应没什么不可，但是请大家一定要清楚，shell编程绝不仅仅只是bash编程。</p>
+<p>通过本文可以帮你解决以下问题：</p>
+<ul>
+<li>if后面的中括号[]是语法必须的么？</li>
+<li>为什么bash编程中有时[]里面要加空格，有时不用加？如if [ -e /etc/passwd ]或ls [abc].sh。</li>
+<li>为什么有人写的脚本这样写：if [ x$test = x”string” ]？</li>
+<li>如何用*号作为通配符对目录树递归匹配？</li>
+<li>为什么在for循环中引用ls命令的输出是可能有问题的？就是说：for i in $(ls /)这样用有问题？</li>
+</ul>
+<p>除了以上知识点以外，本文还试图帮助大家用一个全新的角度对bash编程的知识进行体系化。介绍shell编程传统的做法一般是要先说明什么是shell？什么是bash？这是种脚本语言，那么什么是脚本语言？不过这些内容真的太无聊了，我们快速掠过，此处省略3万字……作为一个实践性非常强的内容，我们直接开始讲语法。所以，这并不是一个入门内容，我们的要求是在看本文之前，大家至少要学会Linux的基本操作，并知道bash的一些基础知识。</p>
+<h2 id="if分支结构"><a href="#if分支结构" class="headerlink" title="if分支结构"></a>if分支结构</h2><p>组成一个语言的必要两种语法结构之一就是分支结构，另一种是循环结构。作为一个编程语言，bash也给我们提供了分支结构，其中最常用的就是if。用来进行程序的分支逻辑判断。其原型声明为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">if list; then list; elif list; then list; ... else list; fi</div></pre></td></tr></table></figure>
+<p>bash在解析字符的时候，对待“;”跟看见回车是一样的行为，所以这个语法也可以写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">if list</div><div class="line">then</div><div class="line">    list</div><div class="line">elif list</div><div class="line">then</div><div class="line">    list</div><div class="line">...</div><div class="line">else</div><div class="line">    list</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>对于这个语法结构，需要重点说明的是list。对于绝大多数其他语言，if关键字后面一般跟的是一个表达式，比如C语言或类似语言的语法，if后面都是跟一个括号将表达式括起来，如：if (a &gt; 0)。这种认识会对学习bash编程造成一些误会，很多初学者都认为bash编程的if语法结构是：if [ ];then…，但实际上这里的中括号[]并不是C语言中小括号()语法结构的类似的关键字。这里的中括号其实就是个shell命令，是test命令的另一种写法。严谨的叙述，if后面跟的就应该是个list。那么什么是bash中的list呢？根据bash的定义，list就是若干个使用管道，；，&amp;，&amp;&amp;，||这些符号串联起来的shell命令序列，结尾可以；，&amp;或换行结束。这个定义可能比较复杂，如果暂时不能理解，大家直接可以认为，if后面跟的就是个shell命令。换个角度说，bash编程仍然贯彻了C程序的设计哲学，即：一切皆表达式。</p>
+<p>一切皆表达式这个设计原则，确定了shell在执行任何东西（注意是任何东西，不仅是命令）的时候都会有一个返回值，因为根据表达式的定义，任何表达式都必须有一个值。在bash编程中，这个返回值也限定了取值范围：0-255。跟C语言含义相反，bash中0为真（true），非0为假（false）。这就意味着，任何给bash之行的东西，都会反回一个值，在bash中，我们可以使用关键字$?来查看上一个执行命令的返回值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ ls /tmp/</div><div class="line">plugtmp  systemd-private-bfcfdcf97a4142e58da7d823b7015a1f-colord.service-312yQe  systemd-private-bfcfdcf97a4142e58da7d823b7015a1f-systemd-timesyncd.service-zWuWs0  tracker-extract-files.1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">0</div><div class="line">[zorro@zorrozou-pc0 ~]$ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">2</div></pre></td></tr></table></figure>
+<p>可以看到，ls /tmp命令执行的返回值为0，即为真，说明命令执行成功，而ls /123时文件不存在，反回值为2，命令执行失败。我们再来看个更极端的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ abcdef</div><div class="line">bash: abcdef: command not found</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">127</div></pre></td></tr></table></figure>
+<p>我们让bash执行一个根本不存在的命令abcdef。反回值为127，依然为假，命令执行失败。复杂一点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ ls /123|wc -l</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">0</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
+<p>这是一个list的执行，其实就是两个命令简单的用管道串起来。我们发现，这时shell会将整个list看作一个执行体，所以整个list就是一个表达式，那么最后只返回一个值0，这个值是整个list中最后一个命令的返回值，第一个命令执行失败并不影响后面的wc统计行数，所以逻辑上这个list执行成功，返回值为真。</p>
+<p>理解清楚这一层意思，我们才能真正理解bash的语法结构中if后面到底可以判断什么？事实是，判断什么都可以，因为bash无非就是把if后面的无论什么当成命令去执行，并判断其起返回值是真还是假？如果是真则进入一个分支，为假则进入另一个。基于这个认识，我们可以来思考以下这个程序两种写法的区别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">DIR=&quot;/etc&quot;</div><div class="line">＃第一种写法</div><div class="line">ls -l $DIR &amp;&gt; /dev/null</div><div class="line">ret=$?</div><div class="line"></div><div class="line">if [ $ret -eq 0 ]</div><div class="line">then</div><div class="line">        echo &quot;$DIR is exist!&quot; </div><div class="line">else</div><div class="line">        echo &quot;$DIR is not exist!&quot;</div><div class="line">fi</div><div class="line"></div><div class="line">#第二种写法</div><div class="line">if ls -l $DIR &amp;&gt; /dev/null</div><div class="line">then</div><div class="line">        echo &quot;$DIR is exist!&quot; </div><div class="line">else</div><div class="line">        echo &quot;$DIR is not exist!&quot;</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>我曾经在无数的脚本中看到这里的第一种写法，先执行某个命令，然后记录其返回值，再使用[]进行分支判断。我想，这样写的人应该都是没有真正理解if语法的语义，导致做出了很多脱了裤子再放屁的事情。当然，if语法中后面最常用的命令就是[]。请注意我的描述中就是说[]是一个命令，而不是别的。实际上这也是bash编程新手容易犯错的地方之一，尤其是有其他编程经验的人，在一开始接触bash编程的时候都是将[]当成if语句的语法结构，于是经常在写[]的时候里面不写空格，即：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#正确的写法</div><div class="line">if [ $ret -eq 0 ]</div><div class="line">＃错误的写法</div><div class="line">if [$ret -eq 0]</div></pre></td></tr></table></figure>
+<p>同样的，当我们理解清楚了[]本质上是一个shell命令的时候，大家就知道这个错误是为什么了：命令加参数要用空格分隔。我们可以用type命令去检查一个命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ type [</div><div class="line">[ is a shell builtin</div></pre></td></tr></table></figure>
+<p>所以，实际上[]是一个内建命令，等同于test命令。所以上面的if语句也可以写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">if test $ret -eq 0</div></pre></td></tr></table></figure>
+<p>这样看，形式上就跟第二种写法类似了。至于if分支怎么使用的其它例子就不再这废话了。重要的再强调一遍：if后面是一个命令(严格来说是list)，并且记住一个原则：一切皆表达式。</p>
+<h2 id="“当”、“直到”循环结构"><a href="#“当”、“直到”循环结构" class="headerlink" title="“当”、“直到”循环结构"></a>“当”、“直到”循环结构</h2><p>一般角度的讲解都会在讲完if分支结构之后讲其它分支结构，但是从执行特性和快速上手的角度来看，我认为先把跟if特性类似的while和until交代清楚更加合理。从字面上可以理解，while就是“当”型循环，指的是当条件成立时执行循环。，而until是直到型循环，其实跟while并没有实质上的区别，只是条件取非，逻辑变成循环到条件成立，或者说条件不成立时执行循环体。他们的语法结构是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">while list-1; do list-2; done</div><div class="line">until list-1; do list-2; done</div></pre></td></tr></table></figure>
+<p>同样，分号可以理解为回车，于是常见写法是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">while list-1</div><div class="line">do</div><div class="line">    list-2</div><div class="line">done</div><div class="line"></div><div class="line">until list-1</div><div class="line">do</div><div class="line">    list-2</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>还是跟if语句一样，我们应该明白对与while和until的条件的含义，仍然是list。其判断条件是list，其执行结构也是list。理解了上面if的讲解，我想这里应该不用复述了。我们用while和unitl来产生一个0-99的数字序列：<br>while版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">count=0</div><div class="line"></div><div class="line">while [ $count -le 100 ]</div><div class="line">do</div><div class="line">    echo $count</div><div class="line">    count=$[$count+1]</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>until版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">count=0</div><div class="line"></div><div class="line">until ! [ $count -le 100 ]</div><div class="line">do</div><div class="line">    echo $count</div><div class="line">    count=$[$count+1]</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>我们通过这两个程序可以再次对比一下while和until到底有什么不一样？其实它们从形式上完全一样。这里另外说明两个知识点：</p>
+<ul>
+<li><p>在bash中，叹号（!）代表对命令(表达式)的返回值取反。就是说如果一个命令或list或其它什么东西如果返回值为真，<br>加了叹号之后就是假，如果是假，加了叹号就是真。</p>
+</li>
+<li><p>在bash中，使用$[]可以得到一个算数运算的值。可以支持常用的5则运算（+-*/%）。<br>用法就是$[3+7]类似这样，而且要注意，这里的$[]里面没有空格分隔，因为它并不是个shell命令，而是特殊字符。</p>
+</li>
+</ul>
+<p>常见运算例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213+456]</div><div class="line">669</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213+456+789]</div><div class="line">1458</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213*456]</div><div class="line">97128</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[213/456]</div><div class="line">0</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[9/3]</div><div class="line">3</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[9/2]</div><div class="line">4</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[9%2]</div><div class="line">1</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[144%7]</div><div class="line">4</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $[7-10]</div><div class="line">-3</div></pre></td></tr></table></figure>
+<p>注意这个运算只支持整数，并且对与小数只娶其整数部分（没有四舍五入，小数全舍）。这个计算方法是bash提供的基础计算方法，如果想要实现更高级的计算可以使用let命令。如果想要实现浮点数运算，我一般使用awk来处理。</p>
+<p>上面的例子中仍然使用[]命令（test）来作为检查条件，我们再试一个别的。假设我们想写一个脚本检查一台服务器是否能ping通？如果能ping通，则每隔一秒再看一次，如果发现ping不通了，就报警。如果什么时候恢复了，就再报告恢复。就是说这个脚本会一直检查服务器状态，ping失败则触发报警，ping恢复则通告恢复。脚本内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">IPADDR=&apos;10.0.0.1&apos;</div><div class="line">INTERVAL=1</div><div class="line"></div><div class="line">while true</div><div class="line">do</div><div class="line">    while ping -c 1 $IPADDR &amp;&gt; /dev/null</div><div class="line">    do</div><div class="line">        sleep $INTERVAL</div><div class="line">    done</div><div class="line"></div><div class="line">    echo &quot;$IPADDR ping error! &quot; 1&gt;&amp;2</div><div class="line"></div><div class="line">    until ping -c 1 $IPADDR &amp;&gt; /dev/null</div><div class="line">    do</div><div class="line">        sleep $INTERVAL</div><div class="line">    done</div><div class="line"></div><div class="line">    echo &quot;$IPADDR ping ok!&quot;</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>这里关于输出重定向的知识我就先不讲解了，后续会有别的文章专门针对这个主题做出说明。以上就是if分支结构和while、until循环结构。掌握了这两种结构之后，我们就可以写出几乎所有功能的bash脚本程序了。这两种语法结构的共同特点是，使用list作为“判断条件”，这种“风味”的语法特点是“一切皆表达式”。bash为了使用方便，还给我们提供了另外一些“风味”的语法。下面我们继续看：</p>
+<h2 id="case分支结构和for循环结构"><a href="#case分支结构和for循环结构" class="headerlink" title="case分支结构和for循环结构"></a>case分支结构和for循环结构</h2><p>我们之所以把case分支和for循环放在一起讨论，主要是因为它们所判断的不再是“表达式”是否为真，而是去匹配字符串。我们还是通过其语法和例子来理解一下。case分支的语法结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">case word in [ [(] pattern [ | pattern ] ... ) list ;; ] ... esac</div></pre></td></tr></table></figure>
+<p>与if语句是以fi标记结束思路相仿，case语句是以esac标记结束。其常见的换行版本是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">case $1 in</div><div class="line">        pattern)</div><div class="line">        list</div><div class="line">        ;;</div><div class="line">        pattern)</div><div class="line">        list</div><div class="line">        ;;</div><div class="line">        pattern)</div><div class="line">        list</div><div class="line">        ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>举几个几个简单的例子，并且它们实际上是一样的：</p>
+<p>例1:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1 in</div><div class="line">    (zorro)</div><div class="line">    echo &quot;hello zorro!&quot;</div><div class="line">    ;;</div><div class="line">    (jerry)</div><div class="line">    echo &quot;hello jerry!&quot;</div><div class="line">    ;;</div><div class="line">    (*)</div><div class="line">    echo &quot;get out!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>例2:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1 in</div><div class="line">    zorro)</div><div class="line">    echo &quot;hello zorro!&quot;</div><div class="line">    ;;</div><div class="line">    jerry)</div><div class="line">    echo &quot;hello jerry!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;get out!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>例3:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1 in</div><div class="line">    zorro|jerry)</div><div class="line">    echo &quot;hello $1!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;get out!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>这些程序的执行结果都是一样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./case.sh zorro</div><div class="line">hello zorro!</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./case.sh jerry</div><div class="line">hello jerry!</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./case.sh xxxxxx</div><div class="line">get out!</div></pre></td></tr></table></figure>
+<p>这些程序应该不难理解，无非就是几个语法的不一样之处，大家自己可以看到哪些可以省略，哪些不能省略。这里需要介绍一下的有两个概念：</p>
+<ul>
+<li>$1在脚本中表示传递给脚本命令的第一个参数。关于这个变量以及其相关系列变量的使用，我们会在后续其它文章中介绍。</li>
+<li>pattern就是bash中“通配符”的概念。常用的bash通配符包括星号(*)、问号(?)和其它一些字符。相信如果对bash有一定了解的话，对这些符号并不陌生，我们在此简单说明一下。</li>
+</ul>
+<p>最常见的通配符有三个：</p>
+<p>? 表示任意一个字符。这个没什么可说的。</p>
+<ul>
+<li>表示任意长度任意字符，包括空字符。在bash4.0以上版本中，如果bash环境开启了globstar设置，那么两个连续的**可以用来递归匹配某目录下所有的文件名。我们通过一个实验测试一下：</li>
+</ul>
+<p>一个目录的结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ tree test/</div><div class="line">test/</div><div class="line">├── 1</div><div class="line">├── 2</div><div class="line">├── 3</div><div class="line">├── 4</div><div class="line">├── a</div><div class="line">│   ├── 1</div><div class="line">│   ├── 2</div><div class="line">│   ├── 3</div><div class="line">│   └── 4</div><div class="line">├── a.conf</div><div class="line">├── b</div><div class="line">│   ├── 1</div><div class="line">│   ├── 2</div><div class="line">│   ├── 3</div><div class="line">│   └── 4</div><div class="line">├── b.conf</div><div class="line">├── c</div><div class="line">│   ├── 5</div><div class="line">│   ├── 6</div><div class="line">│   ├── 7</div><div class="line">│   └── 8</div><div class="line">└── d</div><div class="line">    ├── 1.conf</div><div class="line">    └── 2.conf</div><div class="line"></div><div class="line">4 directories, 20 files</div></pre></td></tr></table></figure>
+<p>使用通配符进行文件名匹配：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/*</div><div class="line">test/1 test/2 test/3 test/4 test/a test/a.conf test/b test/b.conf test/c test/d</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/*.conf</div><div class="line">test/a.conf test/b.conf</div></pre></td></tr></table></figure>
+<p>这个结果大家应该都熟悉。我们再来看看下面：<br>查看当前globstar状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ shopt globstar</div><div class="line">globstar        off</div></pre></td></tr></table></figure>
+<p>打开globstar：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ shopt -s globstar</div><div class="line">[zorro@zorrozou-pc0 bash]$ shopt globstar</div><div class="line">globstar        on</div></pre></td></tr></table></figure>
+<p>使用**匹配：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**</div><div class="line">test/ test/1 test/2 test/3 test/4 test/a test/a/1 test/a/2 test/a/3 test/a/4 test/a.conf test/b test/b/1 test/b/2 test/b/3 test/b/4 test/b.conf test/c test/c/5 test/c/6 test/c/7 test/c/8 test/d test/d/1.conf test/d/2.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**/*.conf</div><div class="line">test/a.conf test/b.conf test/d/1.conf test/d/2.conf</div></pre></td></tr></table></figure>
+<p>关闭globstart并再次测试**：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ shopt -u globstar</div><div class="line">[zorro@zorrozou-pc0 bash]$ shopt  globstar</div><div class="line">globstar        off</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**/*.conf</div><div class="line">test/d/1.conf test/d/2.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ </div><div class="line">[zorro@zorrozou-pc0 bash]$ echo test/**</div><div class="line">test/1 test/2 test/3 test/4 test/a test/a.conf test/b test/b.conf test/c test/d</div></pre></td></tr></table></figure>
+<p>[…] 表示这个范围中的任意一个字符。比如[abcd]，表示a或b或c或d。当然这也可以写成[a-d]。[a-z]表示任意一个小些字母。还是刚才的test目录，我们再来试试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls test/[123]</div><div class="line">test/1  test/2  test/3</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls test/[abc]</div><div class="line">test/a:</div><div class="line">1  2  3  4</div><div class="line"></div><div class="line">test/b:</div><div class="line">1  2  3  4</div><div class="line"></div><div class="line">test/c:</div><div class="line">5  6  7  8</div></pre></td></tr></table></figure>
+<p>以上就是简单的三个通配符的说明。当然，关于通配符以及shopt命令还有很多相关知识。我们还是会在后续的文章中单独把相关知识点拿出来讲，再这里大家先理解这几个。另外需要强调一点，千万不要把bash的通配符和正则表达式搞混了，它们完全没有关系！</p>
+<p>简要理解了pattern的概念之后，我们就可以更加灵活的使用case了，它不仅仅可以匹配一个固定的字符串，还可以利用pattern做到一定程度的模糊匹配。但是无论怎样，case都是去比较字符串是否一样，这跟使用if语句有本质的不同，if是判断表达式。当然，我们在if中使用test命令同样可以做到case的效果，区别仅仅是程序代码多少的区别。还是举个例子说明一下，我们想写一个身份验证程序，大家都知道，一个身份验证程序要判断用户名及其密码是否都匹配某一个字符串，如果两个都匹配，就通过验证，如果有一个不匹配就不能通过验证。分别用if和case来实现这两个验证程序内容如下：</p>
+<p>if版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">if [ $1 = &quot;zorro&quot; ] &amp;&amp; [ $2 = &quot;zorro&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">elif [ $1$2 = &quot;jerryjerry&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">else</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>case版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1$2 in</div><div class="line">    zorrozorro|jerryjerry)</div><div class="line">    echo &quot;ok!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>两个程序一对比，直观看起来case版的要少些代码，表达力也更强一些。但是，这两个程序都有bug，如果case版程序给的两个参数是zorro zorro可以报ok。如果是zorroz orro是不是也可以报ok？如果只给一个参数zorrozorro，另一个参数为空，是不是也可以报ok？同样，if版的jerry判断也有类似问题。当你的程序要跟用户或其它程序交互的时候，一定要谨慎仔细的检查输入，一般写程序很大工作量都在做各种异常检查上，尤其是需要跟人交互的时候。我们看似用一个合并字符串变量的技巧，将两个判断给合并成了一个，但是这个技巧却使程序编写出了错误。对于这个现象，我的意见是，如果不是必要，请不要在编程中玩什么“技巧”，重剑无锋，大巧不工。当然，这个bug可以通过如下方式解决：</p>
+<p>if版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">if [ $1 = &quot;zorro&quot; ] &amp;&amp; [ $2 = &quot;zorro&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">elif [ $1:$2 = &quot;jerry:jerry&quot; ]</div><div class="line">then</div><div class="line">    echo &quot;ok&quot;</div><div class="line">else</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">fi</div></pre></td></tr></table></figure>
+<p>case版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">case $1x$2 in</div><div class="line">    zorro:zorro|jerry:jerry)</div><div class="line">    echo &quot;ok!&quot;</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">    echo &quot;auth failed!&quot;</div><div class="line">    ;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>我加的是个:字符，当然，也可以加其他字符，原则是这个字符不要再输入中能出现。我们在其他人写的程序里也经常能看到类似这样的判断处理：</p>
+<p>if [ x$1 = x”zorro” ] &amp;&amp; [ x$2 = x”zorro” ]</p>
+<p>相信你也能明白为什么要这么处理了。仅对某一个判断来说这似乎没什么必要，但是如果你养成了这样的习惯，那么就能让你避免很多可能出问题的环节。这就是编程经验和编程习惯的重要性。当然，很多人只有“经验”，却也不知道这个经验是怎么来的，那也并不可取。</p>
+<h2 id="for循环结构"><a href="#for循环结构" class="headerlink" title="for循环结构"></a>for循环结构</h2><p>bash提供了两种for循环，一种是类似C语言的for循环，另一种是让某变量在一系列字符串中做循环。在此，我们先说后者。其语法结构是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">for name [ [ in [ word ... ] ] ; ] do list ; done</div></pre></td></tr></table></figure>
+<p>其中name一般是一个变量名，后面的word …是我们要让这个变量分别赋值的字符串列表。这个循环将分别将name变量每次赋值一个word，并执行循环体，直到所有word被遍历之后退出循环。这是一个非常有用的循环结构，其使用频率可能远高于while、until循环。我们来看看例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in 1 2 3 4 5;do echo $i;done</div><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td></tr></table></figure>
+<p>再看另外一个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in aaa bbb ccc ddd eee;do echo $i;done</div><div class="line">aaa</div><div class="line">bbb</div><div class="line">ccc</div><div class="line">ddd</div><div class="line">eee</div></pre></td></tr></table></figure>
+<p>再看一个：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in /etc/* ;do echo $i;done</div><div class="line">/etc/adjtime</div><div class="line">/etc/adobe</div><div class="line">/etc/appstream.conf</div><div class="line">/etc/arch-release</div><div class="line">/etc/asound.conf</div><div class="line">/etc/avahi</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>这种例子举不胜举，可以用for遍历的东西真的很多，大家可以自己发挥想象力。这里要提醒大家注意的是当你学会了“或$()这个符号之后，for的范围就更大了。于是很多然喜欢这样搞：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in `ls`;do echo $i;done</div><div class="line">auth_case.sh</div><div class="line">auth_if.sh</div><div class="line">case.sh</div><div class="line">if_1.sh</div><div class="line">ping.sh</div><div class="line">test</div><div class="line">until.sh</div><div class="line">while.sh</div></pre></td></tr></table></figure>
+<p>乍看起来这好像跟使用*没啥区别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in *;do echo $i;done</div><div class="line">auth_case.sh</div><div class="line">auth_if.sh</div><div class="line">case.sh</div><div class="line">if_1.sh</div><div class="line">ping.sh</div><div class="line">test</div><div class="line">until.sh</div><div class="line">while.sh</div></pre></td></tr></table></figure>
+<p>但可惜的是并不总是这样，请对比如下两个测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ for i in `ls /etc`;do echo $i;done</div><div class="line">adjtime</div><div class="line">adobe</div><div class="line">appstream.conf</div><div class="line">arch-release</div><div class="line">asound.conf</div><div class="line">avahi</div><div class="line">bash.bash_logout</div><div class="line">bash.bashrc</div><div class="line">bind.keys</div><div class="line">binfmt.d</div><div class="line">......</div><div class="line"></div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ for i in /etc/*;do echo $i;done</div><div class="line">/etc/adjtime</div><div class="line">/etc/adobe</div><div class="line">/etc/appstream.conf</div><div class="line">/etc/arch-release</div><div class="line">/etc/asound.conf</div><div class="line">/etc/avahi</div><div class="line">/etc/bash.bash_logout</div><div class="line">/etc/bash.bashrc</div><div class="line">/etc/bind.keys</div><div class="line">/etc/binfmt.d</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>看到差别了么？</p>
+<p>其实这里还会隐含很多其它问题，像ls这样的命令很多时候是设计给人用的，它的很多显示是有特殊设定的，可能并不是纯文本。比如可能包含一些格式化字符，也可能包含可以让终端显示出颜色的标记字符等等。当我们在程序里面使用类似这样的命令的时候要格外小心，说不定什么时候在什么不同环境配置的系统上，你的程序就会有意想不到的异常出现，到时候排查起来非常麻烦。所以这里我们应该尽量避免使用ls这样的命令来做类似的行为，用通配符可能更好。当然，如果你要操作的是多层目录文件的话，那么ls就更不能帮你的忙了，它遇到目录之后显示成这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/*</div><div class="line">/etc/adobe:</div><div class="line">mms.cfg</div><div class="line"></div><div class="line">/etc/avahi:</div><div class="line">avahi-autoipd.action  avahi-daemon.conf  avahi-dnsconfd.action  hosts  services</div><div class="line"></div><div class="line">/etc/binfmt.d:</div><div class="line"></div><div class="line">/etc/bluetooth:</div><div class="line">main.conf</div><div class="line"></div><div class="line">/etc/ca-certificates:</div><div class="line">extracted  trust-source</div></pre></td></tr></table></figure>
+<p>所以遍历一个目录还是要用刚才说到的**，如果不是bash 4.0之后的版本的话，可以使用find。我推荐用find，因为它更通用。有时候你会发现，使用find之后，绝大多数原来需要写脚本解决的问题可能都用不着了，一个find命令解决很多问题。</p>
+<h2 id="select和第二种for循环"><a href="#select和第二种for循环" class="headerlink" title="select和第二种for循环"></a>select和第二种for循环</h2><p>我之所以把这两种语法放到一起讲，主要是这两种语法结构在bash编程中使用的几率可能较小。这里的第二种for循环是相对于上面讲的第一种for循环来说的。实际上这种for循环就是C语言中for循环的翻版，其语义基本一致，区别是括号()变成了双括号(())，循环标记开始和结束也是bash风味的do和done，其语法结构为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">for (( expr1 ; expr2 ; expr3 )) ; do list ; done</div></pre></td></tr></table></figure>
+<p>看一个产生0-99数字的循环例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">for ((count=0;count&lt;100;count++))</div><div class="line">do</div><div class="line">    echo $count</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>我们可以理解为，bash为了对数学运算作为条件的循环方便我们使用，专门扩展了一个for循环来给我们使用。跟C语言一样，这个循环本质上也只是一个while循环，只是把变量初始化，变量比较和循环体中的变量操作给放到了同一个(())语句中。这里不再废话。</p>
+<p>最后是select循环，实际上select提供给了我们一个构建交互式菜单程序的方式，如果没有select的话，我们在shell中写交互的菜单程序是比较麻烦的。它的语法结构是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select name [ in word ] ; do list ; done</div></pre></td></tr></table></figure>
+<p>还是来看看例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">select i in a b c d</div><div class="line">do</div><div class="line">    echo $i</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>这个程序执行的效果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./select.sh </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#?</div></pre></td></tr></table></figure>
+<p>你会发现select给你构造了一个交互菜单，索引为1，2，3，4。对应的名字就是程序中的a，b，c，d。之后我们就可以在后面输入相应的数字索引，选择要echo的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./select.sh </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#? 1</div><div class="line">a</div><div class="line">#? 2</div><div class="line">b</div><div class="line">#? 3</div><div class="line">c</div><div class="line">#? 4</div><div class="line">d</div><div class="line">#? 6</div><div class="line"></div><div class="line">#? </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#? </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#?</div></pre></td></tr></table></figure>
+<p>如果输入的不是菜单描述的范围就会echo一个空行，如果直接输入回车，就会再显示一遍菜单本身。当然我们会发现这样一个菜单程序似乎没有什么意义，实际程序中，select大多数情况是跟case配合使用的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">select i in a b c d</div><div class="line">do</div><div class="line">    case $i in</div><div class="line">        a)</div><div class="line">        echo &quot;Your choice is a&quot;</div><div class="line">        ;;</div><div class="line">        b)</div><div class="line">        echo &quot;Your choice is b&quot;</div><div class="line">        ;;</div><div class="line">        c)</div><div class="line">        echo &quot;Your choice is c&quot;</div><div class="line">        ;;</div><div class="line">        d)</div><div class="line">        echo &quot;Your choice is d&quot;</div><div class="line">        ;;</div><div class="line">        *)</div><div class="line">        echo &quot;Wrong choice! exit!&quot;</div><div class="line">        exit</div><div class="line">        ;;</div><div class="line">    esac</div><div class="line">done</div></pre></td></tr></table></figure>
+<p>执行结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./select.sh </div><div class="line">1) a</div><div class="line">2) b</div><div class="line">3) c</div><div class="line">4) d</div><div class="line">#? 1</div><div class="line">Your choice is a</div><div class="line">#? 2</div><div class="line">Your choice is b</div><div class="line">#? 3</div><div class="line">Your choice is c</div><div class="line">#? 4</div><div class="line">Your choice is d</div><div class="line">#? 5</div><div class="line">Wrong choice! exit!</div></pre></td></tr></table></figure>
+<p>这就是select的常见用法。</p>
+<h2 id="continue和break"><a href="#continue和break" class="headerlink" title="continue和break"></a>continue和break</h2><p>对于bash的实现来说，continue和break实际上并不是语法的关键字，而是被作为内建命令来实现的。不过我们从习惯上依然把它们看作是bash的语法。在bash中，break和continue可以用来跳出和金星下一次for，while，until和select循环。<br>最后</p>
+<p>我们在本文中介绍了bash编程的常用语法结构：if、while、until、case、两种for和select。我们在详细分析它们语法的特点的过程中，也简单说明了使用时需要注意的问题。希望这些知识和经验对大家以后在bash编程上有帮助。</p>
+<p>通过bash编程语法的入门，我们也能发现，bash编程是一个上手容易，但是精通困难的编程语言。任何人想要写个简单的脚本，掌握几个语法结构和几个shell命令基本就可以干活了，但是想写出高质量的代码确没那么容易。通过语法的入门，我们可以管中窥豹的发现，讲述的过程中有无数个可以深入探讨的细节知识点，比如通配符、正则表达式、bash的特殊字符、bash的特殊属性和很多shell命令的使用。我们的后续文章会给大家分块整理这些知识点，如果你有兴趣，请持续关注。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/11/php-glob/" title="php glob" itemprop="url">php glob</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-11T06:13:00.000Z" itemprop="datePublished"> Published 2016-05-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="php查找符合某些规则的文件"><a href="#php查找符合某些规则的文件" class="headerlink" title="php查找符合某些规则的文件"></a>php查找符合某些规则的文件</h2><p>通常实现查找目录下某些规则的文件，用shell实现起来很容易，但是php呢,个人想到的是遍历目录下所有文件并再用正则筛选.<br>然而php有现成的函数已经为我们做好了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">说明</div><div class="line">array glob ( string $pattern [, int $flags = 0 ] )</div><div class="line"></div><div class="line">glob() 函数依照 libc glob() 函数使用的规则寻找所有与 pattern 匹配的文件路径，类似于一般 shells 所用的规则一样。不进行缩写扩展或参数替代。</div><div class="line">参数</div><div class="line"></div><div class="line">pattern</div><div class="line"></div><div class="line">    The pattern. No tilde expansion or parameter substitution is done.</div><div class="line">flags</div><div class="line"></div><div class="line">    有效标记有：</div><div class="line"></div><div class="line">        GLOB_MARK - 在每个返回的项目中加一个斜线</div><div class="line">        GLOB_NOSORT - 按照文件在目录中出现的原始顺序返回（不排序）</div><div class="line">        GLOB_NOCHECK - 如果没有文件匹配则返回用于搜索的模式</div><div class="line">        GLOB_NOESCAPE - 反斜线不转义元字符</div><div class="line">        GLOB_BRACE - 扩充 &#123;a,b,c&#125; 来匹配 &apos;a&apos;，&apos;b&apos; 或 &apos;c&apos;</div><div class="line">        GLOB_ONLYDIR - 仅返回与模式匹配的目录项</div><div class="line">        GLOB_ERR - 停止并读取错误信息（比如说不可读的目录），默认的情况下忽略所有错误</div><div class="line"></div><div class="line">返回值</div><div class="line"></div><div class="line">返回一个包含有匹配文件／目录的数组。如果出错返回 FALSE。</div><div class="line"></div><div class="line">    Note:</div><div class="line"></div><div class="line">    On some systems it is impossible to distinguish between empty match and an error.</div></pre></td></tr></table></figure>
+<p>比如查找某目录下的txt文件并显示其大小<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">&lt;?php</div><div class="line">foreach (glob(&quot;*.txt&quot;) as $filename) &#123;</div><div class="line">    echo &quot;$filename size &quot; . filesize($filename) . &quot;\n&quot;;</div><div class="line">&#125;</div><div class="line">?&gt;</div></pre></td></tr></table></figure></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/09/php-curl-file-get-contents比较/" title="php curl file_get_contents比较" itemprop="url">php curl file_get_contents比较</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-09T12:32:00.000Z" itemprop="datePublished"> Published 2016-05-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>最近发布系统出现了一些速度问题，而且时好时坏，网络非常不稳定，查了一下，发现代码里出现很多file_get_contents函数</p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>写两个简单的例子吧<br>curl </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$i= 0;</div><div class="line">do&#123;</div><div class="line">    $t1 = microtime();</div><div class="line">    $url = &quot;http://www.anjuke.com&quot;;</div><div class="line">    file_get_contents($url);</div><div class="line">    $t2 = microtime();</div><div class="line">    echo (($t2-$t1)&lt;0?($t2-$t1)+1:($t2-$t1)).PHP_EOL;</div><div class="line">&#125;while($i++&lt;2);</div></pre></td></tr></table></figure>
+<p>file_get_contents</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$i= 0;</div><div class="line">do&#123;</div><div class="line">    $t1 = microtime();</div><div class="line">    $url = &quot;http://www.anjuke.com&quot;;</div><div class="line">    file_get_contents($url);</div><div class="line">    $t2 = microtime();</div><div class="line">    echo (($t2-$t1)&lt;0?($t2-$t1)+1:($t2-$t1)).PHP_EOL;</div><div class="line">&#125;while($i++&lt;20);</div></pre></td></tr></table></figure>
+<p>测试了一下，速度相差一个数量级,为何相差如此悬殊，查了些资料，原来file_get_contents会刷新dns缓存。<br>使用strace 追踪,发现其会读取/etc/hosts 和/etc/resolv.conf 文件,找到dns server,而curl不会。</p>
+<p>此外，curl相对自由一些，file_get_contents不支持post请求等等</p>
+<p>相关参考 :</p>
+<p><a href="http://www.nowamagic.net/academy/detail/12220248" target="_blank" rel="external">fsockopen/curl/file_get_contents效率比较</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/04/mysql/" title="MySQL索引背后的数据结构及算法原理" itemprop="url">MySQL索引背后的数据结构及算法原理</a>
   </h1>
   <p class="article-author">By
@@ -893,262 +1227,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/02/07/docker/" title="docker 笔记" itemprop="url">docker 笔记</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-07T06:33:00.000Z" itemprop="datePublished"> Published 2016-02-07</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>最近找了本docker的书<a href="http://www.salttiger.com/using-docker/" target="_blank" rel="external">Using Docker</a><br>读了大半部分了，整理了一下一些很有用的Docker相关笔记，顺便把以前做的一些问题修改了一下，整套脚本构建放到了<a href="https://github.com/magnetoeric/docker-laravel" target="_blank" rel="external">github</a>上。</p>
-<ul>
-<li>docker rm $(docker ps -aq)<br>可以清除所有停止的docker 容器，运行中的不会被清理，同理，docker rmi $(docker images -aq)也可以清理，但是请谨慎使用，因为会把很多有用的‘基础’容器删除，构建image时还要重新下载。所以这里可以使用–filter 和awk grep等命令协同处理（因为有时候docker产生的无用image太多了）</li>
-<li>尽量不要指定HOST_DIR 挂载，因为这会影响到宿主机的文件<br>如果开发dev环境，可以指定宿主机挂载，注意container的运行权限，尽量不要对挂载目录有写的权限，运行时会产生一些缓存文件，这些缓存目录可以设置成777 并在git config里忽略文件的权限</li>
-<li>CTRL P +CTRL Q<br>这个命令是attach到任何容器后不想退出容器，而是进行detach</li>
-<li>对于简单的复制，可以使用copy 替代 add，add可以对文件进行解压缩，实际上是对流进行操作</li>
-<li>不要使用root运行 因为有时候你可能会使用挂载，而root有权限对挂载目录进行写操作，从而造成一些不必要的问题</li>
-<li>.DOCKERIGNORE 类似gitignore，你可以添加一个 .dockerignore 文件到你的 <code>Dockerfile</code> ， Docker 将会在发送构建上下文到守护进程时忽略在 .dockerignore 中指定的文件和目录</li>
-<li>数据尽量使用单独的image，不要混合使用</li>
-<li>docker save 和 export的区别是save是多layer  export只有一个layer (个人使用较少,export 还会丢失一些环境变量)</li>
-<li>RUN 使用&amp;&amp;减少layer的数量，这样在同一层使用某文件后并删除可以控制image的大小。这也是我的构建脚本从900MB减少的500MB的原因，而且可以继续减少（去除apt安装的一些编译头文件）</li>
-<li>compose 的yml可以使用extends 子yml里的配置会覆盖父yml的配置，links 和 volumes-from 不会被继承(docker-compose 个人不是很喜欢，个人比较喜欢shell，方便可控)</li>
-<li>CMD和ENTRYPOINT的区别<br>CMD和ENTRYPOINT是在运行container 时会运行的指令, 都只能写一条, 如果写了多条, 则最后一条生效.<br>CMD在运行时会被command覆盖, ENTRYPOINT不会被运行时的command覆盖, 但是也可以指定.<a href="http://blog.163.com/digoal@126/blog/static/163877040201410411715832/" target="_blank" rel="external">Docker RUN CMD 和ENTRYPOINT</a> 我对ENTRYPOINT的使用也不是很多</li>
-<li>不要把key放到docker里<br>安全原因,可以把它写到shell里，运行时通过shell添加；也可以通过配置中心获取，比如consul等</li>
-<li>docker 日志输出<br><a href="https://github.com/gliderlabs/logspout" target="_blank" rel="external">logspout</a> 可以将docker 产生的log 输出到任何地方，可以使用elk将这些收集整理 最近闲暇时间也学习了一下elk，也搭建了一套本地elk环境，以后该考虑一下应用到生产环境</li>
-<li>监控docker cpu等信息<pre><code>docker stats $(docker inspect -f {{.Name}} $(docker ps -q))
-</code></pre></li>
-</ul>
-<p>继续说说docker laravel环境遇到的一些问题，因为需要将ecshop的代码迁移到laravel里，也就意味着 php版本也要做相应的升级，问题不少，所以搭建了一套laravel的也搭建了一套ecshop的，但是ecshop的nginx涉及到私有问题，就不传出来了。思想都是一样的。最后说说一个折腾了很久的问题吧，搭建docker的环境，主要是为了分离各服务，也就是所谓的微服务microservice，但是使用时，nginx对php-fpm进行link和volumn，发现端口并不能被转发到PHP－fpm的socket端口，nginx一直报502.由于nginx使用的是官方提供的版本，系统精简到ps，netstat，telnet等一些常用的命令都没有，加大了调试难度，在调试过程中个人也从中学到了很多linux系统的一些知识。最后在php-fpm容器中使用netstat发现Local Address是127.0.0.1:9000,也就是说只会监听本地的端口，遂查看php-fpm的config，将127.0.0.1:9000替换为9000,使其可以被外网访问到，当然容器中才可以这样使用，因为容器本身并没有把端口暴露给外部，而是暴露给使用了link该容器的容器。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/docker/">docker</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/docker/">docker</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/02/02/linux_10/" title="服务器TIME_WAIT和CLOSE_WAIT详解" itemprop="url">服务器TIME_WAIT和CLOSE_WAIT详解</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-02T03:22:00.000Z" itemprop="datePublished"> Published 2016-02-02</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>文章转自<a href="http://www.cnblogs.com/sunxucool/p/3449068.html" target="_blank" rel="external">服务器TIME_WAIT和CLOSE_WAIT详解和解决办法</a><br>在服务器的日常维护过程中，会经常用到下面的命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstat -n | awk &apos;/^tcp/ &#123;++S[$NF]&#125; END &#123;for(a in S) print a, S[a]&#125;&apos;</div></pre></td></tr></table></figure></p>
-<p>它会显示例如下面的信息：<br>TIME_WAIT 814<br>CLOSE_WAIT 1<br>FIN_WAIT1 1<br>ESTABLISHED 634<br>SYN_RECV 2<br>LAST_ACK 1<br>常用的三个状态是：ESTABLISHED 表示正在通信，TIME_WAIT 表示主动关闭，CLOSE_WAIT 表示被动关闭。<br>具体每种状态什么意思，其实无需多说，看看下面这种图就明白了，注意这里提到的服务器应该是业务请求接受处理的一方：<br><img src="http://7o52ek.com1.z0.glb.clouddn.com/hexo/eric/0_13110767960diZ.png" alt="image"><br>这么多状态不用都记住，只要了解到我上面提到的最常见的三种状态的意义就可以了。一般不到万不得已的情况也不会去查看网络状态，如果服务器出了异常，百分之八九十都是下面两种情况：</p>
-<p>1.服务器保持了大量TIME_WAIT状态<br>2.服务器保持了大量CLOSE_WAIT状态</p>
-<p>因为linux分配给一个用户的文件句柄是有限的（可以参考<a href="http://blog.csdn.net/shootyou/article/details/6579139）" target="_blank" rel="external">这篇文章</a>，而TIME_WAIT和CLOSE_WAIT两种状态如果一直被保持，那么意味着对应数目的通道就一直被占着，而且是“占着茅坑不使劲”，一旦达到句柄数上限，新的请求就无法被处理了，接着就是大量Too Many Open Files异常，tomcat崩溃。。。</p>
-<p>下面来讨论下这两种情况的处理方法，网上有很多资料把这两种情况的处理方法混为一谈，以为优化系统内核参数就可以解决问题，其实是不恰当的，优化系统内核参 数解决TIME_WAIT可能很容易，但是应对CLOSE_WAIT的情况还是需要从程序本身出发。现在来分别说说这两种情况的处理方法：</p>
-<p><strong>1.服务器保持了大量TIME_WAIT状态</strong><br>这种情况比较常见，一些爬虫服务器或者WEB服务器（如果网管在安装的时候没有做内核参数优化的话）上经常会遇到这个问题，这个问题是怎么产生的呢？</p>
-<p>从上面的示意图可以看得出来，TIME_WAIT是主动关闭连接的一方保持的状态，对于爬虫服务器来说他本身就是“客户端”，在完成一个爬取任务之后，他就 会发起主动关闭连接，从而进入TIME_WAIT的状态，然后在保持这个状态2MSL（max segment lifetime,RFC 793中规定MSL为2分钟，实际应用中常用的是30秒，1分钟和2分钟等）时间之后，彻底关闭回收资源。为什么要这么做？明明就已经主动关闭连接了为啥还要保持资源一段时间呢？这个是TCP/IP的设计者规定 的，主要出于以下两个方面的考虑：</p>
-<p>1.防止上一次连接中的包，迷路后重新出现，影响新连接（经过2MSL，上一次连接中所有的重复包都会消失）</p>
-<ol>
-<li>可靠的关闭TCP连接。在主动关闭方发送的最后一个 ack(fin) ，有可能丢失，这时被动方会重新发fin, 如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack。所以主动方要处于 TIME_WAIT 状态，而不能是 CLOSED 。另外这么设计TIME_WAIT 会定时的回收资源，并不会占用很大资源的，除非短时间内接受大量请求或者受到攻击。</li>
-</ol>
-<p>关于MSL引用下面一段话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">MSL 為 一個 TCP Segment (某一塊 TCP 網路封包) 從來源送到目的之間可續存的時間 (也就是一個網路封</div><div class="line">包在網路上傳輸時能存活的時間)，由 於 RFC 793 TCP 傳輸協定是在 1981 年定義的，當時的網路速度不像</div><div class="line">現在的網際網路那樣發達，你可以想像你從瀏覽器輸入網址等到第一 個 byte 出現要等 4 分鐘嗎？在現在的網</div><div class="line">路環境下幾乎不可能有這種事情發生，因此我們大可將 TIME_WAIT 狀態的續存時間大幅調低，好 讓 連線埠 </div><div class="line">(Ports) 能更快空出來給其他連線使用。</div></pre></td></tr></table></figure></p>
-<p>再引用网络资源的一段话：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">值得一说的是，对于基于TCP的HTTP协议，关闭TCP连接的是Server端，这样，Server端会进入TIME_WAIT状</div><div class="line">态，可 想而知，对于访 问量大的Web Server，会存在大量的TIME_WAIT状态，假如server一秒钟接收1000</div><div class="line">个请求，那么就会积压 240*1000=240000个 TIME_WAIT的记录，维护这些状态给Server带来负担。当然现</div><div class="line">代操作系统都会用快速的查找算法来管理这些 TIME_WAIT，所以对于新的 TCP连接请求，判断是否hit中一个</div><div class="line">TIME_WAIT不会太费时间，但是有这么多状态要维护总是不好。  </div><div class="line">HTTP协议1.1版规定default行为是Keep-Alive，也就是会重用TCP连接传输多个 request/response，一</div><div class="line">个主要原因就是发现了这个问题。</div></pre></td></tr></table></figure>
-<p>也就是说HTTP的交互跟上面画的那个图是不一样的，关闭连接的不是客户端，而是服务器，所以web服务器也是会出现大量的TIME_WAIT的情况的。</p>
-<p>现在来说如何来解决这个问题。</p>
-<p>解决思路很简单，就是让服务器能够快速回收和重用那些TIME_WAIT的资源。</p>
-<p>下面来看一下我们网管对/etc/sysctl.conf文件的修改：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">#对于一个新建连接，内核要发送多少个 SYN 连接请求才决定放弃,不应该大于255，默认值是5，对应于180秒左右时间   </div><div class="line">net.ipv4.tcp_syn_retries=2  </div><div class="line">#net.ipv4.tcp_synack_retries=2  </div><div class="line">#表示当keepalive起用的时候，TCP发送keepalive消息的频度。缺省是2小时，改为300秒  </div><div class="line">net.ipv4.tcp_keepalive_time=1200  </div><div class="line">net.ipv4.tcp_orphan_retries=3  </div><div class="line">#表示如果套接字由本端要求关闭，这个参数决定了它保持在FIN-WAIT-2状态的时间  </div><div class="line">net.ipv4.tcp_fin_timeout=30    </div><div class="line">#表示SYN队列的长度，默认为1024，加大队列长度为8192，可以容纳更多等待连接的网络连接数。  </div><div class="line">net.ipv4.tcp_max_syn_backlog = 4096  </div><div class="line">#表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭  </div><div class="line">net.ipv4.tcp_syncookies = 1  </div><div class="line">  </div><div class="line">#表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭  </div><div class="line">net.ipv4.tcp_tw_reuse = 1  </div><div class="line">#表示开启TCP连接中TIME-WAIT sockets的快速回收，默认为0，表示关闭  </div><div class="line">net.ipv4.tcp_tw_recycle = 1  </div><div class="line">  </div><div class="line">##减少超时前的探测次数   </div><div class="line">net.ipv4.tcp_keepalive_probes=5   </div><div class="line">##优化网络设备接收队列   </div><div class="line">net.core.netdev_max_backlog=3000</div></pre></td></tr></table></figure>
-<p>修改完之后执行/sbin/sysctl -p让参数生效。</p>
-<p>这里头主要注意到的是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">net.ipv4.tcp_tw_reuse </div><div class="line">net.ipv4.tcp_tw_recycle </div><div class="line">net.ipv4.tcp_fin_timeout </div><div class="line">net.ipv4.tcp_keepalive_*</div></pre></td></tr></table></figure></p>
-<p>这几个参数。<br>net.ipv4.tcp_tw_reuse和net.ipv4.tcp_tw_recycle的开启都是为了回收处于TIME_WAIT状态的资源。<br>net.ipv4.tcp_fin_timeout这个时间可以减少在异常情况下服务器从FIN-WAIT-2转到TIME_WAIT的时间。<br>net.ipv4.tcp<em>keepalive</em>*一系列参数，是用来设置服务器检测连接存活的相关配置。<br>关于keepalive的用途可以参考<a href="http://hi.baidu.com/tantea/blog/item/580b9d0218f981793812bb7b.html" target="_blank" rel="external">这篇</a></p>
-<p> <strong>2.服务器保持了大量CLOSE_WAIT状态</strong><br>休息一下，喘口气，一开始只是打算说说TIME_WAIT和CLOSE_WAIT的区别，没想到越挖越深，这也是写博客总结的好处，总可以有意外的收获。</p>
-<p>TIME_WAIT状态可以通过优化服务器参数得到解决，因为发生TIME_WAIT的情况是服务器自己可控的，要么就是对方连接的异常，要么就是自己没有迅速回收资源，总之不是由于自己程序错误导致的。<br>但<br>是CLOSE_WAIT就不一样了，从上面的图可以看出来，如果一直保持在CLOSE_WAIT状态，那么只有一种情况，就是在对方关闭连接之后服务器程<br>序自己没有进一步发出ack信号。换句话说，就是在对方连接关闭之后，程序里没有检测到，或者程序压根就忘记了这个时候需要关闭连接，于是这个资源就一直<br>被程序占着。个人觉得这种情况，通过服务器内核参数也没办法解决，服务器对于程序抢占的资源没有主动回收的权利，除非终止程序运行。</p>
-<p>如果你使用的是HttpClient并且你遇到了大量CLOSE_WAIT的情况，那么这篇日志也许对你有用：<a href="http://blog.csdn.net/shootyou/article/details/6615051" target="_blank" rel="external">http://blog.csdn.net/shootyou/article/details/6615051</a><br>在那边日志里头我举了个场景，来说明CLOSE_WAIT和TIME_WAIT的区别，这里重新描述一下：<br>服 务器A是一台爬虫服务器，它使用简单的HttpClient去请求资源服务器B上面的apache获取文件资源，正常情况下，如果请求成功，那么在抓取完 资源后，服务器A会主动发出关闭连接的请求，这个时候就是主动关闭连接，服务器A的连接状态我们可以看到是TIME_WAIT。如果一旦发生异常呢？假设 请求的资源服务器B上并不存在，那么这个时候就会由服务器B发出关闭连接的请求，服务器A就是被动的关闭了连接，如果服务器A被动关闭连接之后程序员忘了 让HttpClient释放连接，那就会造成CLOSE_WAIT的状态了。</p>
-<p>所以如果将大量CLOSE_WAIT的解决办法总结为一句话那就是：查代码。因为问题出在服务器程序里头啊。</p>
-<p>参考资料：<br>1.windows下的TIME_WAIT的处理可以参加这位大侠的日志：<a href="http://blog.miniasp.com/post/2010/11/17/How-to-deal-with-TIME_WAIT-problem-under-Windows.aspx" target="_blank" rel="external">http://blog.miniasp.com/post/2010/11/17/How-to-deal-with-TIME_WAIT-problem-under-Windows.aspx</a><br>2.WebSphere的服务器优化有一定参考价值：<a href="http://publib.boulder.ibm.com/infocenter/wasinfo/v6r0/index.jsp?topic=/com.ibm.websphere.express.doc/info/exp/ae/tprf_tunelinux.html" target="_blank" rel="external">http://publib.boulder.ibm.com/infocenter/wasinfo/v6r0/index.jsp?topic=/com.ibm.websphere.express.doc/info/exp/ae/tprf_tunelinux.html</a><br>3.各种内核参数的含义：<a href="http://haka.sharera.com/blog/BlogTopic/32309.htm" target="_blank" rel="external">http://haka.sharera.com/blog/BlogTopic/32309.htm</a><br>4.linux服务器历险之sysctl优化linux网络：<a href="http://blog.csdn.net/chinalinuxzend/article/details/1792184" target="_blank" rel="external">http://blog.csdn.net/chinalinuxzend/article/details/1792184</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/http/">http</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/01/23/linux_09/" title="Linux strace命令" itemprop="url">Linux strace命令</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-01-23T04:56:00.000Z" itemprop="datePublished"> Published 2016-01-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>文章转自<a href="http://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316692.html" target="_blank" rel="external">Linux strace命令</a></p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><hr>
-<p>strace常用来跟踪进程执行时的系统调用和所接收的信号。 在Linux世界，进程不能直接访问硬件设备，当进程需要访问硬件设备(比如读取磁盘文件，接收网络数据等等)时，必须由用户态模式切换至内核态模式，通 过系统调用访问硬件设备。strace可以跟踪到一个进程产生的系统调用,包括参数，返回值，执行消耗的时间。</p>
-<h2 id="输出参数含义"><a href="#输出参数含义" class="headerlink" title="输出参数含义"></a>输出参数含义</h2><hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">root@ubuntu:/usr# strace cat /dev/null </div><div class="line">execve(&quot;/bin/cat&quot;, [&quot;cat&quot;, &quot;/dev/null&quot;], [/* 22 vars */]) = 0</div><div class="line">brk(0)                                  = 0xab1000</div><div class="line">access(&quot;/etc/ld.so.nohwcap&quot;, F_OK)      = -1 ENOENT (No such file or directory)</div><div class="line">mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f29379a7000</div><div class="line">access(&quot;/etc/ld.so.preload&quot;, R_OK)      = -1 ENOENT (No such file or directory)</div><div class="line">...</div><div class="line">brk(0) = 0xab1000</div><div class="line">brk(0xad2000) = 0xad2000</div><div class="line">fstat(1, &#123;st_mode=S_IFCHR|0620, st_rdev=makedev(136, 0), ...&#125;) = 0</div><div class="line">open(&quot;/dev/null&quot;, O_RDONLY) = 3</div><div class="line">fstat(3, &#123;st_mode=S_IFCHR|0666, st_rdev=makedev(1, 3), ...&#125;) = 0</div><div class="line">read(3, &quot;&quot;, 32768) = 0</div><div class="line">close(3) = 0</div><div class="line">close(1) = 0</div><div class="line">close(2) = 0</div><div class="line">exit_group(0) = ?</div></pre></td></tr></table></figure>
-<p>每一行都是一条系统调用，等号左边是系统调用的函数名及其参数，右边是该调用的返回值。<br>strace 显示这些调用的参数并返回符号形式的值。strace 从内核接收信息，而且不需要以任何特殊的方式来构建内核。</p>
-<p>strace参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">-c 统计每一系统调用的所执行的时间,次数和出错的次数等. </div><div class="line">-d 输出strace关于标准错误的调试信息. </div><div class="line">-f 跟踪由fork调用所产生的子进程. </div><div class="line">-ff 如果提供-o filename,则所有进程的跟踪结果输出到相应的filename.pid中,pid是各进程的进程号. </div><div class="line">-F 尝试跟踪vfork调用.在-f时,vfork不被跟踪. </div><div class="line">-h 输出简要的帮助信息. </div><div class="line">-i 输出系统调用的入口指针. </div><div class="line">-q 禁止输出关于脱离的消息. </div><div class="line">-r 打印出相对时间关于,,每一个系统调用. </div><div class="line">-t 在输出中的每一行前加上时间信息. </div><div class="line">-tt 在输出中的每一行前加上时间信息,微秒级. </div><div class="line">-ttt 微秒级输出,以秒了表示时间. </div><div class="line">-T 显示每一调用所耗的时间. </div><div class="line">-v 输出所有的系统调用.一些调用关于环境变量,状态,输入输出等调用由于使用频繁,默认不输出. </div><div class="line">-V 输出strace的版本信息. </div><div class="line">-x 以十六进制形式输出非标准字符串 </div><div class="line">-xx 所有字符串以十六进制形式输出. </div><div class="line">-a column </div><div class="line">设置返回值的输出位置.默认 为40. </div><div class="line">-e expr </div><div class="line">指定一个表达式,用来控制如何跟踪.格式如下: </div><div class="line">[qualifier=][!]value1[,value2]... </div><div class="line">qualifier只能是 trace,abbrev,verbose,raw,signal,read,write其中之一.value是用来限定的符号或数字.默认的 qualifier是 trace.感叹号是否定符号.例如: </div><div class="line">-eopen等价于 -e trace=open,表示只跟踪open调用.而-etrace!=open表示跟踪除了open以外的其他调用.有两个特殊的符号 all 和 none. </div><div class="line">注意有些shell使用!来执行历史记录里的命令,所以要使用\\. </div><div class="line">-e trace=set </div><div class="line">只跟踪指定的系统 调用.例如:-e trace=open,close,rean,write表示只跟踪这四个系统调用.默认的为set=all. </div><div class="line">-e trace=file </div><div class="line">只跟踪有关文件操作的系统调用. </div><div class="line">-e trace=process </div><div class="line">只跟踪有关进程控制的系统调用. </div><div class="line">-e trace=network </div><div class="line">跟踪与网络有关的所有系统调用. </div><div class="line">-e strace=signal </div><div class="line">跟踪所有与系统信号有关的 系统调用 </div><div class="line">-e trace=ipc </div><div class="line">跟踪所有与进程通讯有关的系统调用 </div><div class="line">-e abbrev=set </div><div class="line">设定 strace输出的系统调用的结果集.-v 等与 abbrev=none.默认为abbrev=all. </div><div class="line">-e raw=set </div><div class="line">将指 定的系统调用的参数以十六进制显示. </div><div class="line">-e signal=set </div><div class="line">指定跟踪的系统信号.默认为all.如 signal=!SIGIO(或者signal=!io),表示不跟踪SIGIO信号. </div><div class="line">-e read=set </div><div class="line">输出从指定文件中读出 的数据.例如: </div><div class="line">-e read=3,5 </div><div class="line">-e write=set </div><div class="line">输出写入到指定文件中的数据. </div><div class="line">-o filename </div><div class="line">将strace的输出写入文件filename </div><div class="line">-p pid </div><div class="line">跟踪指定的进程pid. </div><div class="line">-s strsize </div><div class="line">指定输出的字符串的最大长度.默认为32.文件名一直全部输出. </div><div class="line">-u username </div><div class="line">以username 的UID和GID执行被跟踪的命令</div></pre></td></tr></table></figure></p>
-<h2 id="命令实例"><a href="#命令实例" class="headerlink" title="命令实例"></a>命令实例</h2><hr>
-<p>通用的完整用法：</p>
-<p><code>strace -o output.txt -T -tt -e trace=all -p 28979</code><br>上面的含义是 跟踪28979进程的所有系统调用（-e trace=all），并统计系统调用的花费时间，以及开始时间（并以可视化的时分秒格式显示），最后将记录结果存在output.txt文件里面。</p>
-<h2 id="strace案例"><a href="#strace案例" class="headerlink" title="strace案例"></a>strace案例</h2><hr>
-<p>  <strong>用strace调试程序</strong><br>在理想世界里，每当一个程序不能正常执行一个功能时，它就会给出一个有用的错误提示，告诉你在足够的改正错误的线索。但遗憾的是，我们不是生活在理想世界 里，起码不总是生活在理想世界里。有时候一个程序出现了问题，你无法找到原因。<br>这就是调试程序出现的原因。strace是一个必不可少的 调试工具，strace用来监视系统调用。你不仅可以调试一个新开始的程序，也可以调试一个已经在运行的程序（把strace绑定到一个已有的PID上 面）。<br>首先让我们看一个真实的例子：启动KDE时出现问题<br>前一段时间，我在 启动KDE的时候出了问题，KDE的错误信息无法给我任何有帮助的线索。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">_KDE_IceTransSocketCreateListener: failed to bind listener</div><div class="line">_KDE_IceTransSocketUNIXCreateListener: ...SocketCreateListener() failed</div><div class="line">_KDE_IceTransMakeAllCOTSServerListeners: failed to create listener for local</div></pre></td></tr></table></figure></p>
-<p>Cannot establish any listening sockets DCOPServer self-test failed.<br>对 我来说这个错误信息没有太多意义，只是一个对KDE来说至关重要的负责进程间通信的程序无法启动。我还可以知道这个错误和ICE协议（Inter Client Exchange）有关，除此之外，我不知道什么是KDE启动出错的原因。</p>
-<p>我决定采用strace看一下在启动 dcopserver时到底程序做了什么：</p>
-<p><code>strace -f -F -o ~/dcop-strace.txt dcopserver</code><br>这里 -f -F选项告诉strace同时跟踪fork和vfork出来的进程，-o选项把所有strace输出写到~/dcop-strace.txt里 面，dcopserver是要启动和调试的程序。</p>
-<p>再次出现错误之后，我检查了错误输出文件dcop-strace.txt，文件里有很多 系统调用的记录。在程序运行出错前的有关记录如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">27207 mkdir(&quot;/tmp/.ICE-unix&quot;, 0777) = -1 EEXIST (File exists)</div><div class="line">27207 lstat64(&quot;/tmp/.ICE-unix&quot;, &#123;st_mode=S_IFDIR|S_ISVTX|0755, st_size=4096, ...&#125;) = 0</div><div class="line">27207 unlink(&quot;/tmp/.ICE-unix/dcop27207-1066844596&quot;) = -1 ENOENT (No such file or directory)</div><div class="line">27207 bind(3, &#123;sin_family=AF_UNIX, path=&quot;/tmp/.ICE-unix/dcop27207-1066844596&quot;&#125;, 38) = -1 EACCES (Permission denied) </div><div class="line">27207 write(2, &quot;_KDE_IceTrans&quot;, 13) = 13</div><div class="line">27207 write(2, &quot;SocketCreateListener: failed to &quot;..., 46) = 46</div><div class="line">27207 close(3) = 0 27207 write(2, &quot;_KDE_IceTrans&quot;, 13) = 13</div><div class="line">27207 write(2, &quot;SocketUNIXCreateListener: ...Soc&quot;..., 59) = 59</div><div class="line">27207 umask(0) = 0 27207 write(2, &quot;_KDE_IceTrans&quot;, 13) = 13</div><div class="line">27207 write(2, &quot;MakeAllCOTSServerListeners: fail&quot;..., 64) = 64</div><div class="line">27207 write(2, &quot;Cannot establish any listening s&quot;..., 39) = 39</div></pre></td></tr></table></figure>
-<p>其中第一行显示程序试图创建/tmp/.ICE-unix目录，权限为0777，这个操作因为目录已经存在而失败了。第二个系统调用（lstat64）检查 了目录状态，并显示这个目录的权限是0755，这里出现了第一个程序运行错误的线索：程序试图创建属性为0777的目录，但是已经存在了一个属性为 0755的目录。第三个系统调用（unlink）试图删除一个文件，但是这个文件并不存在。这并不奇怪，因为这个操作只是试图删掉可能存在的老文件。</p>
-<p>但是，第四行确认了错误所在。他试图绑定到/tmp/.ICE-unix/dcop27207-1066844596，但是出现了拒绝访问错误。. ICE_unix目录的用户和组都是root，并且只有所有者具有写权限。一个非root用户无法在这个目录下面建立文件，如果把目录属性改成0777， 则前面的操作有可能可以执行，而这正是第一步错误出现时进行过的操作。</p>
-<p>所以我运行了chmod 0777 /tmp/.ICE-unix之后KDE就可以正常启动了，问题解决了，用strace进行跟踪调试只需要花很短的几分钟时间跟踪程序运行，然后检查并分 析输出文件。</p>
-<p>说明：运行chmod 0777只是一个测试，一般不要把一个目录设置成所有用户可读写，同时不设置粘滞位(sticky bit)。给目录设置粘滞位可以阻止一个用户随意删除可写目录下面其他人的文件。一般你会发现/tmp目录因为这个原因设置了粘滞位。KDE可以正常启动 之后，运行chmod +t /tmp/.ICE-unix给.ICE_unix设置粘滞位。</p>
-<p> <strong>解决库依赖问题</strong><br>starce 的另一个用处是解决和动态库相关的问题。当对一个可执行文件运行ldd时，它会告诉你程序使用的动态库和找到动态库的位置。但是如果你正在使用一个比较老 的glibc版本（2.2或更早），你可能会有一个有bug的ldd程序，它可能会报告在一个目录下发现一个动态库，但是真正运行程序时动态连接程序 （/lib/ld-linux.so.2）却可能到另外一个目录去找动态连接库。这通常因为/etc/ld.so.conf和 /etc/ld.so.cache文件不一致，或者/etc/ld.so.cache被破坏。在glibc 2.3.2版本上这个错误不会出现，可能ld-linux的这个bug已经被解决了。</p>
-<p>尽管这样，ldd并不能把所有程序依赖的动态库列出 来，系统调用dlopen可以在需要的时候自动调入需要的动态库，而这些库可能不会被ldd列出来。作为glibc的一部分的NSS（Name Server Switch）库就是一个典型的例子，NSS的一个作用就是告诉应用程序到哪里去寻找系统帐号数据库。应用程序不会直接连接到NSS库，glibc则会通 过dlopen自动调入NSS库。如果这样的库偶然丢失，你不会被告知存在库依赖问题，但这样的程序就无法通过用户名解析得到用户ID了。让我们看一个例子：<br>whoami程序会给出你自己的用户名，这个程序在一些需要知道运行程序的真正用户的脚本程序里面非常有用，whoami的一个示例 输出如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ whoami</div><div class="line">root</div></pre></td></tr></table></figure>
-<p>假设因为某种原因在升 级glibc的过程中负责用户名和用户ID转换的库NSS丢失，我们可以通过把nss库改名来模拟这个环境：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ mv /lib/libnss_files.so.2 /lib/libnss_files.so.2.backup </div><div class="line">whoami</div><div class="line">whoami: cannot find username for UID 0</div></pre></td></tr></table></figure>
-<p>这里你可以看到，运行whoami时出现了错误，ldd程序的输出不会提供有用的帮助：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ ldd /usr/bin/whoami</div><div class="line">libc.so.6 =&gt; /lib/libc.so.6 (0x4001f000)</div><div class="line">/lib/ld-linux.so.2 =&gt; /lib/ld-linux.so.2 (0x40000000)</div></pre></td></tr></table></figure></p>
-<p>你只会看到whoami依赖Libc.so.6和ld-linux.so.2，它没有给出运行whoami所必须的其他库。这里时用strace跟踪 whoami时的输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">strace -o whoami-strace.txt whoami</div><div class="line"></div><div class="line">open(&quot;/lib/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">open(&quot;/lib/i686/mmx/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib/i686/mmx&quot;, 0xbffff190) = -1 ENOENT (No such file or directory) </div><div class="line">open(&quot;/lib/i686/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib/i686&quot;, 0xbffff190) = -1 ENOENT (No such file or directory)</div><div class="line">open(&quot;/lib/mmx/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib/mmx&quot;, 0xbffff190) = -1 ENOENT (No such file or directory) </div><div class="line">open(&quot;/lib/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/lib&quot;, &#123;st_mode=S_IFDIR|0755, st_size=2352, ...&#125;) = 0</div><div class="line">open(&quot;/usr/lib/i686/mmx/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div><div class="line">stat64(&quot;/usr/lib/i686/mmx&quot;, 0xbffff190) = -1 ENOENT (No such file or directory) </div><div class="line">open(&quot;/usr/lib/i686/libnss_files.so.2&quot;, O_RDONLY) = -1 ENOENT (No such file or directory)</div></pre></td></tr></table></figure>
-<p>你可以发现在不同目录下面查找libnss.so.2的尝试，但是都失败了。如果没有strace这样的工具，很难发现这个错误是由于缺少动态库造成的。现 在只需要找到libnss.so.2并把它放回到正确的位置就可以了。　</p>
-<h2 id="限制strace只跟踪特定的系统调用"><a href="#限制strace只跟踪特定的系统调用" class="headerlink" title="限制strace只跟踪特定的系统调用"></a>限制strace只跟踪特定的系统调用</h2><hr>
-<p>如果你已经知道你要找什么，你可以让strace只跟踪一些类型的系统调用。例如，你需要看看在configure脚本里面执行的程序，你需要监视的系统调 用就是execve。让strace只记录execve的调用用这个命令：</p>
-<p>strace -f -o configure-strace.txt -e execve ./configure</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/linux/">linux</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
@@ -1228,7 +1306,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>11</sup></a></li>
 		  
 		
 		  
@@ -1236,7 +1314,7 @@
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>13</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>15</sup></a></li>
 		  
 		
 		  

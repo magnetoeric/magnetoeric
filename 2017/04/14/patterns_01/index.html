@@ -12,17 +12,17 @@
     
 
     
-    <meta name="description" content="###Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#">
+    <meta name="description" content="Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#123">
 <meta name="keywords" content="patterns">
 <meta property="og:type" content="article">
 <meta property="og:title" content="观察者模式">
 <meta property="og:url" content="http://magnetoeric.github.io/2017/04/14/patterns_01/index.html">
 <meta property="og:site_name" content="艾瑞克">
-<meta property="og:description" content="###Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#">
-<meta property="og:updated_time" content="2017-04-14T14:53:37.000Z">
+<meta property="og:description" content="Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#123">
+<meta property="og:updated_time" content="2017-04-14T14:54:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="观察者模式">
-<meta name="twitter:description" content="###Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#">
+<meta name="twitter:description" content="Spl中提供了两个接口来实现观察者模式Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者Observer需要实现一个接口，更新 12345678910111213141516171819202122232425262728293031323334353637383940414243class ConcertSubject implements SplSubject&amp;#123">
 
     
     
@@ -100,7 +100,7 @@
 		
 		</div>
 		
-		<p>###<br>Spl中提供了两个接口来实现观察者模式<br>Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者<br>Observer需要实现一个接口，更新</p>
+		<p>Spl中提供了两个接口来实现观察者模式<br>Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者<br>Observer需要实现一个接口，更新</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">class ConcertSubject implements SplSubject&#123;</div><div class="line">    private $obeservers;</div><div class="line"></div><div class="line">    private $value;</div><div class="line"></div><div class="line">    public function __construct()</div><div class="line">    &#123;</div><div class="line">        $this-&gt;obeservers = new SplObjectStorage();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function attach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;attach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    public function detach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;detach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function notify ()&#123;</div><div class="line">        foreach ($this-&gt;obeservers as $obeserver)&#123;</div><div class="line">            $obeserver-&gt;update($this);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    public function setValue($value)&#123;</div><div class="line">        $this-&gt;value = $value;</div><div class="line">        $this-&gt;notify();</div><div class="line">    &#125;</div><div class="line">    public function getValue()&#123;</div><div class="line">        return $this-&gt;value;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">class ConcertObserver implements SplObserver&#123;</div><div class="line"></div><div class="line">    public function update (SplSubject $subject)&#123;</div><div class="line">            var_dump($subject-&gt;getValue());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$subject = new ConcertSubject();</div><div class="line">$observer =  new ConcertObserver();</div><div class="line">$subject-&gt;attach($observer);</div><div class="line">$subject-&gt;setValue(666);</div></pre></td></tr></table></figure>  
 	</div>
 		<footer class="article-footer clearfix">
@@ -144,6 +144,14 @@
 </a>
 </div>
 
+
+<div class="next">
+<a href="/2017/04/22/rsa/"  title="rsa加密">
+ <strong>下一篇：</strong><br/> 
+ <span>rsa加密
+</span>
+</a>
+</div>
 
 </nav>
 
@@ -230,7 +238,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>11</sup></a></li>
 		  
 		
 		  
@@ -238,7 +246,7 @@
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>13</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>15</sup></a></li>
 		  
 		
 		  

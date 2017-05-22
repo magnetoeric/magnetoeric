@@ -80,6 +80,196 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/01/04/other_02/" title="无题" itemprop="url">无题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-01-04T02:55:01.000Z" itemprop="datePublished"> Published 2016-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>新的一年  心的开始<br>过去一年，工作换了两次，一直都在试用期，过去一年的目标，也完成了不少。<br>参与设计开发了一些比较有规模的java项目，这个应该是完成的最好的了<br>php的框架，一直在学习，心中也有了一些简单框架的雏形<br>php扩展，一直以来，对c还是有些茫然，主要还是指针，不过最近通过书籍，基本熟悉了扩展开发流程，但是C的基础太差，也只能做最简单的开发<br>接下来，也为这一年，定下自己的目标吧<br>首先是C了，接下来的一年，一定要掌握这门语言，为以后打基础<br>接下来是扩展了，写一个基本的扩展<br>然后就是nginx了，了解nginx各模块，以及openrestry<br>就先这些吧，多说无益</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/24/php_05/" title="php socket" itemprop="url">php socket</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-24T11:11:00.000Z" itemprop="datePublished"> Published 2015-12-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>闲了很多天，又不知道写点什么，看书看到了socket这块，还挺有意思，照着书上的模仿了一下，用socket模拟smtp协议发送邮件，邮件服务器是qq的。不过书有点老，qq的邮件服务器必须用https了，所以自己摸索着实现了一下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/**</div><div class="line"> * Created by PhpStorm.</div><div class="line"> * User: eric</div><div class="line"> * Date: 15/12/24</div><div class="line"> * Time: 上午10:54</div><div class="line"> */</div><div class="line">class Mail&#123;</div><div class="line">    private $sock;</div><div class="line">    private $errorStr;</div><div class="line">    private $errorNo;</div><div class="line">    private $timeout=30;</div><div class="line">    private $host;</div><div class="line">    private $port;</div><div class="line">    private $user;</div><div class="line">    private $password;</div><div class="line">    function __construct($host,$port,$user,$pass,$format=1,$debug=0)&#123;</div><div class="line">        $this-&gt;host = $host;</div><div class="line">        $this-&gt;port = $port;</div><div class="line">        $this-&gt;user = base64_encode($user);</div><div class="line">        $this-&gt;password = base64_encode($pass);</div><div class="line">        $this-&gt;sock = fsockopen($this-&gt;host,$this-&gt;port,$this-&gt;errorNo,$this-&gt;errorStr,$this-&gt;timeout);</div><div class="line">        if(!$this-&gt;sock)&#123;</div><div class="line">            exit(&quot;oops&quot;);</div><div class="line">        &#125;</div><div class="line">        $response  = fgets($this-&gt;sock);</div><div class="line">        if(strstr($response,&apos;220&apos;) === false)&#123;</div><div class="line">            exit(&quot;server error&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    function showDebug($response,$commond)&#123;</div><div class="line">        echo $commond;</div><div class="line">        echo $response.PHP_EOL;</div><div class="line">    &#125;</div><div class="line">    function doCommond($commond,$return_code)&#123;</div><div class="line">        fwrite($this-&gt;sock,$commond);</div><div class="line">        $response = fgets($this-&gt;sock);</div><div class="line">        if(stristr($response,&quot;$return_code&quot;) == false)&#123;</div><div class="line">            $this-&gt;showDebug($response,$commond);</div><div class="line">            return false;</div><div class="line">        &#125;</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">    function sendMail($from,$to,$sub,$body)&#123;</div><div class="line">        $detail = &quot;FROM:&quot;.$from.&quot;\r\n&quot;;</div><div class="line">        $detail.=&quot;To:&quot;.$to.&quot;\r\n&quot;;</div><div class="line">        $detail.=&quot;Subject:&quot;.$sub.&quot;\r\n&quot;;</div><div class="line">        $detail.=&quot;Content-type:text/plain;\r\n\r\n&quot;;</div><div class="line">        $detail.=$body;</div><div class="line">        $this-&gt;doCommond(&quot;HELO smtp.qq.com\r\n&quot;,250);</div><div class="line">        $this-&gt;doCommond(&quot;AUTH LOGIN\r\n&quot;,334);</div><div class="line">        $this-&gt;doCommond($this-&gt;user.&quot;\r\n&quot;,334);</div><div class="line">        $this-&gt;doCommond($this-&gt;password.&quot;\r\n&quot;,235);</div><div class="line">        $this-&gt;doCommond(&quot;MAIL FROM:&quot;.$from.&quot;\r\n&quot;,250);</div><div class="line">        $this-&gt;doCommond(&quot;RCPT TO:&quot;.$to.&quot;\r\n&quot;,250);</div><div class="line">        $this-&gt;doCommond(&quot;DATA\r\n&quot;,354);</div><div class="line">        $this-&gt;doCommond($detail.&quot;\r\n.\r\n&quot;,250);</div><div class="line">        $this-&gt;doCommond(&quot;QUIT\r\n&quot;,221);</div><div class="line">        return true;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$mail  =  new Mail(&apos;ssl://smtp.qq.com&apos;,465,&apos;xxx@qq.com&apos;,&apos;特殊的密码，因为我有邮箱独立密码，所以只能使用qq邮箱额外提供的&apos;);</div><div class="line">$mail-&gt;sendMail(&apos;xxx@qq.com&apos;,&apos;xxxx@qq.com&apos;,&apos;hi&apos;,&apos;嘿嘿嘿&apos;);</div></pre></td></tr></table></figure></p>
+<p>因为smtp可以在telnet中模拟，所以想着去模拟一个请求去访问redis也应该是可以的，在没有装redis扩展或者composer依赖的时候，简单的请求可以直接用socket实现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/**</div><div class="line"> * Created by PhpStorm.</div><div class="line"> * User: eric</div><div class="line"> * Date: 15/12/24</div><div class="line"> * Time: 下午2:15</div><div class="line"> */</div><div class="line">$socket = fsockopen(&apos;127.0.0.1&apos;,6379);</div><div class="line">fwrite($socket,&quot;ping\r\n&quot;);</div><div class="line">$response = fgets($socket);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($response);</div><div class="line">fwrite($socket,&quot;set a aaa\r\n &quot;);</div><div class="line">$response = fgets($socket);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($response);</div><div class="line">fwrite($socket,&quot;get a\r\n&quot;);</div><div class="line">$response = fgets($socket);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($response);</div></pre></td></tr></table></figure></p>
+<p>接下来尝试下用php socket搭建一个煎蛋代理服务(因为之前转过了一篇node)</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/02/redis_02/" title="redis分布式锁" itemprop="url">redis分布式锁</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-02T01:19:17.000Z" itemprop="datePublished"> Published 2015-12-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>看了<a href="http://ifeve.com/redis-lock/" target="_blank" rel="external">并发编程网的这篇翻译</a>。<br>看了标题，首先想到的是如何实现一个单机锁，因为redis中大多数操作都是原子的，所以想法是：</p>
+<ul>
+<li>在redis中存在一个key，保证客户端在读到这个key的时候，阻塞</li>
+<li>如果一个客户端在读不到的这个key的时候，说明没有客户端持有锁，可以将其上锁</li>
+<li>获取到锁的客户端在执行逻辑完后，释放锁</li>
+</ul>
+<p>redis中的命令刚好有一个这样的命令  setnx。<br>继续看下面的翻译，发现自己的想法过于简单，任何设计都应该遵循design for failure 的原则</p>
+<ul>
+<li>如果一个客户端在获取到锁后，因为某些原因，down掉了，所有的客户端就永远不会持有锁了</li>
+<li>针对上面的情况，可以为这个key设置一个存活时间（但是setnx并不支持存在时间，如果使用expire，不能保证原子性，看了文档，在2.6后续版本中，set已经可以替代setnx了[set的文档]<a href="http://redis.io/commands/set）" target="_blank" rel="external">http://redis.io/commands/set）</a></li>
+<li>针对上一条的情况，由于某些因素导致某客户端A获取锁后执行的时间过长，一致于超过了锁的缓存时间，这时又有其他客户端B获取到锁，A执行完成之后，释放锁，这时其他客户端就会获取锁。所以需要为每一个锁设置唯一的value，保证只有持有锁的客户端才能删除它</li>
+</ul>
+<p>在其他的blog里也看到了类似的想法<a href="http://huoding.com/2015/09/14/463" target="_blank" rel="external">谈谈Redis的SETNX</a></p>
+<p>redis作者也给出了<a href="https://github.com/ronnylt/redlock-php" target="_blank" rel="external">代码</a>(php版本)，这里不贴了，分布式版本中，考虑的问题就更多了。<a href="https://github.com/antirez/redis-doc/blob/master/topics/distlock.md" target="_blank" rel="external">原文</a>中，针对分布式中的情况作了很多解释，翻译也有了，就不贴了，不过翻译有的地方是错的，以后还是看原文吧，英语看的慢点，多看几遍，不至于理解错</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/nosql/">nosql</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/redis/">redis</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/11/29/php02/" title="php object2array array2object" itemprop="url">php object2array array2object</a>
   </h1>
   <p class="article-author">By
@@ -626,225 +816,6 @@ proxy_set_header X-Forwarded-For $remote_addr;
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/30/linux_06/" title="Linux 技巧：让进程在后台可靠运行的几种方法" itemprop="url">Linux 技巧：让进程在后台可靠运行的几种方法</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-29T16:26:00.000Z" itemprop="datePublished"> Published 2015-08-30</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>通常在服务器执行某些shell的时候，都是挂起执行的。<br>但是有时候忘记了挂起执行，不小心直接执行了，ctrl＋c 停止，然后再加nohup。<br>但是这种方式带来的问题也很突出，前面执行的命令是无法回滚的。<br>所以去网上寻找了一些方法，这篇<a href="http://www.ibm.com/developerworks/cn/linux/l-cn-nohup/" target="_blank" rel="external">文章</a>虽然比较久远，但是很实用，转过来学习了<br>解决方法就是使用disown</p>
-<hr>
-<p>我们经常会碰到这样的问题，用 telnet/ssh 登录了远程的 Linux 服务器，运行了一些耗时较长的任务， 结果却由于网络的不稳定导致任务中途失败。如何让命令提交后不受本地关闭终端窗口/网络断开连接的干扰呢？下面举了一些例子， 您可以针对不同的场景选择不同的方式来处理这个问题。</p>
-<p>nohup/setsid/&amp;</p>
-<hr>
-<p>场景：<br>如果只是临时有一个命令需要长时间运行，什么方法能最简便的保证它在后台稳定运行呢？<br>hangup 名称的来由<br>在 Unix 的早期版本中，每个终端都会通过 modem 和系统通讯。当用户 logout 时，modem 就会挂断（hang up）电话。 同理，当 modem 断开连接时，就会给终端发送 hangup 信号来通知其关闭所有子进程。<br>解决方法：<br>我们知道，当用户注销（logout）或者网络断开时，终端会收到 HUP（hangup）信号从而关闭其所有子进程。因此，我们的解决办法就有两种途径：要么让进程忽略 HUP 信号，要么让进程运行在新的会话里从而成为不属于此终端的子进程。<br><strong>1. nohup</strong><br>nohup 无疑是我们首先想到的办法。顾名思义，nohup 的用途就是让提交的命令忽略 hangup 信号。让我们先来看一下 nohup 的帮助信息：<br>NOHUP(1)                        User Commands                        NOHUP(1)</p>
-<p>NAME<br>       nohup - run a command immune to hangups, with output to a non-tty</p>
-<p>SYNOPSIS<br>       nohup COMMAND [ARG]…<br>       nohup OPTION</p>
-<p>DESCRIPTION<br>       Run COMMAND, ignoring hangup signals.</p>
-<pre><code>--help display this help and exit
-
---version
-       output version information and exit
-</code></pre><p>可见，nohup 的使用是十分方便的，只需在要处理的命令前加上 nohup 即可，标准输出和标准错误缺省会被重定向到 nohup.out 文件中。一般我们可在结尾加上”&amp;”来将命令同时放入后台运行，也可用”&gt;filename 2&gt;&amp;1”来更改缺省的重定向文件名。<br>nohup 示例<br>[root@pvcent107 ~]# nohup ping www.ibm.com &amp;<br>[1] 3059<br>nohup: appending output to `nohup.out’<br>[root@pvcent107 ~]# ps -ef |grep 3059<br>root      3059   984  0 21:06 pts/3    00:00:00 ping www.ibm.com<br>root      3067   984  0 21:06 pts/3    00:00:00 grep 3059<br>[root@pvcent107 ~]#<br><strong>2。setsid</strong><br>nohup 无疑能通过忽略 HUP 信号来使我们的进程避免中途被中断，但如果我们换个角度思考，如果我们的进程不属于接受 HUP 信号的终端的子进程，那么自然也就不会受到 HUP 信号的影响了。setsid 就能帮助我们做到这一点。让我们先来看一下 setsid 的帮助信息：<br>SETSID(8)                 Linux Programmer’s Manual                 SETSID(8)</p>
-<p>NAME<br>       setsid - run a program in a new session</p>
-<p>SYNOPSIS<br>       setsid program [ arg … ]</p>
-<p>DESCRIPTION<br>       setsid runs a program in a new session.<br>可见 setsid 的使用也是非常方便的，也只需在要处理的命令前加上 setsid 即可。<br>setsid 示例<br>[root@pvcent107 ~]# setsid ping www.ibm.com<br>[root@pvcent107 ~]# ps -ef |grep www.ibm.com<br>root     31094     1  0 07:28 ?        00:00:00 ping www.ibm.com<br>root     31102 29217  0 07:29 pts/4    00:00:00 grep www.ibm.com<br>[root@pvcent107 ~]#<br>值得注意的是，上例中我们的进程 ID(PID)为31094，而它的父 ID（PPID）为1（即为 init 进程 ID），并不是当前终端的进程 ID。请将此例与nohup 例中的父 ID 做比较。<br><strong>3。&amp;</strong><br>这里还有一个关于 subshell 的小技巧。我们知道，将一个或多个命名包含在“()”中就能让这些命令在子 shell 中运行中，从而扩展出很多有趣的功能，我们现在要讨论的就是其中之一。<br>当我们将”&amp;”也放入“()”内之后，我们就会发现所提交的作业并不在作业列表中，也就是说，是无法通过jobs来查看的。让我们来看看为什么这样就能躲过 HUP 信号的影响吧。<br>subshell 示例<br>[root@pvcent107 ~]# (ping www.ibm.com &amp;)<br>[root@pvcent107 ~]# ps -ef |grep www.ibm.com<br>root     16270     1  0 14:13 pts/4    00:00:00 ping www.ibm.com<br>root     16278 15362  0 14:13 pts/4    00:00:00 grep www.ibm.com<br>[root@pvcent107 ~]#<br>从上例中可以看出，新提交的进程的父 ID（PPID）为1（init 进程的 PID），并不是当前终端的进程 ID。因此并不属于当前终端的子进程，从而也就不会受到当前终端的 HUP 信号的影响了。<br>回页首</p>
-<p>disown</p>
-<hr>
-<p>场景：<br>我们已经知道，如果事先在命令前加上 nohup 或者 setsid 就可以避免 HUP 信号的影响。但是如果我们未加任何处理就已经提交了命令，该如何补救才能让它避免 HUP 信号的影响呢？<br>解决方法：<br>这时想加 nohup 或者 setsid 已经为时已晚，只能通过作业调度和 disown 来解决这个问题了。让我们来看一下 disown 的帮助信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">disown [-ar] [-h] [jobspec ...]</div><div class="line">	Without options, each jobspec is  removed  from  the  table  of</div><div class="line">	active  jobs.   If  the -h option is given, each jobspec is not</div><div class="line">	removed from the table, but is marked so  that  SIGHUP  is  not</div><div class="line">	sent  to the job if the shell receives a SIGHUP.  If no jobspec</div><div class="line">	is present, and neither the -a nor the -r option  is  supplied,</div><div class="line">	the  current  job  is  used.  If no jobspec is supplied, the -a</div><div class="line">	option means to remove or mark all jobs; the -r option  without</div><div class="line">	a  jobspec  argument  restricts operation to running jobs.  The</div><div class="line">	return value is 0 unless a jobspec does  not  specify  a  valid</div><div class="line">	job.</div></pre></td></tr></table></figure></p>
-<p>可以看出，我们可以用如下方式来达成我们的目的。<br>灵活运用 CTRL-z<br>在我们的日常工作中，我们可以用 CTRL-z 来将当前进程挂起到后台暂停运行，执行一些别的操作，然后再用 fg 来将挂起的进程重新放回前台（也可用 bg 来将挂起的进程放在后台）继续运行。这样我们就可以在一个终端内灵活切换运行多个任务，这一点在调试代码时尤为有用。因为将代码编辑器挂起到后台再重新放回时，光标定位仍然停留在上次挂起时的位置，避免了重新定位的麻烦。<br>用disown -h jobspec来使某个作业忽略HUP信号。<br>用disown -ah 来使所有的作业都忽略HUP信号。<br>用disown -rh 来使正在运行的作业忽略HUP信号。<br>需要注意的是，当使用过 disown 之后，会将把目标作业从作业列表中移除，我们将不能再使用jobs来查看它，但是依然能够用ps -ef查找到它。<br>但是还有一个问题，这种方法的操作对象是作业，如果我们在运行命令时在结尾加了”&amp;”来使它成为一个作业并在后台运行，那么就万事大吉了，我们可以通过jobs命令来得到所有作业的列表。但是如果并没有把当前命令作为作业来运行，如何才能得到它的作业号呢？答案就是用 CTRL-z（按住Ctrl键的同时按住z键）了！<br>CTRL-z 的用途就是将当前进程挂起（Suspend），然后我们就可以用jobs命令来查询它的作业号，再用bg jobspec来将它放入后台并继续运行。需要注意的是，如果挂起会影响当前进程的运行结果，请慎用此方法。<br>disown 示例1（如果提交命令时已经用“&amp;”将命令放入后台运行，则可以直接使用“disown”）<br>[root@pvcent107 build]# cp -r testLargeFile largeFile &amp;<br>[1] 4825<br>[root@pvcent107 build]# jobs<br>[1]+  Running                 cp -i -r testLargeFile largeFile &amp;<br>[root@pvcent107 build]# disown -h %1<br>[root@pvcent107 build]# ps -ef |grep largeFile<br>root      4825   968  1 09:46 pts/4    00:00:00 cp -i -r testLargeFile largeFile<br>root      4853   968  0 09:46 pts/4    00:00:00 grep largeFile<br>[root@pvcent107 build]# logout<br>disown 示例2（如果提交命令时未使用“&amp;”将命令放入后台运行，可使用 CTRL-z 和“bg”将其放入后台，再使用“disown”）<br>[root@pvcent107 build]# cp -r testLargeFile largeFile2</p>
-<p>[1]+  Stopped                 cp -i -r testLargeFile largeFile2<br>[root@pvcent107 build]# bg %1<br>[1]+ cp -i -r testLargeFile largeFile2 &amp;<br>[root@pvcent107 build]# jobs<br>[1]+  Running                 cp -i -r testLargeFile largeFile2 &amp;<br>[root@pvcent107 build]# disown -h %1<br>[root@pvcent107 build]# ps -ef |grep largeFile2<br>root      5790  5577  1 10:04 pts/3    00:00:00 cp -i -r testLargeFile largeFile2<br>root      5824  5577  0 10:05 pts/3    00:00:00 grep largeFile2<br>[root@pvcent107 build]#</p>
-<p>screen</p>
-<hr>
-<p>场景：<br>我们已经知道了如何让进程免受 HUP 信号的影响，但是如果有大量这种命令需要在稳定的后台里运行，如何避免对每条命令都做这样的操作呢？<br>解决方法：<br>此时最方便的方法就是 screen 了。简单的说，screen 提供了 ANSI/VT100 的终端模拟器，使它能够在一个真实终端下运行多个全屏的伪终端。screen 的参数很多，具有很强大的功能，我们在此仅介绍其常用功能以及简要分析一下为什么使用 screen 能够避免 HUP 信号的影响。我们先看一下 screen 的帮助信息：<br>SCREEN(1)                                                           SCREEN(1)</p>
-<p>NAME<br>       screen - screen manager with VT100/ANSI terminal emulation</p>
-<p>SYNOPSIS<br>       screen [ -options ] [ cmd [ args ] ]<br>       screen -r [[pid.]tty[.host]]<br>       screen -r sessionowner/[[pid.]tty[.host]]</p>
-<p>DESCRIPTION<br>       Screen  is  a  full-screen  window manager that multiplexes a physical<br>       terminal between several  processes  (typically  interactive  shells).<br>       Each  virtual  terminal provides the functions of a DEC VT100 terminal<br>       and, in addition, several control functions from the  ISO  6429  (ECMA<br>       48,  ANSI  X3.64)  and ISO 2022 standards (e.g. insert/delete line and<br>       support for multiple character sets).  There is a  scrollback  history<br>       buffer  for  each virtual terminal and a copy-and-paste mechanism that<br>       allows moving text regions between windows.<br>使用 screen 很方便，有以下几个常用选项：<br>用screen -dmS session name来建立一个处于断开模式下的会话（并指定其会话名）。<br>用screen -list 来列出所有会话。<br>用screen -r session name来重新连接指定会话。<br>用快捷键CTRL-a d 来暂时断开当前会话。<br>screen 示例<br>[root@pvcent107 ~]# screen -dmS Urumchi<br>[root@pvcent107 ~]# screen -list<br>There is a screen on:<br>        12842.Urumchi   (Detached)<br>1 Socket in /tmp/screens/S-root.</p>
-<p>[root@pvcent107 ~]# screen -r Urumchi<br>当我们用“-r”连接到 screen 会话后，我们就可以在这个伪终端里面为所欲为，再也不用担心 HUP 信号会对我们的进程造成影响，也不用给每个命令前都加上“nohup”或者“setsid”了。这是为什么呢？让我来看一下下面两个例子吧。</p>
-<ol>
-<li>未使用 screen 时新进程的进程树<br>[root@pvcent107 ~]# ping www.google.com &amp;<br>[1] 9499<br>[root@pvcent107 ~]# pstree -H 9499<br>init─┬─Xvnc<br>  ├─acpid<br>  ├─atd<br>  ├─2*[sendmail]<br>  ├─sshd─┬─sshd───bash───pstree<br>  │       └─sshd───bash───ping</li>
-</ol>
-<p>我们可以看出，未使用 screen 时我们所处的 bash 是 sshd 的子进程，当 ssh 断开连接时，HUP 信号自然会影响到它下面的所有子进程（包括我们新建立的 ping 进程）。</p>
-<ol>
-<li>使用了 screen 后新进程的进程树<br>[root@pvcent107 ~]# screen -r Urumchi<br>[root@pvcent107 ~]# ping www.ibm.com &amp;<br>[1] 9488<br>[root@pvcent107 ~]# pstree -H 9488<br>init─┬─Xvnc<br>  ├─acpid<br>  ├─atd<br>  ├─screen───bash───ping<br>  ├─2*[sendmail]<br>而使用了 screen 后就不同了，此时 bash 是 screen 的子进程，而 screen 是 init（PID为1）的子进程。那么当 ssh 断开连接时，HUP 信号自然不会影响到 screen 下面的子进程了。<br>回页首<br>总结<br>现在几种方法已经介绍完毕，我们可以根据不同的场景来选择不同的方案。nohup/setsid 无疑是临时需要时最方便的方法，disown 能帮助我们来事后补救当前已经在运行了的作业，而 screen 则是在大批量操作时不二的选择了。</li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/linux/">linux</a><a href="/tags/shell/">shell</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/28/nodejs/" title="一个快速的mock服务器" itemprop="url">一个快速的mock服务器</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-28T12:03:00.000Z" itemprop="datePublished"> Published 2015-08-28</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>最近做代码重构迁移<br>在为app提供接口开发时，常常是定好接口，然后为其提供fake api。<br>然后在java开发时，写接口需要定义好dto再返回，在开发过程中可能还会改变，更重要的是，需要机器去为app提供接口访问。<br>显然浪费了很多时间和精力<br>github上一个很火的<a href="https://github.com/typicode/json-server" target="_blank" rel="external">项目</a><br>Get a full fake REST API with zero coding in less than 30 seconds (seriously)<br>正如描述的，可以提供快速的fake api构建。<br>然而使用普通的<code>json-server --watch db.json</code>方式启动并不能满足需求，项目的api是动态增加的，不可能每次都去修改db.json然后再重启，格式乱掉也会是个问题。<br>然后想到的是使用<code>json-server index.js</code> 在启动时把接口文件载入到内存中，提供给app使用<br>约定加载api文件夹下所有的文件，每个文件使用json格式保存<br>因为访问路径时使用的是／，所以考虑把api文件命名规则定为xx.x.xxx代替xx/x/xxx，这样访问路径就可以确定下来了<br>下面的代码中，我把文件夹名称改掉了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">module.exports=function()&#123;</div><div class="line">    var data = [];</div><div class="line">    var dirName = &quot;./xxx/&quot;</div><div class="line">    var rf=require(&quot;fs&quot;);</div><div class="line">    var files = rf.readdirSync(dirName);</div><div class="line">    files.forEach(function(file)&#123;</div><div class="line">        var content = rf.readFileSync(dirName+file);</div><div class="line">        var ob  = JSON.parse(content);</div><div class="line">        var arr = file.split(&quot;.&quot;);</div><div class="line">        var path = arr.join(&quot;/&quot;);</div><div class="line">        data[path] = ob;</div><div class="line">    &#125;);</div><div class="line">    return data;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>写段nodejs真是不容易。。。开始readfile使用的是异步方式，然后服务器启动成功，但是没有任何api被加载，以为是闭包中全局变量的问题，查下来才发现是异步执行的。<br>接下来的问题不能在后台挂起，问了作者才知道，需要使用<a href="https://github.com/typicode/hotel" target="_blank" rel="external">hotel</a>做damon process,问题总算是解决了<br>接下来写了个shell，执行shell可以从远程git上把api拉下来，然后在server.js中执行shell来更新文件。<br>然后发现nodejs execfile也是异步的，真是xxxx。换了种思路，直接在shell中更新api数据，然后启动json-server。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">git fetch origin</div><div class="line">diff=$(git diff origin/master --shortstat);</div><div class="line">if [ -n &quot;$diff&quot; ]</div><div class="line">then</div><div class="line"> git rebase origin master</div><div class="line">fi</div><div class="line">echo &quot;starting json-server&quot;;</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hotel add &apos;cmd -p $&#123;port&#125;&apos;</div></pre></td></tr></table></figure>
-<p>就可以在web中启动和关闭fake server实现代码更新了<br>接下来的问题是这个fake server的问题是无法处理post请求，json－server原本的post请求实际上是为了向‘服务器’添加数据。看了下文档，好像也没办法解决，只能在nginx里处理了</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/nodejs/">nodejs</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/nodejs/">nodejs</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/23/dubbo/" title="dubbo 服务治理" itemprop="url">dubbo 服务治理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-23T12:46:00.000Z" itemprop="datePublished"> Published 2015-08-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>之前打算使用consul作为服务注册发现,thrift来做远程服务调用.很可惜，一些原因没有使用.<br>使用dubbo来作为服务治理<br>dubbo的<a href="http://dubbo.io" target="_blank" rel="external">官方文档</a>也比较详细，使用过程中也踩了不少坑<br>缺点是只能使用java，不能满足其他语言之间的互相通信。<br>而thrift 是一个语言框架，在spring中使用swift可以自动生成idl文件，通过idl文件生成其他语言，这点很强大,关于thrit，虽然以后不一定会接触了，<a href="http://calvin1978.blogcn.com/articles/apache-thrift.html" target="_blank" rel="external">这篇</a>写的还是不错的</p>
-<p>最近很累，不想写太多，就转个不错的吧，是一个系列文章<br><a href="http://blog.csdn.net/lishehe/article/details/46652497" target="_blank" rel="external">Dubbo框架应用之（一）–服务体系</a><br><a href="http://blog.csdn.net/lishehe/article/details/46652743" target="_blank" rel="external">Dubbo框架应用之（二）–服务治理</a><br><a href="http://blog.csdn.net/lishehe/article/details/46653915" target="_blank" rel="external"> Dubbo框架应用之（三）–Zookeeper注册中心、管理控制台的安装及讲解</a><br><a href="http://blog.csdn.net/lishehe/article/details/46653793" target="_blank" rel="external">Dubbo框架应用之（四）–Dubbo基于Zookeeper实现分布式实例</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/java/">java</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/rpc/">rpc</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/4/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/">Next<span></span></a>
@@ -924,7 +895,7 @@ proxy_set_header X-Forwarded-For $remote_addr;
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>11</sup></a></li>
 		  
 		
 		  
@@ -932,7 +903,7 @@ proxy_set_header X-Forwarded-For $remote_addr;
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>13</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>15</sup></a></li>
 		  
 		
 		  

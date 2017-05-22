@@ -80,6 +80,129 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/04/23/baidu_login/" title="百度 模拟登陆" itemprop="url">百度 模拟登陆</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-23T03:35:00.000Z" itemprop="datePublished"> Published 2017-04-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="百度-模拟登陆"><a href="#百度-模拟登陆" class="headerlink" title="百度 模拟登陆"></a>百度 模拟登陆</h1><p>最近闲着无聊 没事写点东西玩<br>其实这种模拟登陆就是体力活，多次寻找，对比发送请求，找出’变量’和’常量’,然后代码中对’变量’进行填充,就可以了。难解决的问题是验证码,ip等,这里不做扩展。<br>百度在首次访问时会随机生成一个uid,这个uid的算法是js生成的,具体可以在js文件看到，不过js文件是通过多层js引用加载出来的<br>登陆时会使用到rsa算法，也是使用js做的加密,pubkey是通过异步动态获取的,逻辑不少，多抓几次包差不多就了解个大概了，细心点就可以了<br>直接贴代码吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">&lt;?php</div><div class="line">/**</div><div class="line"> * Created by PhpStorm.</div><div class="line"> * User: eric</div><div class="line"> * Date: 2017/4/22</div><div class="line"> * Time: 下午2:17</div><div class="line"> */</div><div class="line">use \GuzzleHttp\Client;</div><div class="line">require &quot;vendor/autoload.php&quot;;</div><div class="line">class HttpClient extends Client&#123;</div><div class="line">    private static $instance = null;</div><div class="line">    public static function getInstance()&#123;</div><div class="line">        if(self::$instance ==null)&#123;</div><div class="line">            self::$instance = new HttpClient([&apos;cookies&apos; =&gt; true]);</div><div class="line">        &#125;</div><div class="line">        return self::$instance;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">function buildGid()&#123;</div><div class="line">    $ss = &apos;xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx&apos;;</div><div class="line">    $len = strlen($ss);</div><div class="line">    $result = &apos;&apos;;</div><div class="line">    for ($i = 0; $i &lt; $len; $i++) &#123;</div><div class="line">        $result .= rep_sp($ss[$i]);</div><div class="line">    &#125;</div><div class="line">    return $result;</div><div class="line">&#125;</div><div class="line">function rep_sp($ns)&#123;</div><div class="line">    $t = rand(0, 16);</div><div class="line">    preg_match(&apos;/[xy]/&apos;,$ns,$result);</div><div class="line">    if(empty($result) )&#123;</div><div class="line">        return $ns;</div><div class="line">    &#125;</div><div class="line">    $n = $result ? $t:(3 &amp; $t|8);</div><div class="line">    return strtoupper(dechex($n) );</div><div class="line">&#125;</div><div class="line">function getToken($gid,$tt)&#123;</div><div class="line">    </div><div class="line">    $callback = &apos;bd__cbs__3vybvq&apos;;</div><div class="line">    $api = &quot;https://passport.baidu.com/v2/api/?getapi&amp;tpl=pp&amp;apiver=v3&amp;tt=$tt&amp;class=login&amp;gid=$gid&amp;logintype=basicLogin&amp;callback=$callback&quot;;</div><div class="line">    $result = HttpClient::getInstance()-&gt;request(&apos;GET&apos;,$api);</div><div class="line">    $t = substr($result-&gt;getBody(),strlen($callback)+1,-1);</div><div class="line">    $t = str_replace(&quot;&apos;&quot;,&quot;\&quot;&quot;,$t);</div><div class="line">    $t = json_decode($t,true);</div><div class="line">    $token = $t[&apos;data&apos;][&apos;token&apos;];</div><div class="line">    return $token;</div><div class="line"></div><div class="line">&#125;</div><div class="line">function getRsaKey($token,$gid,$tt)&#123;</div><div class="line">    $callback = &apos;bd__cbs__51lp3z&apos;;</div><div class="line">    $api = &quot;https://passport.baidu.com/v2/getpublickey?token=$token&amp;tpl=pp&amp;apiver=v3&amp;tt=$tt&amp;gid=$gid&amp;callback=$callback&quot;;</div><div class="line">    $result =  HttpClient::getInstance()-&gt;request(&apos;GET&apos;,$api);</div><div class="line">    $t = substr($result-&gt;getBody(),strlen($callback)+1,-1);</div><div class="line">    $t = str_replace(&quot;&apos;&quot;,&quot;\&quot;&quot;,$t);</div><div class="line">    $t = json_decode($t,true);</div><div class="line">    return array($t[&apos;key&apos;],$t[&apos;pubkey&apos;]);</div><div class="line">&#125;</div><div class="line">function rsaSign($str,$pubKey) &#123;</div><div class="line">    openssl_public_encrypt($str,$sign,$pubKey);</div><div class="line">    return base64_encode($sign);</div><div class="line"> &#125;</div><div class="line">function getMicroTime()&#123;</div><div class="line">    return intval(microtime(true)*1000);</div><div class="line">&#125;</div><div class="line"></div><div class="line">$passort_api = &quot;https://passport.baidu.com/v2/api/?login&quot;;</div><div class="line">$password = &apos;xxxx&apos;;</div><div class="line">$username = &apos;xxxx&apos;;</div><div class="line">HttpClient::getInstance()-&gt;request(&apos;get&apos;,&apos;https://passport.baidu.com/v2/?login&apos;);</div><div class="line">$random_time = getMicroTime();</div><div class="line">$gid = buildGid();</div><div class="line">$token = getToken($gid,$random_time);</div><div class="line">$random_time = $random_time+rand(1,1000);</div><div class="line">list($key,$pubKey) = getRsaKey($token,$gid,$random_time);</div><div class="line">$sign = rsaSign($password,$pubKey);</div><div class="line">$postData = array(</div><div class="line">    &apos;staticpage&apos;=&gt;&apos;https://passport.baidu.com/static/passpc-account/html/v3Jump.html&apos;,</div><div class="line">    &apos;charset&apos;=&gt;&apos;UTF-8&apos;,</div><div class="line">    &apos;token&apos;=&gt;$token,</div><div class="line">    &apos;tpl&apos;=&gt;&apos;pp&apos;,</div><div class="line">    &apos;subpro&apos;=&gt;&apos;&apos;,</div><div class="line">    &apos;apiver&apos;=&gt;&apos;v3&apos;,</div><div class="line">    &apos;tt&apos;=&gt;time()*1000+123,</div><div class="line">    &apos;codestring&apos;=&gt;&apos;&apos;,</div><div class="line">    &apos;safeflg&apos;=&gt;&quot;0&quot;,</div><div class="line">    &apos;u&apos;=&gt;&quot;https://passport.baidu.com/&quot;,</div><div class="line">    &apos;isPhone&apos;=&gt;0,</div><div class="line">    &apos;detect&apos;=&gt;&quot;1&quot;,</div><div class="line">    &apos;gid&apos;=&gt;$gid,</div><div class="line">    &apos;quick_user&apos;=&gt;0,</div><div class="line">    &apos;logintype&apos;=&gt;&apos;basicLogin&apos;,</div><div class="line">     &apos;logLoginType&apos;=&gt;&apos;pc_loginBasic&apos;,</div><div class="line">    &apos;idc&apos;=&gt;&apos;&apos;,</div><div class="line">    &apos;loginmerge&apos;=&gt;&quot;true&quot;,</div><div class="line">    &apos;username&apos;=&gt;$username,</div><div class="line">    &apos;password&apos;=&gt;$sign,</div><div class="line">    &apos;crypttype&apos;=&gt;12,</div><div class="line">     &apos;ppui_logintime&apos;=&gt;rand(1000,10000),</div><div class="line">    &apos;countrycode&apos;=&gt;&apos;&apos;,</div><div class="line">    &apos;rsakey&apos;=&gt;$key,</div><div class="line">    &apos;mem_pass&apos;=&gt;&apos;on&apos;,</div><div class="line">    &apos;callback&apos;=&gt;&apos;parent.bd__pcbs__l3z9y3&apos;</div><div class="line"></div><div class="line">);</div><div class="line">$headers = array(</div><div class="line">    &apos;Accept&apos;=&gt;&apos;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&apos;,</div><div class="line">    &apos;User-Agent&apos;=&gt; &apos;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0&apos;,</div><div class="line">    &apos;Accept-Language&apos;=&gt;&apos;zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3&apos;,</div><div class="line">    &apos;Accept-Encoding&apos;=&gt;&apos; deflate, br&apos;,</div><div class="line">    &apos;Referer&apos;=&gt; &apos;https://passport.baidu.com/v2/?login&apos;,</div><div class="line">    &apos;Content-Type&apos;=&gt;&apos;application/x-www-form-urlencoded&apos;,</div><div class="line">    &apos;Host&apos;=&gt; &apos;passport.baidu.com&apos;,</div><div class="line">    &apos;Connection&apos;=&gt;&apos;keep-alive&apos;,</div><div class="line">    &apos;Upgrade-Insecure-Requests&apos;=&gt;1,</div><div class="line">    );</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">$aaa = HttpClient::getInstance()-&gt;request(&quot;POST&quot;,$passort_api,[&apos;form_params&apos;=&gt;$postData,&apos;headers&apos;=&gt;$headers]);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($aaa-&gt;headers());exit;</div></pre></td></tr></table></figure>
+<p>获取到BDUSS cookie即表明登陆成功</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/04/22/rsa/" title="rsa加密" itemprop="url">rsa加密</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-22T11:35:00.000Z" itemprop="datePublished"> Published 2017-04-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="rsa加密"><a href="#rsa加密" class="headerlink" title="rsa加密"></a>rsa加密</h1><p>rsa算法相关<br><a href="http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html" target="_blank" rel="external">RSA算法原理（一）</a><br><a href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html" target="_blank" rel="external">RSA算法原理（二）</a></p>
+<p>最近研究百度登陆,发现百度登陆使用到了rsa加密,通过异步获取pubkey后，对password进行了rsa加密<br>具体php实现如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">function rsaSign($password,$pubKey) &#123;</div><div class="line">    openssl_public_encrypt($password,$sign,$pubKey);</div><div class="line">    return base64_encode($sign);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/04/14/patterns_01/" title="观察者模式" itemprop="url">观察者模式</a>
   </h1>
   <p class="article-author">By
@@ -93,7 +216,7 @@
 </header>
     <div class="article-content">
         
-        <p>###<br>Spl中提供了两个接口来实现观察者模式<br>Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者<br>Observer需要实现一个接口，更新</p>
+        <p>Spl中提供了两个接口来实现观察者模式<br>Subject需要实现3个具体方法,包括添加观察者，删除观察者，通知观察者<br>Observer需要实现一个接口，更新</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">class ConcertSubject implements SplSubject&#123;</div><div class="line">    private $obeservers;</div><div class="line"></div><div class="line">    private $value;</div><div class="line"></div><div class="line">    public function __construct()</div><div class="line">    &#123;</div><div class="line">        $this-&gt;obeservers = new SplObjectStorage();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function attach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;attach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    public function detach (SplObserver $observer)&#123;</div><div class="line">        $this-&gt;obeservers-&gt;detach($observer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function notify ()&#123;</div><div class="line">        foreach ($this-&gt;obeservers as $obeserver)&#123;</div><div class="line">            $obeserver-&gt;update($this);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    public function setValue($value)&#123;</div><div class="line">        $this-&gt;value = $value;</div><div class="line">        $this-&gt;notify();</div><div class="line">    &#125;</div><div class="line">    public function getValue()&#123;</div><div class="line">        return $this-&gt;value;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">class ConcertObserver implements SplObserver&#123;</div><div class="line"></div><div class="line">    public function update (SplSubject $subject)&#123;</div><div class="line">            var_dump($subject-&gt;getValue());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$subject = new ConcertSubject();</div><div class="line">$observer =  new ConcertObserver();</div><div class="line">$subject-&gt;attach($observer);</div><div class="line">$subject-&gt;setValue(666);</div></pre></td></tr></table></figure>
         
         
@@ -153,7 +276,7 @@
 </header>
     <div class="article-content">
         
-        <h3 id="parse-url"><a href="#parse-url" class="headerlink" title="parse_url"></a>parse_url</h3><p>很多人喜欢用正则提取url中的domain,path及参数信息<br>实际上php已经提供了对url解析的方法:<a href="http://php.net/manual/en/function.parse-url.php" target="_blank" rel="external">parse_url</a><br>一个url可以分解成如下几个部分</p>
+        <p>很多人喜欢用正则提取url中的domain,path及参数信息<br>实际上php已经提供了对url解析的方法:<a href="http://php.net/manual/en/function.parse-url.php" target="_blank" rel="external">parse_url</a><br>一个url可以分解成如下几个部分</p>
 <ul>
 <li>scheme  协议</li>
 <li>host  主机</li>
@@ -263,6 +386,78 @@
   <a class="article-category-link" href="/categories/other/">other</a>
 </div>
 
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/04/02/php_config/" title="读取config的几种方式" itemprop="url">读取config的几种方式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2017-04-02T14:15:00.000Z" itemprop="datePublished"> Published 2017-04-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="几种方式"><a href="#几种方式" class="headerlink" title="几种方式"></a>几种方式</h2><h3 id="ini"><a href="#ini" class="headerlink" title=".ini"></a>.ini</h3><p>parse_ini_file() 载入一个由 filename 指定的 ini 文件，并将其中的设置作为一个联合数组返回。</p>
+<p>ini 文件的结构和 php.ini 的相似。<br>一下是一个名为 db.ini的配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[db]</div><div class="line">host=0.0.0.0</div><div class="line">port=1234</div><div class="line">username=username</div><div class="line">password=pass</div></pre></td></tr></table></figure>
+<p>那么使用parse_ini_file读取也很简单</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$config = parse_ini_file(&apos;db&apos;,true);</div><div class="line">print_r($config);exit;</div></pre></td></tr></table></figure>
+<p>会返回一个key为db的二维数组</p>
+<h3 id="env"><a href="#env" class="headerlink" title=".env"></a>.env</h3><p>利用php的环境变量 $_ENV</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">通过环境方式传递给当前脚本的变量的数组。</div><div class="line"></div><div class="line">这些变量被从 PHP 解析器的运行环境导入到 PHP 的全局命名空间。很多是由支持 PHP 运行的 Shell 提供的，并且不同的系统很可能运行着不同种类的 Shell，所以不可能有一份确定的列表。请查看你的 Shell 文档来获取定义的环境变量列表。</div><div class="line"></div><div class="line">其他环境变量包含了 CGI 变量，而不管 PHP 是以服务器模块还是 CGI 处理器的方式运行。</div><div class="line"></div><div class="line">$HTTP_ENV_VARS 包含相同的信息，但它不是一个超全局变量。 (注意 $HTTP_ENV_VARS 和 $_ENV 是不同的变量，PHP 处理它们的方式不同)</div></pre></td></tr></table></figure>
+<p>推荐使用php的<a href="https://github.com/vlucas/phpdotenv" target="_blank" rel="external">phpdotenv</a><br>使用起来非常简单，laravel里就是使用dotenv作为配置的</p>
+<h3 id="yaml"><a href="#yaml" class="headerlink" title="yaml"></a>yaml</h3><p>这个没怎么用过，不太喜欢靠缩进风格的代码。可读性太差<br>这里有很详尽的说明<a href="https://segmentfault.com/a/1190000000409556" target="_blank" rel="external">PHP下处理YAML</a>以及<br><a href="https://packagist.org/packages/symfony/yaml" target="_blank" rel="external">symfony/yaml</a></p>
+<h3 id="xml"><a href="#xml" class="headerlink" title="xml"></a>xml</h3><p>php中很少见到有使用xml的，不过spring基本上是以这种方式加载大多数配置的(后续版本中也有大量使用annotition来声明配置)，一个主要原因是可读性很强，另一个原因也是规范化</p>
+<h3 id="array-amp-json"><a href="#array-amp-json" class="headerlink" title="array &amp; json"></a>array &amp; json</h3><p>很多公司自己实现的框架中都是依靠数组去实现配置的。这就导致配置文件的解析耗费了很大的性能</p>
+<h2 id="yaconf"><a href="#yaconf" class="headerlink" title="yaconf"></a>yaconf</h2><p>最后推荐鸟哥的<a href="http://www.laruence.com/2015/06/12/3051.html" target="_blank" rel="external">yaconf</a>,由于php的生命周期,导致每次读取配置时都需要解析配置文件,而yaconf是常驻内存的，而且支持动态更新等等，优势非常明显，缺点也很突出,仅支持php7,但是php7的项目推荐使用yaconf</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
 
 </div>
 
@@ -568,316 +763,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/01/04/search/" title="常见搜索引擎的分布式解决方法" itemprop="url">常见搜索引擎的分布式解决方法</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2017-01-04T11:59:00.000Z" itemprop="datePublished"> Published 2017-01-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>本文转自<a href="http://armsword.com/2017/01/16/distributed-solutions-for-search-engines/" target="_blank" rel="external">说说常见搜索引擎的分布式解决方法</a><br>随着索引数据的增大以及请求的增多，分布式搜索是最好的一种解决方案，主要解决两个问题，其一是能让单台机器load所有索引数据到内存中，其二是请求延时大，解决请求latency问题。我之前为团队写了篇专利，内容是关于分布式搜索解决方案的，所以粗略的看了下大部分开源的搜索引擎是怎么实现分布式的，后面的文章我会简单说下常见的搜索引擎的分布式解决方案。</p>
-<p>首先我们先说下几个简单概念，分布式搜索都是M*N（横向切分数据，纵向切分流量）这个维度去解决问题的，虽然不同产品或场景概念不完全相同，读者可以简单认为一份完整的数据，被均分为M份，每一份被称为一个分配（Shard或者Partition），然后提供对每个Shard提供N份副本（Replica）。那么分布式的设计就围绕着以下问题：</p>
-<ul>
-<li>如何选择合适的分片(Shard)，副本(Replica)的数量</li>
-<li>如何做路由，即怎么在所有Shard里找到一份完整的数据（找到对应的机器列表）</li>
-<li>如何做负载均衡</li>
-<li>如果提高服务的可扩展性</li>
-<li>如何提高服务的服务能力（QPS），当索引和搜索并发量增大时，如何平滑解决</li>
-<li>如何更新索引，全量和增量索引的更新解决方法</li>
-<li>如果提高服务的稳定性，单台服务挂掉怎么不影响整体服务等等</li>
-</ul>
-<p>下面就说下常见的搜索引擎的分布式解决方案，因为开源的搜索产品基本上都没有在工作中用过，对代码细节并不是太了解，只是研究了下其原理，所以理解的会有些偏差，看官们如果发现错误直接指出即可。</p>
-<h2 id="Sphinx-Coreseek"><a href="#Sphinx-Coreseek" class="headerlink" title="Sphinx/Coreseek"></a>Sphinx/Coreseek</h2><p>Sphinx的流程还是很简单的，可以看下其流程图：<br><img src="http://githubforericwang.qiniudn.com//hexo/eric/sphinx.png" alt="sphinx"><br>需要支持分布式的话，需要改下配置，大致是这样子的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">index dist</div><div class="line">&#123;</div><div class="line">  type = distributed</div><div class="line">  local = chunk1</div><div class="line">  agent = localhost:9312:chunk2  本地</div><div class="line">  agent = 192.168.100.2:9312:chunk3  远程</div><div class="line">  agent = 192.168.100.3:9312:chunk4  远程	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>从图中也可以看出，需要在配置列表里配置好其他shard的地址。查询过程为：</p>
-<ul>
-<li>连接到远程代理</li>
-<li>执行查询</li>
-<li>对本地索引进行查询</li>
-<li>接收来自远程代理的搜索结果</li>
-<li>将所有结果合并，删除重复项</li>
-<li>将合并后的结果返回给客户端<br>索引数据复制同步的方法也是常用的两种：</li>
-</ul>
-<p>主从同步<br>增量更新索引<br>方法也是设置crontab，添加2个选项，一个是重建主索引，一个是增量索引更新。</p>
-<p>当然为了避免单点以及增加服务能力，肯定有多个Replica，解决方法应该也是配置或者haproxy相关的方法解决，从上面可以看出，Sphinx很难用，自动化能力太弱，所以很多大厂要么不再使用Sphinx要么基于其二次开发。</p>
-<h2 id="Solr"><a href="#Solr" class="headerlink" title="Solr"></a>Solr</h2><p>Solr提供了两种方案来应对访问压力，其一是Replication，另一个是SolrCloud。我们此处只说Replication原理。<br>Replication采用了Master/Slave模式，也就是说由一个主索引和多个从索引构成，从索引从主索引复制索引，主索引负责更新索引，从索引负责同步索引和查询。本质上是读写分离的思想，MySQL/Redis等数据库也多是这种方式部署的。有两种部署方式：</p>
-<ul>
-<li>第一种<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/solr.png" alt="solr-replica"></li>
-<li>第二种<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/solr_repeater.png" alt="solr-repeater"></li>
-</ul>
-<p>与第一种相比多了一层Repeater，Repeater既扮演了Master角色，又扮演了Slave功能，主要解决单个Master下Slave太多，Master压力太大的问题。</p>
-<p>Master与Slave之间的通信是无状态的http连接，Slave端发送不同的Command从Master端获得数据。原理就是Master那边有个标志位和版本号，用于获取正确的数据版本，然后数据扔到Slave临时目录下，数据完整后，再覆盖原有数据。多个副本的方法应该与Sphinx相似，一般也是通过通过上游负载均衡模块如Nginx，HaProxy来分流。</p>
-<h2 id="SolrCloud"><a href="#SolrCloud" class="headerlink" title="SolrCloud"></a>SolrCloud</h2><p>因为Solr Replication不好用，本质上还不算真正分布式的，所以Solr从4.0开始支持SolrCloud模式。特性不少，主要说两个吧：</p>
-<p>配置文件统一管理，扔到Zookeeper上<br>自动做负载均衡和故障恢复，不再需要Nginx或HaProxy的支持<br>逻辑图<br><img src="http://githubforericwang.qiniudn.com/hexo/eric/solrcloud.png" alt="逻辑图"></p>
-<ul>
-<li>Collection：逻辑意义上一份完整的索引</li>
-<li>Shard：上文已说，就是索引的1/N分片</li>
-<li>Replica：Shard的一个拷贝<br>每个Shard，即相同的Replica下都会有一个leader，leader选举由Zookeeper完成。虽然有leader的概念，但是其实SolrCloud分布式是去中心化的，意思就是说，leader和非leader都能提供查询功能（也有修改和删除功能，搜索场景应用不多吧？），而更新索引，创建Collection/Shard/Replica（即扩容）只能由leader完成，避免产生并发修改问题，当非leader节点收到修改操作请求时，将信息存储在zookeeper中相应节点上，leader节点会一直对该节点进行watch，发现变化就实时做处理。</li>
-</ul>
-<h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3><p>任意节点收到创建索引请求后，转换成json格式存储到zk的/overseer/collection-queue-work的children节点上<br>leader线程一直监控collection-queue-work节点，检查到变化后，取出json数据，根据信息计算出需要创建的shard、replica，将创建具体replica的请求转向各对应节点<br>各节点创建完具体的replica后，将该节点的状态（创建成功与否等）更新到/overseer/queue的children节点上<br>leader线程监控/overseer/queue节点，将overseer/queue的children节点的状态更新至/clusterstate.json<br>各节点同步/clusterstate.json，整个集群状态得到更新，新索引创建成功</p>
-<h3 id="更新索引"><a href="#更新索引" class="headerlink" title="更新索引"></a>更新索引</h3><p>根据路由规则计算出该doc所属shard，并找出该doc所属的shard对应的leader<br>如果当前Replica是对应Shard且是leader，首先更新本地索引，然后再将doc转向该Shard的其余Replica<br>扩容/缩容</p>
-<p>停掉某台Solr，更新集群状态到/clusterstate.json<br>增加一台Solr，从leader出复制相同的数据，然后配置写到/clusterstate.json<br>查询</p>
-<p>去中心的，leader和非leader一样功能，Replica接收搜索请求时，从Zookeeper中获取该Replica对应的Collection及所有的Shard和Replica<br>将请求发送到该Collection下对应的Shard，然后负载均衡到对应的Replica<br>SolrCloud也有其他功能，比如Optimization，就是一个运行在leader机器的进程，复杂压缩索引和归并Segment；近实时搜索等。总体看SolrCloud解决了Solr Replication遇到的一些问题，比Sphinx更好用，更自动化。</p>
-<p>一号店</p>
-<p>很多大一点的厂商如果不自研搜索引擎的话，并没有使用SolrCloud，而多基于Solr/Lucence。比如一号店的分布式搜索解决方案，如下所示：<br><a href="http://www.infoq.com/cn/articles/yhd-11-11-distributed-search-engine-architecture" target="_blank" rel="external">http://www.infoq.com/cn/articles/yhd-11-11-distributed-search-engine-architecture</a></p>
-<p>Broker就相当于Proxy，扮演了路由功能，很多厂商做的与一号店有相似之处。因为没有leader选举，所以索引的更新就由其他模块来做了。</p>
-<h2 id="ElasticSearch"><a href="#ElasticSearch" class="headerlink" title="ElasticSearch"></a>ElasticSearch</h2><p>ElasticSearch的倒排索引也是基于Lucence实现的。功能强大，不仅提供了实时搜索功能，还有分析功能，DB-Engines上面的搜索引擎排名，目前已经超越Solr排名第一位了。因为太强大了，功能也特别多，我研究还不够深，简单说下吧。<br>es会将集群名字相同的机器归为一个集群（业务），所以先说下启动过程。</p>
-<h3 id="启动过程"><a href="#启动过程" class="headerlink" title="启动过程"></a>启动过程</h3><p><img src="http://githubforericwang.qiniudn.com/hexo/eric/es_start.png" alt="es_start"><br>当ElasticSearch的节点启动后，它会利用多播(multicast)(或者单播，如果用户更改了配置)寻找集群中的其它节点，并与之建立连接。</p>
-<h3 id="leader选举"><a href="#leader选举" class="headerlink" title="leader选举"></a>leader选举</h3><p>与SolrCloud相似，也是去中心化的，但是没有使用Zookeeper，而是自己实现了分布式锁，选主的流程叫做 ZenDiscovery（详情见第三个参考链接）：</p>
-<ul>
-<li>节点启动后先ping（这里的ping是 Elasticsearch 的一个RPC命令。如果 discovery.zen.ping.unicast.hosts 有设置，则ping设置中的host，否则尝试ping localhost 的几个端口， Elasticsearch 支持同一个主机启动多个节点）</li>
-<li>Ping的response会包含该节点的基本信息以及该节点认为的master节点</li>
-<li>选举开始，先从各节点认为的master中选，规则很简单，按照id的字典序排序，取第一个</li>
-<li>如果各节点都没有认为的master，则从所有节点中选择，规则同上。这里有个限制条件就是 discovery.zen.minimum_master_nodes，如果节点数达不到最小值的限制，则循环上述过程，直到节点数足够可以开始选举</li>
-<li>最后选举结果是肯定能选举出一个master，如果只有一个local节点那就选出的是自己</li>
-<li>如果当前节点是master，则开始等待节点数达到 minimum_master_nodes，然后提供服务</li>
-<li>如果当前节点不是master，则尝试加入master</li>
-<li>选举完leader后，主节点leader会去读取集群状态信息；因为主节点会监控其他节点，当其他节点出现故障时，会进行恢复工作。在这个阶段，主节点会去检查哪些分片可用，决定哪些分片作为主分片。</li>
-</ul>
-<p>选举完leader后，主节点leader会去读取集群状态信息；因为主节点会监控其他节点，当其他节点出现故障时，会进行恢复工作。在这个阶段，主节点会去检查哪些分片可用，决定哪些分片作为主分片。</p>
-<p>分片</p>
-<p>es在创建索引时，自己设置好分片个数，默认5个，整个过程类似于分裂的概念，如下图所示：</p>
-<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/es_shard.svg" alt="es_shard"></p>
-<p>至于读写、写操作等于SolrCloud相似，等我细研究后后续再说吧，也可以说下实时索引怎么做的，细节很多，下次再说吧。至于文中为什么不说Lucence，因为Lucence其实就是个index lib，只是解决倒排、正排索引怎么存放的，并不是一个完整的搜索引擎解决方案。而ES为什么能脱颖而出的主要原因是配套设施完善，工具，Web UI都是非常赞的，对于很多开源产品，它能后来居上的主要原因就是它真实的能解决用户遇到的问题或者比其他产品更好用。搜索引擎发展这么多年了，架构这块能做的基本上大家都差不太多，最后能脱颖而出的肯定是第三方工具做的更完善，更好用的了。</p>
-<p>PS：<br>至于阿里搜索怎么做的，可以参考下这个文档，包括了阿里搜索里用到的很多基础模块了：<br><a href="https://share.weiyun.com/f66e79d9f6897d0aac683361531cf00d" target="_blank" rel="external">https://share.weiyun.com/f66e79d9f6897d0aac683361531cf00d</a></p>
-<p>参考链接：<br><a href="http://blog.haohtml.com/archives/13724" target="_blank" rel="external">http://blog.haohtml.com/archives/13724</a><br><a href="http://www.voidcn.com/blog/u011026968/article/p-4922079.html" target="_blank" rel="external">http://www.voidcn.com/blog/u011026968/article/p-4922079.html</a><br><a href="http://jolestar.com/elasticsearch-architecture/" target="_blank" rel="external">http://jolestar.com/elasticsearch-architecture/</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/other/">other</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/solr/">solr</a><a href="/tags/elasticsearch/">elasticsearch</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/11/29/c_02/" title="linux下c语言编程" itemprop="url">linux下c语言编程</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-11-29T12:14:00.000Z" itemprop="datePublished"> Published 2016-11-29</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="linux-下c语言编程"><a href="#linux-下c语言编程" class="headerlink" title="linux 下c语言编程"></a>linux 下c语言编程</h1><h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><p>GCC（GNU Compiler Collection，GNU编译器套装），是一套由 GNU 开发的编程语言编译器。它是一套以 GPL 及 LGPL 许可证所发行的自由软件，也是 GNU计划 的关键部分，亦是自由的 类Unix 及苹果计算机 Mac OS X 操作系统的标准编译器。GCC（特别是其中的C语言编译器）也常被认为是跨平台编译器的事实标准。在ubuntu等操作系统中编译安装大多数开源项目几乎都会用到gcc。</p>
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//hellp.c</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">int main(void)</div><div class="line">&#123;</div><div class="line">    printf(&quot;Hello World!\n&quot;);</div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>简单的编译: gcc hello.c -o hello<br>gcc 编译器就会为我们生成一个 hello 的可执行文件,执行./hello 就可以看到程序的输出结果了。命令行中 gcc 表示我们是用 gcc 来编译我们的源程序,-o 选项表示我们要求编译器 给我们输出的可执行文件名为 hello 而 hello.c 是我们的源程序文件。<br>实质上，上述编译过程是分为四个阶段进行的，即预处理(也称预编译，Preprocessing)、编译(Compilation)、汇编 (Assembly)和连接(Linking)。</p>
-<p>gcc还有很多参数:<br>    -o 要求输出的可执行文件名。<br>    -c 要求编译器输出目标代码,而不必要输出可执行文件。<br>    -g 要求编译器在编译的时候提供我们以后对程序进行调试的信息。</p>
-<h2 id="多个程序文件的编译"><a href="#多个程序文件的编译" class="headerlink" title="多个程序文件的编译"></a>多个程序文件的编译</h2><p>比如hello.c include了一些头，包含在hello1.h和hello2.h中,hello1.c和hello2.c也包含了这些头，需要编译多个文件<br>gcc -c hello.c<br>gcc -c hello1.c<br>gcc -c hello2.c<br>gcc hello.o hello1.o hello2.o -o hello</p>
-<p>虽然这些命令可以使用shell脚本完成，但是大型的项目中会有很多源程序，不可能有一个改动就重新一个个编译。<br>因此就有了makefile，makefile带来的好处就是自动化编译，一旦写好，只需要一个make命令，整个工程完全自动编译，极大的提高了软件开发的效率。</p>
-<h2 id="makefile"><a href="#makefile" class="headerlink" title="makefile"></a>makefile</h2><p>在 Makefile 中也#开始的行都是注释行.Makefile 中 最重要的是描述文件的依赖关系的说明.一般的格式是:<br>target: prerequisites<br>TAB command<br>第一行表示的是依赖关系,第二行是规则。</p>
-<p>于是 hello的生成可以这么写 </p>
-<p>hello:hello.o hello1.o hello2.o<br>    gcc -o hello hello.o hello1.o hello2.o<br>hello.o:hello.c hello1.h hello2.h<br>    gcc -c hello.c<br>hello1.o:hello1.c hello1.h<br>    gcc -c hello1.c<br>hello2.o:hello2.c hello2.h<br>    gcc -c hello2.c</p>
-<p>Makefile 有三个非常有用的变量.分别是$@,$^,$&lt;代表的意义分别是: $@–目标文件,$^–所有的依赖文件,$&lt;–第一个依赖文件。<br>所以上面的可以写成<br>hello:hello.o hello1.o hello2.o<br>    gcc -o $@ $^<br>.c.o:<br>    gcc -c $&lt;</p>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><p>gdb工具，暂时没用到，先不看了</p>
-<p>简单地了解下linux下C语言编程。有空得继续深入了</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/limux/">limux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/c/">c</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/11/29/guid/" title="guid" itemprop="url">guid</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-11-29T11:55:00.000Z" itemprop="datePublished"> Published 2016-11-29</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="分布式id生成器"><a href="#分布式id生成器" class="headerlink" title="分布式id生成器"></a>分布式id生成器</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>有些人也喜欢叫发号器，一般是作为服务运行，主要目的是就是为一个系统的数据对象分配一个唯一id。</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
-<li>唯一性</li>
-<li>时间段内粗略有序</li>
-<li>可制造</li>
-<li>可反解</li>
-</ul>
-<p>一般来说，id生成器的要求主要是一下几点:</p>
-<ul>
-<li>快速响应，可以毫秒级并发</li>
-<li>高可用性</li>
-<li>体积小(存储)</li>
-</ul>
-<p>这里不讨论uuid<a href="http://kccoder.com/mysql/uuid-vs-int-insert-performance/" target="_blank" rel="external">uuid-vs-int-insert-performance</a></p>
-<h2 id="生成方法"><a href="#生成方法" class="headerlink" title="生成方法"></a>生成方法</h2><h3 id="自增有序"><a href="#自增有序" class="headerlink" title="自增有序"></a>自增有序</h3><p>这种方式可以利用mysql的自增id。但是使用mysql有一些瓶颈:</p>
-<ul>
-<li>单点问题(高可用性)</li>
-<li>并发</li>
-</ul>
-<p>flickr巧妙的利用replace实现分布式发号器<br>自增id使用big int  为了提高并发，使用多台mysql机器，每台机器设置不同的起始值和步长，sql使用replace唯一id的方式使得mysql每次增长一个步长(insert on duplacate key也可以，update不可以,是因为update的返回值是成功还是失败)<br>表结构</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `Tickets64` (</div><div class="line">  `id` bigint(20) unsigned NOT NULL auto_increment,</div><div class="line">  `stub` char(1) NOT NULL default &apos;&apos;,</div><div class="line">  PRIMARY KEY  (`id`),</div><div class="line">  UNIQUE KEY `stub` (`stub`)</div><div class="line">) ENGINE=MyISAM</div></pre></td></tr></table></figure>
-<p>sql语句</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">REPLACE INTO Tickets64 (stub) VALUES (&apos;a&apos;);</div><div class="line">SELECT LAST_INSERT_ID();</div></pre></td></tr></table></figure>
-<p>设置步长和起始值(步长也可以直接在session中指定)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">TicketServer1:</div><div class="line">auto-increment-increment = 2</div><div class="line">auto-increment-offset = 1</div><div class="line"></div><div class="line">TicketServer2:</div><div class="line">auto-increment-increment = 2</div><div class="line">auto-increment-offset = 2</div></pre></td></tr></table></figure>
-<p>php 实现，java无法使用jpa，可以用jdbcTemplate实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">include_once &apos;pdoFactory.php&apos;;</div><div class="line">// insert</div><div class="line">//$sql = &quot;INSERT INTO Tickets64 (stub) VALUES (&apos;a&apos;) ON DUPLiCATE KEY UPDATE id=id+1&quot;;</div><div class="line">// replace</div><div class="line">$sql = &quot;REPLACE INTO Tickets64 (stub) VALUES (&apos;a&apos;)&quot;;</div><div class="line"></div><div class="line">$pdo = pdoFactory::getInstance()-&gt;getPdo(&apos;default&apos;);</div><div class="line">$p = $pdo-&gt;exec($sql);</div><div class="line">echo &quot;&lt;pre&gt;&quot;;print_r($pdo-&gt;lastInsertId());exit;</div></pre></td></tr></table></figure>
-<p>优缺点</p>
-<p>优点是简单，实现快速。</p>
-<p>缺点是mysql中需要设置起始值，需要多台mysql服务，可扩展性差。并发取决于mysql节点数量</p>
-<p>架构图</p>
-<p><img src="http://githubforericwang.qiniudn.com/hexo/eric/autoincreament.png" alt=""></p>
-<p>腾讯的seqsvr <a href="http://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&amp;mid=2650992918&amp;idx=1&amp;sn=be5121c3c57257291a30715ef7130a90&amp;scene=23&amp;srcid=0628Xb1bDyZ2EdvPffymi6za#rd" target="_blank" rel="external">万亿级调用系统：微信序列号生成器架构设计及演变</a><br>简单来讲，seqsvr是一个巨大的long数组,每个元素代表一个用户，比如小明的uid是12,那么seq[12]就是他产生的guid，每个用户(元素)之间产生的uid互不影响,每个uid产生的guid严格递增(为了保证这一点，付出的代价很高，不能使用负载均衡，同一时间只有一个服务器产生该用户的guid)，发号分为两层，下层是持久化层，主要存储当前uid产生的最大的guid，上层为缓存层，缓存一个步长，用来发号。也做了很多优化，比如设置最大临时guid,相邻的uid共享该max_guid，这样在服务器重启时可以大大减少向存储层发起的请求，减少内存使用。容灾问题上做了很多处理，前面说到这种方式存在单点问题，seqsrv做了很多，分set做隔离，路由和配置服务做失败请求，仲裁服务做服务切换</p>
-<h3 id="时间有序"><a href="#时间有序" class="headerlink" title="时间有序"></a>时间有序</h3><p>主流的方式都是类似twitter的snowflake，一个long是64字节，可以根据自身业务特点选择秒级别还是毫秒级别，一般系统寿命在30年左右，所以毫秒级别需要41位表示时间，秒级别需要30位，剩下的需要几位去表示机器号，也可以预留2位表示版本，方便切换</p>
-<p>摘自<a href="http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/" target="_blank" rel="external">一乐:业务系统需要什么样的ID生成器</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">SnowFlake</div><div class="line"></div><div class="line">41bit留给毫秒时间，10bit给MachineID，也就是机器要预先配置，剩下12位留给Sequence。</div><div class="line"></div><div class="line">Weibo</div><div class="line"></div><div class="line">微博使用了秒级的时间，用了30bit，Sequence 用了15位，理论上可以搞定3.2w/s的速度。用4bit来区分IDC，也就是可以支持16个 IDC，对于核心机房来说够了。剩下的有2bit 用来区分业务，由于当前发号服务是机房中心式的，1bit 来区分热备。是的，也没有用满64bit。</div><div class="line"></div><div class="line">Ticktick</div><div class="line"></div><div class="line">也就是当前在环信系统里要用到的。使用了30bit 的秒级时间，20bit 给Sequence。这里是有个考虑，第一版实现还是希望到毫秒级，所以20bit 的前10bit给了毫秒来用，剩下10bit给 Sequence。等到峰值提高的时候可以暂时回到秒级。</div><div class="line"></div><div class="line">前面说到的三十年问题，因此我在高位留了2bit 做 Version，或者到时候改造使用更长字节数，用第一位来标识不同 ID，或者可以把这2bit 挪给时间用，可以给系统改造留出一定的时间。</div><div class="line"></div><div class="line">剩下的10bit 留给 MachineID，也就是说当前 ID 生成可以直接内嵌在业务服务中，最多支持千级别的服务器数量。最后有2bit 做Tag 用，可能区分群消息和单聊消息。同时你也看出，这个 ID 最多支持一天10亿消息，也是怕系统增速太快，这2bit 可以挪给 Sequence，可以支持40亿级别消息量，或者结合前面的版本支持到百亿级别。</div><div class="line"></div><div class="line">修正：评论里指出上面一个计算错误，不挪借的话应该是支持一天约千亿级别。对比当前 Whatsapp 的600亿和腾讯 QQ 的200亿，已经足够了。</div></pre></td></tr></table></figure>
-<p>snowflake</p>
-<p>优点:可用性强</p>
-<p>缺点:依赖zookeeper，要么人肉做配置，总之需要在服务中配置机器号识别。</p>
-<p>Instagram<br><a href="http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram" target="_blank" rel="external">sharding-ids-at-instagram</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">CREATE OR REPLACE FUNCTION insta5.next_id(OUT result bigint) AS $$</div><div class="line">DECLARE</div><div class="line">    our_epoch bigint := 1314220021721;</div><div class="line">    seq_id bigint;</div><div class="line">    now_millis bigint;</div><div class="line">    shard_id int := 5;</div><div class="line">BEGIN</div><div class="line">    SELECT nextval(&apos;insta5.table_id_seq&apos;) %% 1024 INTO seq_id;</div><div class="line"></div><div class="line">    SELECT FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000) INTO now_millis;</div><div class="line">    result := (now_millis - our_epoch) &lt;&lt; 23;</div><div class="line">    result := result | (shard_id &lt;&lt; 10);</div><div class="line">    result := result | (seq_id);</div><div class="line">END;</div><div class="line">$$ LANGUAGE PLPGSQL;</div></pre></td></tr></table></figure>
-<p>也是类似snowflake,直接在postgrsql中实现的。简单看了一下，类似触发器，id自增换成函数生成<br>达达的也类似<a href="http://www.infoq.com/cn/articles/imdada-high-performance-server-optimization/" target="_blank" rel="external">达达-高性能服务端优化之路</a></p>
-<p>优： 开发成本低<br>劣： 基于postgreSQL的存储过程，较为偏门</p>
-<p>基于redis的id生成器</p>
-<p>基于redis的id生成器(<a href="http://blog.csdn.net/hengyunabc/article/details/44244951" target="_blank" rel="external">http://blog.csdn.net/hengyunabc/article/details/44244951</a>)</p>
-<p>优点:利用redis lua脚本实现，少量机器即可满足需求</p>
-<p>缺点: 需要配置redis起始值及步长</p>
-<p>一些变种</p>
-<p>Hibernate <a href="https://github.com/hibernate/hibernate-orm/blob/master/hibernate-core/src/main/java/org/hibernate/id/uuid/CustomVersionOneStrategy.java" target="_blank" rel="external">github</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">- 时间戳(6bytes, 48bit)：毫秒级别的，从1970年算起，能撑8925年....</div><div class="line">- 顺序号(2bytes, 16bit, 最大值65535): 没有时间戳过了一秒要归零的事，各搞各的，short溢出到了负数就归0。</div><div class="line">- 机器标识(4bytes 32bit): 拿localHost的IP地址，IPV4呢正好4个byte，但如果是IPV6要16个bytes，就只拿前4个byte。</div><div class="line">- 进程标识(4bytes 32bit)： 用当前时间戳右移8位再取整数应付，不信两条线程会同时启动。</div><div class="line"></div><div class="line">值得留意就是，机器进程和进程标识组成的64bit Long几乎不变，只变动另一个Long就够了。</div></pre></td></tr></table></figure>
-<p>mongodb <a href="https://docs.mongodb.com/manual/reference/bson-types/#objectid" target="_blank" rel="external">Mongdodb objectId</a> 非long型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">- 时间戳(4 bytes 32bit): 是秒级别的，从1970年算起，能撑136年。</div><div class="line"></div><div class="line">- 自增序列(3bytes 24bit, 最大值一千六百万)： 是一个从随机数开始（机智）的Int不断加一，也没有时间戳过了一秒要归零的事，各搞各的。因为只有3bytes，所以一个4bytes的Int还要截一下后3bytes。</div><div class="line"></div><div class="line">- 机器标识(3bytes 24bit): 将所有网卡的Mac地址拼在一起做个HashCode，同样一个int还要截一下后3bytes。搞不到网卡就用随机数混过去。</div><div class="line"></div><div class="line">- 进程标识(2bytes 16bits)：从JMX里搞回来到进程号，搞不到就用进程名的hash或者随机数混过去。</div><div class="line"></div><div class="line">可见，MongoDB的每一个字段设计都比Hibernate的更合理一点，比如时间戳是秒级别的。总长度也降到了12 bytes 96bit，但如果果用64bit长的Long来保存有点不上不下的，只能表达成byte数组或16进制字符串。</div></pre></td></tr></table></figure>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://calvin1978.blogcn.com/articles/uuid.html" target="_blank" rel="external">江南白衣:分布式Unique ID的生成方法一览</a></p>
-<p><a href="http://ericliang.info/what-kind-of-id-generator-we-need-in-business-systems/" target="_blank" rel="external">一乐:业务系统需要什么样的ID生成器</a></p>
-<p><a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap/" target="_blank" rel="external">flickr Ticket Servers: Distributed Unique Primary Keys on the Cheap</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/arch/">arch</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/arch/">arch</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
@@ -957,7 +842,7 @@
 		  
 		
 		  
-			<li><a href="/categories/other/" title="other">other<sup>10</sup></a></li>
+			<li><a href="/categories/other/" title="other">other<sup>11</sup></a></li>
 		  
 		
 		  
@@ -965,7 +850,7 @@
 		  
 		
 		  
-			<li><a href="/categories/php/" title="php">php<sup>13</sup></a></li>
+			<li><a href="/categories/php/" title="php">php<sup>15</sup></a></li>
 		  
 		
 		  

@@ -46,7 +46,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -62,7 +62,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -80,6 +80,513 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2016/06/08/shell-2/" title="shell编程之执行环境" itemprop="url">shell编程之执行环境</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-06-08T08:36:50.000Z" itemprop="datePublished"> 发表于 2016-06-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://liwei.life/2016/05/30/shell%E7%BC%96%E7%A8%8B%E4%B9%8B%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83/" target="_blank" rel="external">SHELL编程之执行环境</a></p>
+<p>微博ID：<strong>orroz</strong></p>
+<p>微信公众号：<strong>Linux系统技术</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第三篇，主要介绍bash脚本的执行环境以及注意事项。通过本文，应该可以帮助您解决以下问题：</p>
+<ul>
+<li>执行bash和执行sh究竟有什么区别？</li>
+<li>如何调试bash脚本？</li>
+<li>如何记录用户在什么时候执行的某条命令？</li>
+<li>为什么有时ulimit命令的设置不生效或者报错？</li>
+<li>环境变量和一般变量有什么区别？？</li>
+</ul>
+<h2 id="常用参数"><a href="#常用参数" class="headerlink" title="常用参数"></a>常用参数</h2><h3 id="交互式login-shell"><a href="#交互式login-shell" class="headerlink" title="交互式login shell"></a>交互式login shell</h3><p>关于bash的编程环境，首先我们要先理解的就是bash的参数。不同方式启动的bash一般默认的参数是不一样的。一般在命令行中使用的bash，都是以login方式打开的，对应的参数是：-l或—login。还有-i参数，表示bash是以交互方式打开的，在默认情况下，不加任何参数的bash也是交互方式打开的。这两种方式都会在启动bash之前加载一些文件：</p>
+<p>首先，bash去检查/etc/profile文件是否存在，如果存在就读取并执行这个文件中的命令。</p>
+<p>之后，bash再按照以下列出的文件顺序依次查看是否存在这些文件，如果任何一个文件存在，就读取、执行文件中的命令：</p>
+<ol>
+<li>~/.bash_profile</li>
+<li>~/.bash_login</li>
+<li>~/.profile</li>
+</ol>
+<p>这里要注意的是，本步骤只会检查到一个文件并处理，即使同时存在2个或3个文件，本步骤也只会处理最优先的那个文件，而忽略其他文件。以上两个步骤的检查都可以用—noprofile参数进行关闭。</p>
+<p>当bash是以login方式登录的时候，在bash退出时（exit），会额外读取并执行~/.bash_logout文件中的命令。</p>
+<p>当bash是以交互方式登录时（-i参数），bash会读取并执行~/.bashrc中的命令。—norc参数可以关闭这个功能，另外还可以通过—rcfile参数指定一个文件替代默认的~/.bashrc文件。</p>
+<p>以上就是bash以login方式和交互式方式登录的主要区别，根据这个过程，我们到RHEL7的环境上看看都需要加载哪些配置：</p>
+<p>1.首先是加载/etc/profile。根据RHEL7上此文件内容，这个脚本还需要去检查/etc/profile.d/目录，将里面以.sh结尾的文件都加载一遍。具体细节可以自行查看本文件内容。<br>2.之后是检查~/.bash_profile。这个文件中会加载~/.bashrc文件。<br>3.之后是处理~/.bashrc文件。此文件主要功能是给bash环境添加一些alias，之后再加载/etc/bashrc文件。<br>4.最后处理/etc/bashrc文件。这个过程并不是bash自身带的过程，而是在RHEL7系统中通过脚本调用实现。</p>
+<p>了解了这些之后，如果你的bash环境不是在RHEL7系统上，也应该可以确定在自己环境中启动的bash到底加载了哪些配置文件。</p>
+<h3 id="bash和sh"><a href="#bash和sh" class="headerlink" title="bash和sh"></a>bash和sh</h3><p>几乎所有人都知道bash有个别名叫sh，也就是说在一个脚本前面写!#/bin/bash和#!/bin/sh似乎没什么不同。但是下面我们要看看它们究竟有什么不同。</p>
+<p>首先，第一个区别就是这两个文件并不是同样的类型。如果细心观察过这两个文件的话，大家会发现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls -l /usr/bin/sh</div><div class="line">lrwxrwxrwx 1 root root 4 11月 24 04:20 /usr/bin/sh -&gt; bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls -l /usr/bin/bash</div><div class="line">-rwxr-xr-x 1 root root 791304 11月 24 04:20 /usr/bin/bash</div></pre></td></tr></table></figure>
+<p>sh是指向bash的一个符号链接。符号链接就像是快捷方式，那么执行sh就是在执行bash。这说明什么？说明这两个执行方式是等同的么？实际上并不是。我们都知道在程序中是可以获得自己执行命令的进程名称的，这个方法在bash编程中可以使用$0变量来实现，参见如下脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat name.sh</div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">echo $0</div><div class="line"></div><div class="line">case $0 in</div><div class="line">*name.sh)</div><div class="line">echo &quot;My name is name!&quot;</div><div class="line">;;</div><div class="line">*na.sh)</div><div class="line">echo &quot;My name is na&quot; </div><div class="line">;;</div><div class="line">*)</div><div class="line">echo &quot;Name error!&quot;</div><div class="line">;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<p>这个脚本直接执行的结果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./name.sh </div><div class="line">./name.sh</div><div class="line">My name is name!</div></pre></td></tr></table></figure>
+<p>大家也能看到脚本中有个逻辑是，如果进程名字是以na.sh结尾，那么打印的内容不一样。我们如何能让同一个程序触发这段不同的逻辑呢？其实很简单，就是给这个脚本创建一个叫na.sh的符号链接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ln -s name.sh na.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ ./na.sh </div><div class="line">./na.sh</div><div class="line">My name is na</div></pre></td></tr></table></figure>
+<p>通过符号链接的方式改变进程名称是一种常见的编程技巧，我们可以利用这个办法让程序通过不同进程名触发不同处理逻辑。所以大家以后再遇到类似bash和sh这样的符号链接关系的进程时要格外注意它们的区别。在这里它们到底有什么区别呢？实际上bash的源代码中对以bash名称和sh名称执行的时候，会分别触发不同的逻辑，主要的逻辑区别是：以sh名称运行时，会相当于以—posix参数方式启动bash。这个方式跟一般方式的具体区别可以参见：<a href="http://tiswww.case.edu/php/chet/bash/POSIX。" target="_blank" rel="external">http://tiswww.case.edu/php/chet/bash/POSIX。</a></p>
+<p>我遇到过很多次因为不同文件名的处理逻辑不同而引发的问题。其中一次是因为posix模式和一般模式的ulimit -c设置不同导致的。ulimit -c参数可以设置进程出现coredump时产生的文件的大小限制。因为内存的页大多都是4k，所以一般core文件都是最小4k一个，当ulimit -c参数设置小于4k时，无法正常产生core文件。为了调试方便，我们的生产系统都开了ulimit -c限制单位为4。因为默认ulimit -c的限制单位是1k，ulimit -c 4就是4k，够用了。但是我们仍然发现部分服务器不能正常产生core文件，最后排查定位到，这些不能产生core文件的配置脚本只要将#!/bin/sh改为#!/bin/bash就可以正常产生core文件。于是郁闷之余，查阅了bash的处理代码，最终发现原来是这个坑导致的问题。原因是：在posix模式下，ulimit -c的参数单位不是1024，而是512。至于还有什么其他不同，在上述链接中都有说明。</p>
+<h2 id="脚本调试"><a href="#脚本调试" class="headerlink" title="脚本调试"></a>脚本调试</h2><p>程序员对程序的调试工作是必不可少的，bash本身对脚本程序提供的调试手段不多，printf大法是必要技能之一，当然在bash中就是echo大法。另外就是bash的-v参数、-x参数和-n参数。</p>
+<p>-v参数就是可视模式，它会在执行bash程序的时候将要执行的内容也打印出来，除此之外，并不改变bash执行的过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat arg.sh</div><div class="line">#!/bin/bash -v</div><div class="line"></div><div class="line">echo $0</div><div class="line">echo $1</div><div class="line">echo $2</div><div class="line">ls /123</div><div class="line">echo $3</div><div class="line">echo $4</div><div class="line"></div><div class="line">echo $#</div><div class="line">echo $*</div><div class="line">echo $?</div></pre></td></tr></table></figure>
+<p>执行结果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./arg.sh 111 222 333 444 555</div><div class="line">#!/bin/bash -v</div><div class="line"></div><div class="line">echo $0</div><div class="line">./arg.sh</div><div class="line">echo $1</div><div class="line">111</div><div class="line">echo $2</div><div class="line">222</div><div class="line">ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">echo $3</div><div class="line">333</div><div class="line">echo $4</div><div class="line">444</div><div class="line"></div><div class="line">echo $#</div><div class="line">5</div><div class="line">echo $*</div><div class="line">111 222 333 444 555</div><div class="line">echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
+<p>-n参数用来检查bash的语法错误，并且不会真正执行bash脚本。这个就不举例子了。另外，三种方式除了可以直接在bash后面加参数以外，还可以在程序中随时使用内建命令set打开和关闭，方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat arg.sh</div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">set -v</div><div class="line">#set -o verbose</div><div class="line">echo $0</div><div class="line">set +v</div><div class="line">echo $1</div><div class="line">set -x</div><div class="line">#set -o xtrace</div><div class="line">echo $2</div><div class="line">ls /123</div><div class="line">echo $3</div><div class="line">set +x</div><div class="line">echo $4</div><div class="line"></div><div class="line">echo $#</div><div class="line"></div><div class="line">set -n</div><div class="line">#set -o noexec</div><div class="line">echo $*</div><div class="line">echo $?</div><div class="line">set +n</div></pre></td></tr></table></figure>
+<p>执行结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./arg.sh </div><div class="line">#set -o verbose</div><div class="line">echo $0</div><div class="line">./arg.sh</div><div class="line">set +v</div><div class="line"></div><div class="line">+ echo</div><div class="line"></div><div class="line">+ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">+ echo</div><div class="line"></div><div class="line">+ set +x</div><div class="line"></div><div class="line">0</div></pre></td></tr></table></figure>
+<p>以上例子中顺便演示了1、3、#、?的意义，大家可以自行对比它们的区别以理解参数的意义。另外再补充一个-e参数，这个参数可以让bash脚本命令执行错误的时候直接退出，而不是继续执行。这个功能在某些调试的场景下非常有用！</p>
+<p>本节只列出了几个常用的参数的意义和使用注意事项，希望可以起到抛砖引玉的作用。大家如果想要学习更多的bash参数，可以自行查看bash的man手册，并详细学习set和shopt命令的使用方法。</p>
+<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><p>我们目前已经知道有个PATH变量，bash会在查找外部命令的时候到PATH所记录的目录中进行查找，从这个例子我们可以先理解一下环境变量的作用。环境变量就类似PATH这种变量，是bash预设好的一些可能会对其状态和行为产生影响的变量。bash中实现的环境变量个数大概几十个，所有的帮助说明都可以在man bash中找到。我们还是拿一些会在bash编程中经常用到的来讲解一下。</p>
+<p>我们可以使用env命令来查看当前bash已经定义的环境变量。set命令不加任何参数可以查看当前bash环境中的所有变量，包括环境变量和私有的一般变量。一般变量的定义方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">[zorro@zorrozou-pc0 ~]$ set|grep aaa</div><div class="line">aaa=1000</div></pre></td></tr></table></figure>
+<p>上面我们定义了一个变量名字叫做aaa，我们能看到在set命令中可以显示出这个变量，但是env不显示。export命令可以将一个一般变量编程环境变量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ export aaa</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ set|grep aaa</div><div class="line">aaa=1000</div></pre></td></tr></table></figure>
+<p>export之后，env和set都能看到这个变量了。一般变量和环境变量的区别是：一般变量不能被子进程继承，而环境变量会被子进程继承。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep aaa</div><div class="line">aaa=1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ bbb=2000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $bbb</div><div class="line">2000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ env|grep bbb</div><div class="line">[zorro@zorrozou-pc0 ~]$ bash</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $aaa</div><div class="line">1000</div><div class="line">[zorro@zorrozou-pc0 ~]$ echo $bbb</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 ~]$</div></pre></td></tr></table></figure>
+<p>上面测试中，我们的bash环境里有一个环境变量aaa＝1000，又定义了一个一般变量bbb＝2000。此时我们在用bash打开一个子进程，在子进程中我们发现，aaa变量仍然能取到值，但是bbb不可以。证明aaa可以被子进程继承，bbb不可以。</p>
+<p>搞清楚了环境变量的基础知识之后，再来看一下bash中常用的环境变量：</p>
+<p>进程自身信息相关</p>
+<p>BASH：当前bash进程的进程名。</p>
+<p>BASHOPTS：记录了shopt命令已经设置为打开的选项。</p>
+<p>BASH_VERSINFO：bash的版本号信息，是一个数组。可以使用命令：echo ${BASH_VERSINFO[*]}查看数组的信息。有关数组的操作我们会在其它文章里详细说明。</p>
+<p>BASH_VERSION：bash的版本号信息。比上一个信息更少一点。</p>
+<p>HOSTNAME：系统主机名信息。</p>
+<p>HOSTTYPE：系统类型信息。</p>
+<p>OLDPWD：上一个当前工作目录。</p>
+<p>PWD：当前工作目录。</p>
+<p>HOME：主目录。一般指进程uid对应用户的主目录。</p>
+<p>SHELL：bash程序所在路径。</p>
+<p>常用数字</p>
+<p>RANDOM：每次取这个变量的值都能得到一个0-32767的随机数。</p>
+<p>SECONDS：当前bash已经开启了多少秒。</p>
+<p>BASHPID：当前bash进程的PID。</p>
+<p>EUID：进程的有效用户id。</p>
+<p>GROUPS：进程组身份。</p>
+<p>PPID：父进程PID。</p>
+<p>UID：用户uid。</p>
+<p>提示符</p>
+<p>PS1：用户bash的交互提示符，主提示符。</p>
+<p>PS2：第二提示符，主要用在一些除了PS1之外常见的提示符场景，比如输入了’之后回车，就能看到这个提示符。</p>
+<p>PS3：用于select语句的交互提示符。</p>
+<p>PS4：用于跟踪执行过程时的提示符，一般显示为”+”。比如我们在bash中使用set -x之后的跟踪提示就是这个提示符显示的。</p>
+<h2 id="命令历史"><a href="#命令历史" class="headerlink" title="命令历史"></a>命令历史</h2><p>交互bash中提供一种方便追溯曾经使用的命令的功能，叫做命令历史功能。就是将曾经用过的命令纪录下来，以备以后查询或者重复调用。这个功能在交互方式的bash中默认打开，在bash编程环境中默认是没有开启的。可以使用set +H来关闭这个功能，set -H打开这个功能。在开启了history功能的bash中我们可以使用history内建命令查询当前的命令历史列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">1 sudo bash</div><div class="line">2 ps ax</div><div class="line">3 ls</div><div class="line">4 ip ad sh</div></pre></td></tr></table></figure>
+<p>命令历史的相关配置都是通过bash的环境变量来完成的：</p>
+<p>HISTFILE：记录命令历史的文件路径。</p>
+<p>HISTFILESIZE：命令历史文件的行数限制</p>
+<p>HISTCONTROL：这个变量可以用来控制命令历史的一些特性。比如一般的命令历史会完全按照我们执行命令的顺序来完整记录，如果我们连续执行相同的命令，也会重复记录，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">......</div><div class="line">1173 pwd</div><div class="line">1174 pwd</div><div class="line">1175 pwd</div><div class="line">1176 history</div></pre></td></tr></table></figure>
+<p>我们可以利用这个变量的配置来消除命令历史中的重复记录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ export HISTCONTROL=ignoredups</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ pwd</div><div class="line">/home/zorro/bash</div><div class="line">[zorro@zorrozou-pc0 bash]$ history </div><div class="line">1177 export HISTCONTROL=ignoredups</div><div class="line">1178 history </div><div class="line">1179 pwd</div><div class="line">1180 history</div></pre></td></tr></table></figure>
+<p>这个变量还有其它配置，ignorespace可以用来让history忽略以空格开头的命令，ignoreboth可以同时起到ignoredups和ignorespace的作用，</p>
+<p>HISTIGNORE：可以控制history机制忽略某些命令，配置方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export HISTIGNORE=”pwd:ls:cd:”。</div></pre></td></tr></table></figure>
+<p>HISTSIZE：命令历史纪录的命令个数。</p>
+<p>HISTTIMEFORMAT：可以用来定义命令历史纪录的时间格式.在命令历史中记录命令执行时间有时候很有用，配置方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export HISTTIMEFORMAT=&apos;%F %T &apos;</div></pre></td></tr></table></figure>
+<p>相关时间格式的帮助可以查看man 3 strftime。</p>
+<p>HISTCMD：当前命令历史的行数。</p>
+<p>在交互式操作bash的时候，可以通过一些特殊符号对命令历史进行快速调用，这些符号基本都是以!开头的，除非!后面跟的是空格、换行、等号=或者小括号()：</p>
+<p>!n：表示引用命令历史中的第n条命令，如：!123，执行第123条命令。</p>
+<p>!-n：表示引用命令历史中的倒数第n条命令，如：!-123，执行倒数第123条命令。</p>
+<p>!!：重复执行上一条命令。</p>
+<p>!string：在命令历史中找到最近的一条以string字符串开头的命令并执行。</p>
+<p>!?string[?]：在命令历史中找到最近的一条包括string字符的命令并执行。如果最有一个?省略的话，就是找到以string结尾的命令。</p>
+<p>^string1^string2^：将上一个命令中的string1字符串替换成string2字符串并执行。可以简写为：^string1^string2</p>
+<p>!#：重复当前输入的命令。</p>
+<p>以下符号可以作为某个命令的单词代号，如：</p>
+<p>^：!^表示上一条命令中的第一个参数，$123^表示第123条命令的第一个参数。</p>
+<p>$：!$表示上一条命令中的最后一个参数。!123$表示第123条命令的最后一个参数。</p>
+<p>n（数字）：!!0表示上一条命令的命令名，!!3上一条命令的第三个参数。!123:3第123条命令的第三个参数。</p>
+<p>：表示所有参数，如：!123:\或!123*</p>
+<p>x-y：x和y都是数字，表示从第x到第y个参数，如：!123:1-6表示第123条命令的第1个到第6个参数。只写成-y，取前y个，如：!123:-7表示0-7。</p>
+<p>x：表示取从第x个参数之后的所有参数，相当于x-$。如：!123:2\</p>
+<p>x-：表示取从第x个参数之后的所有参数，不包括最后一个。如：!123:2-</p>
+<p>选择出相关命令或者参数之后，我们还可以通过一些命令对其进行操作：</p>
+<p>h 删除所有后面的路径，只留下前面的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/passwd</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:h</div><div class="line">ls /etc</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>紧接着上面的命令执行，相当于运行passwd。</p>
+<p>r 删除后缀.xxx, 留下文件名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls 123.txt</div><div class="line">ls: cannot access &apos;123.txt&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:r</div><div class="line">ls 123</div></pre></td></tr></table></figure>
+<p>e 删除文件名, 留下后缀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ !-2:e</div><div class="line">.txt</div><div class="line">bash: .txt: command not found</div></pre></td></tr></table></figure>
+<p>p 只打印结果命令，但不执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/passwd</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:p</div><div class="line">ls /etc/passwd</div></pre></td></tr></table></figure>
+<p>q 防止代换参数被再次替换，相当于给选择的参数加上了’’，以防止其被转义。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls `echo /etc/passwd`</div><div class="line">/etc/passwd</div><div class="line">[zorro@zorrozou-pc0 bash]$ !!:q</div><div class="line">&apos;ls `echo /etc/passwd`&apos;</div><div class="line">-bash: ls `echo /etc/passwd`: No such file or directory</div></pre></td></tr></table></figure>
+<p>x 作用同上，区别是每个参数都会分别给加上’’。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ !-2:x</div><div class="line">&apos;ls&apos; &apos;`echo&apos; &apos;/etc/passwd`&apos;</div><div class="line">ls: cannot access &apos;`echo&apos;: No such file or directory</div><div class="line">ls: cannot access &apos;/etc/passwd`&apos;: No such file or directory</div></pre></td></tr></table></figure>
+<p>s/old/new/ 字符串替换，跟上面的^^类似，但是可以指定任意历史命令。只替换找到的第一个old字符串。<br>&amp; 重复上次替换<br>g 在执行s或者＆命令作为前缀使用，表示全局替换。</p>
+<h2 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h2><p>每一个进程环境中都有对于资源的限制，bash脚本也不例外。我们可以使用ulimit内建命令查看和设置bash环境中的资源限制。</p>
+<p>[zorro@zorrozou-pc0 ~]$ ulimit -a<br>core file size (blocks, -c) unlimited<br>data seg size (kbytes, -d) unlimited<br>scheduling priority (-e) 0<br>file size (blocks, -f) unlimited<br>pending signals (-i) 63877<br>max locked memory (kbytes, -l) 64<br>max memory size (kbytes, -m) unlimited<br>open files (-n) 1024<br>pipe size (512 bytes, -p) 8<br>POSIX message queues (bytes, -q) 819200<br>real-time priority (-r) 0<br>stack size (kbytes, -s) 8192<br>cpu time (seconds, -t) unlimited<br>max user processes (-u) 63877<br>virtual memory (kbytes, -v) unlimited<br>file locks (-x) unlimited</p>
+<p>在上文讲述bash和sh之间的区别时，我们已经接触过这个命令中的-c参数了，用来限制core文件的大小。我们再来看看其它参数的含义：</p>
+<p>data seg size：程序的数据段限制。</p>
+<p>scheduling priority：优先级限制。相关概念的理解可以参考这篇：<a href="http://wp.me/p79Cit-S" target="_blank" rel="external">http://wp.me/p79Cit-S</a></p>
+<p>file size：文件大小限制。</p>
+<p>pending signals：未决信号个数限制。</p>
+<p>max locked memory：最大可以锁内存的空间限制。</p>
+<p>max memory size：最大物理内存使用限制。</p>
+<p>open files：文件打开个数限制。</p>
+<p>pipe size：管道空间限制。</p>
+<p>POSIX message queues：POSIX消息队列空间限制。</p>
+<p>real-time priority：实时优先级限制。相关概念的理解可以参考这篇：<a href="http://wp.me/p79Cit-S" target="_blank" rel="external">http://wp.me/p79Cit-S</a></p>
+<p>stack size：程序栈空间限制。</p>
+<p>cpu time：占用CPU时间限制。</p>
+<p>max user processes：可以打开的的进程个数限制。</p>
+<p>virtual memory：虚拟内存空间限制。</p>
+<p>file locks：锁文件个数限制。</p>
+<p>以上参数涉及各方面的相关知识，我们在此就不详细描述这些相关内容了。在此我们主要关注open files和max user processes参数，这两个参数是我们在优化系统时最常用的两个参数。</p>
+<p>这里需要注意的是，使用ulimit命令配置完这些参数之后的bash产生的子进程都会继承父进程的相关资源配置。ulimit的资源配置的继承关系类似环境变量，父进程的配置变化可以影响子进程。所以，如果我们只是在某个登录shell或者交互式shell中修改了ulimit配置，那么在这个bash环境中执行的命令和产生的子进程都会受到影响，但是对整个系统的其它进程没有影响。如果我们想要让所有用户一登录就有相关的配置，可以考虑把ulimit命令写在bash启动的相关脚本中，如/etc/profile。如果只想影响某一个用户，可以写在这个用户的主目录的bash启动脚本中，如~/.bash_profile。系统的pam模块也给我们提供了配置ulimit相关限制的配置方法，在centos7中大家可以在以下目录和文件中找到相关配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/security/limits.d/</div><div class="line">10-gcr.conf 99-audio.conf</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls /etc/security/limits.conf </div><div class="line">/etc/security/limits.conf</div></pre></td></tr></table></figure>
+<p>即使是写在pam相关配置文件中的相关配置，也可能不是系统全局的。如果你想给某一个后台进程设置ulimit，最靠谱的办法还是在它的启动脚本中进行配置。无论如何，只要记得一点，如果相关进程的ulimit没生效，要想的是它的父进程是谁？它的父进程是不是生效了？</p>
+<p>ulimit参数中绝大多数配置都是root才有权限改的更大，而非root身份只能在现有的配置基础上减小限制。如果你执行ulimit的时候报错了，请注意是不是这个原因。<br>```</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>通过本文我们学习了bash编程的进程环境的相关内容，主要包括的知识点为：</p>
+<ul>
+<li>bash的常用参数。</li>
+<li>bash的环境变量。</li>
+<li>命令历史功能和相关变量配置。</li>
+<li>bash脚本的资源限制ulimit的使用。</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/24/shell-1/" title="SHELL编程之执行过程" itemprop="url">SHELL编程之执行过程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-24T01:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="SHELL编程之执行过程"><a href="#SHELL编程之执行过程" class="headerlink" title="SHELL编程之执行过程"></a>SHELL编程之执行过程</h1><p>每次看这位大大的文章都会收获很多<br>文章转自<a href="http://liwei.life/2016/05/23/shell%E7%BC%96%E7%A8%8B%E4%B9%8B%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/" target="_blank" rel="external">SHELL编程之执行过程</a><br>作者相关:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">微博ID：**orroz**</div><div class="line"></div><div class="line">微信公众号：**Linux系统技术**</div></pre></td></tr></table></figure></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文是shell编程系列的第二篇，主要介绍bash脚本是如何执行命令的。通过本文，您应该可以解决以下问题：</p>
+<ul>
+<li><p>脚本开始的#!到底是怎么起作用的？</p>
+</li>
+<li><p>bash执行过程中的字符串判断顺序究竟是什么样？</p>
+</li>
+<li><p>如果我们定义了一个函数叫ls，那么调用ls的时候，到底bash是执行ls函数还是ls命令？</p>
+</li>
+<li><p>内建命令和外建命令到底有什么差别？</p>
+</li>
+<li><p>程度退出的时候要注意什么？</p>
+</li>
+</ul>
+<h1 id="以魔法-开始"><a href="#以魔法-开始" class="headerlink" title="以魔法#!开始"></a>以魔法#!开始</h1><p>一个脚本程序的开始方式都比较统一，它们几乎都开始于一个#!符号。这个符号的作用大家似乎也都知道，叫做声明解释器。脚本语言跟编译型语言的不一样之处主要是脚本语言需要解释器。因为脚本语言主要是文本，而系统中能够执行的文件实际上都是可执行的二进制文件，就是编译好的文件。文本的好处是人看方便，但是操作系统并不能直接执行，所以就需要将文本内容传递给一个可执行的二进制文件进行解析，再由这个可执行的二进制文件根据脚本的内容所确定的行为进行执行。可以做这种解析执行的二进制可执行程序都可以叫做解释器。</p>
+<p>脚本开头的#!就是用来声明本文件的文本内容是交给那个解释器进行解释的。比如我们写bash脚本，一般声明的方法是#!/bin/bash或#!/bin/sh。如果写的是一个python脚本，就用#!/usr/bin/python。当然，在不同环境的系统中，这个解释器放的路径可能不一样，所以固定写一个路径的方式就可能造成脚本在不同环境的系统中不通用的情况，于是就出现了这样的写法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env 脚本解释器名称</div></pre></td></tr></table></figure>
+<p>这就利用了env命令可以得到可执行程序执行路径的功能，让脚本自行找到在当前系统上到底解释器在什么路径。让脚本更具通用性。但是大家有没有想过一个问题，大多数脚本语言都是将#后面出现的字符当作是注释，在脚本中并不起作用。这个#!和这个注释的规则不冲突么？</p>
+<p>这就要从#!符号起作用的原因说起，其实也很简单，这个功能是由操作系统的程序载入器做的。在Linux操作系统上，出了1号进程以外，我们可以认为其它所有进程都是由父进程fork出来的。所以对bash来说，所谓的载入一个脚本执行，无非就是父进程调用fork()、exec()来产生一个子进程。这#!就是在内核处理exec的时候进行解析的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">内核中整个调用过程如下（linux 4.4），内核处理exec族函数的主要实现在fs/exec.c文件的do_execveat_common()方法中，其中调用exec_binprm()方法处理执行逻辑，这函数中使用</div><div class="line">search_binary_handler()对要加载的文件进行各种格式的判断，脚本（script）只是其中的一种。确定是script格式后，就会调用script格式对应的load_binary方法：</div><div class="line">load_script()进行处理，#!就是在这个函数中解析的。解析到了#!以后，内核会取其后面的可执行程序路径，再传递给search_binary_handler（）重新解析。</div><div class="line">这样最终找到真正的可执行二进制文件进行相关执行操作。</div></pre></td></tr></table></figure>
+<p>因此，对脚本第一行的#!解析，其实是内核给我们变的魔术。#!后面的路径内容在起作用的时候还没有交给脚本解释器。很多人认为#!这一行是脚本解释器去解析的，然而并不是。了解了原理之后，也顺便明白了为什么#!一定要写在第一行的前两个字符，因为这是在内核里写死的，它就只检查前两个字符。当内核帮你选好了脚本解释器之后，后续的工作就都交给解释器做了。脚本的所有内容也都会原封不动的交给解释器再次解释，是的，包括#!。但是由于对于解释器来说，#开头的字符串都是注释，并不生效，所以解释器自然对#!后面所有的内容无感，继续解释对于它来说有意义的字符串去了。</p>
+<p>我们可以用一个自显示脚本来观察一下这个事情，什么是自显示脚本？无非就是#!/bin/cat，这样文本的所有内容包括#!行都会交给cat进行显示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat cat.sh </div><div class="line">#!/bin/cat</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ ./cat.sh </div><div class="line">#!/bin/cat</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div></pre></td></tr></table></figure>
+<p>或者自删除脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat rm.sh </div><div class="line">#!/bin/rm</div><div class="line"></div><div class="line">echo &quot;hello world!&quot;</div><div class="line">[zorro@zorrozou-pc0 bash]$ chmod +x rm.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ ./rm.sh </div><div class="line">[zorro@zorrozou-pc0 bash]$ cat rm.sh</div><div class="line">cat: rm.sh: No such file or directory</div></pre></td></tr></table></figure>
+<p>这就是#!的本质。</p>
+<h2 id="bash如何执行shell命令？"><a href="#bash如何执行shell命令？" class="headerlink" title="bash如何执行shell命令？"></a>bash如何执行shell命令？</h2><p>刚才我们从#!的作用原理讲解了一个bash脚本是如何被加载的。就是说当#!/bin/bash的时候，实际上内核给我们启动了一个bash进程，然后把脚本内容都传递给bash进行解析执行。实际上，无论在脚本里还是在命令行中，bash对文本的解析方法大致都是一样的。首先，bash会以一些特殊字符作为分隔符，将文本进行分段解析。最主要的分隔符无疑就是回车，类似功能的分隔符还有分号”;”。所以在bash脚本中是以回车或者分号作为一行命令结束的标志的。这基本上就是第一层级的解析，主要目的是将大段的命令行进行分段。</p>
+<p>之后是第二层级解析，这一层级主要是区分所要执行的命令。这一层级主要解析的字符是管道”|”，&amp;&amp;、||这样的可以起到连接命令作用的特殊字符。这一层级解析完后，bash就能拿到最基本的一个个的要执行的命令了。</p>
+<p>当然拿到命令之后还要继续第三层解析，这一层主要是区分出要执行的命令和其参数，主要解析的是空格和tab字符。这一层次解析完之后，bash才开始对最基本的字符串进行解释工作。当然，绝大多数解析完的字符串，bash都是在fork之后将其传递给exec进行执行，然后wait其执行完毕之后再解析下一行。这就是bash脚本也被叫做批处理脚本的原因，主要执行过程是一个一个指令串行执行的，上一个执行完才执行下一个。以上这个过程并不能涵盖bash解释字符串的全过程，实际情况要比这复杂。</p>
+<p>bash在解释命令的时候为了方便一些操作和提高某些效率做了不少特性，包括alias功能和外部命令路径的hash功能。bash还因为某些功能不能做成外部命令，所以必须实现一些内建命令，比如cd、pwd等命令。当然除了内建命令以外，bash还要实现一些关键字，比如其编程语法结构的if或是while这样的功能。实际上作为一种编程语言，bash还要实现函数功能，我们可以理解为，bash的函数就是将一堆命令做成一个命令，然后调用执行这个名字，bash就是去执行事先封装好的那堆命令。</p>
+<p>好吧，问题来了：我们已知有一个内建命令叫做cd，如果此时我们又建立一个alias也叫cd，那么当我在bash中敲入cd并回车之后，bash究竟是将它当成内建命令解释还是当成alias解释？同样，如果cd又是一个外部命令能？如果又是一个hash索引呢？如果又是一个关键字或函数呢？</p>
+<p>实际上bash在做这些功能的时候已经安排好了它们在名字冲突的情况下究竟该先以什么方式解释。优先顺序是：</p>
+<ol>
+<li><p>别名：alias</p>
+</li>
+<li><p>关键字：keyword</p>
+</li>
+<li><p>函数：function</p>
+</li>
+<li><p>内建命令：built in</p>
+</li>
+<li><p>哈西索引：hash</p>
+</li>
+<li><p>外部命令：command</p>
+</li>
+</ol>
+<p>这些bash要判断的字符串类型都可以用type命令进行判断，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ type egrep</div><div class="line">egrep is aliased to &apos;egrep --color=auto&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ type if</div><div class="line">if is a shell keyword</div><div class="line">[zorro@zorrozou-pc0 bash]$ type pwd</div><div class="line">pwd is a shell builtin</div><div class="line">[zorro@zorrozou-pc0 bash]$ type passwd</div><div class="line">passwd is /usr/bin/passwd</div></pre></td></tr></table></figure>
+<h3 id="别名alias"><a href="#别名alias" class="headerlink" title="别名alias"></a>别名alias</h3><p>bash提供了一种别名(alias)功能，可以将某一个字符串做成另一个字符串的别名，使用方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias cat=&apos;cat -n&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ cat /etc/passwd</div><div class="line">     1  root:x:0:0:root:/root:/bin/bash</div><div class="line">     2  bin:x:1:1:bin:/bin:/usr/bin/nologin</div><div class="line">     3  daemon:x:2:2:daemon:/:/usr/bin/nologin</div><div class="line">     4  mail:x:8:12:mail:/var/spool/mail:/usr/bin/nologin</div><div class="line">     ......</div></pre></td></tr></table></figure>
+<p>于是我们再使用cat命令的时候，bash会将其解释为cat -n。</p>
+<p>这个功能在交互方式进行bash操作的时候可以提高不少效率。如果我们发现我们常用到某命令的某个参数的时候，就可以将其做成alias，以后就可以方便使用了。交互bash中，我们可以用alias命令查看目前已经有的alias列表。可以用unalias取消这个别名设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias </div><div class="line">alias cat=&apos;cat -n&apos;</div><div class="line"></div><div class="line">[zorro@zorrozou-pc0 bash]$ unalias cat</div></pre></td></tr></table></figure>
+<p>alias功能在交互打开的bash中是默认开启的，但是在bash脚本中是默认关闭的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#shopt -s expand_aliases</div><div class="line"></div><div class="line">alias ls=&apos;ls -l&apos;</div><div class="line">ls /etc</div></pre></td></tr></table></figure>
+<p>此时本程序输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./alias.sh </div><div class="line">adjtime       cgconfig.conf         docker       group      ifplugd     libao.conf      mail.rc      netconfig       passwd   request-key.conf  shells         udisks2</div><div class="line">adobe         cgrules.conf          drirc   ...</div></pre></td></tr></table></figure>
+<p>使用注释行中的shopt -s expand_aliases命令可以打开alias功能支持，我们将这行注释取消掉之后的执行结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./alias.sh </div><div class="line">total 1544</div><div class="line">-rw-r--r-- 1 root    root        44 11月 13 19:53 adjtime</div><div class="line">drwxr-xr-x 2 root    root      4096 4月  20 09:34 adobe</div><div class="line">-rw-r--r-- 1 root    root       389 4月  18 22:19 appstream.conf</div><div class="line">-rw-r--r-- 1 root    root         0 10月  1 2015 arch-release</div><div class="line">-rw-r--r-- 1 root    root       260 7月   1 2014 asound.conf</div><div class="line">drwxr-xr-x 3 root    root      4096 3月  11 10:09 avahi</div></pre></td></tr></table></figure>
+<p>这就是bash的alias功能。</p>
+<h3 id="关键字：keyword"><a href="#关键字：keyword" class="headerlink" title="关键字：keyword"></a>关键字：keyword</h3><p>关键字的概念很简单，主要就是bash提供的语法。比如if，while，function等等。对这些关键字使用type命令会显示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ type function</div><div class="line">function is a shell keyword</div></pre></td></tr></table></figure>
+<p>说明这是一个keyword。我想这个概念没什么可以解释的了，无非就是bash提供的一种语法而已。只是要注意，bash会在判断alias之后才来判断字符串是不是个keyword。就是说，我们还是可以创建一个叫if的alias，并且在执行的时候，bash只把它当成alias看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ alias if=&apos;echo zorro&apos;</div><div class="line">[zorro@zorrozou-pc0 bash]$ if</div><div class="line">zorro</div><div class="line">[zorro@zorrozou-pc0 bash]$ unalias if</div></pre></td></tr></table></figure>
+<h3 id="函数：function"><a href="#函数：function" class="headerlink" title="函数：function"></a>函数：function</h3><p>bash在判断完字符串不是一个关键字之后，将会检查其是不是一个函数。在bash编程中，我们可以使用关键字function来定义一个函数，当然这个关键字其实也可以省略：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">name () compound-command [redirection]</div><div class="line">function name [()] compound-command [redirection]</div></pre></td></tr></table></figure>
+<p>语法结构中的compound-command一般是放在{}里的一个命令列表（list）。定义好的函数其实就是一系列shell命令的封装，并且它还具有很多bash程序的特征，比如在函数内部可以使用$1，$2等这样的变量来判断函数的参数，也可以对函数使用重定向功能。</p>
+<p>关于函数的更细节讨论我们会在后续的文章中展开说明，再这里我们只需要知道它对于bash来说是第几个被解释的即可。</p>
+<h3 id="内建命令：built-in"><a href="#内建命令：built-in" class="headerlink" title="内建命令：built in"></a>内建命令：built in</h3><p>在判断完函数之后，bash将查看给的字符串是不是一个内建命令。内建命令是相对于外建命令来说的。其实我们在bash中执行的命令最常见的是外建（外部）命令。比如常见的ls，find，passwd等。这些外建命令的特点是，它们是作为一个可执行程序放在$PATH变量所包含的目录中的。bash在执行这些命令的时候，都会进行fork(),exec()并且wait()。就是用标准的打开子进程的方式处理外部命令。但是内建命令不同，这些命令都是bash自身实现的命令，它们不依靠外部的可执行文件存在。只要有bash，这些命令就可以执行。典型的内建命令有cd、pwd等。大家可以直接help cd或者任何一个内建命令来查看它们的帮助。大家还可以man bash来查看bash相关的帮助，当然也包括所有的内建命令。</p>
+<p>其实内建命令的个数并不会很多，一共大概就这些：</p>
+<p>:,  ., [, alias, bg, bind, break, builtin, caller, cd, command, compgen, complete, compopt, continue, declare, dirs, disown, echo, enable, eval, exec, exit, export, false, fc,<br>   fg, getopts, hash, help, history, jobs, kill, let, local, logout, mapfile, popd, printf, pushd, pwd, read, readonly, return, set, shift, shopt, source, suspend,  test,  times,  trap,<br>   true, type, typeset, ulimit, umask, unalias, unset, wait</p>
+<p>我们在后续的文章中会展开讲解这些命令的功能。</p>
+<h3 id="哈西索引：hash"><a href="#哈西索引：hash" class="headerlink" title="哈西索引：hash"></a>哈西索引：hash</h3><p>hash功能实际上是针对外部命令做的一个功能。刚才我们已经知道了，外部命令都是放在$PATH变量对应的路径中的可执行文件。bash在执行一个外部命令时所需要做的操作是：如果发现这个命令是个外部命令就按照$PATH变量中按照目录路径的顺序，在每个目录中都遍历一遍，看看有没有对应的文件名。如果有，就fork、exec、wait。我们系统上一般的$PATH内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ echo $PATH</div><div class="line">/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:</div><div class="line">/usr/bin/vendor_perl:/usr/bin/core_perl:/home/zorro/.local/bin:/home/zorro/bin</div></pre></td></tr></table></figure>
+<p>当然，很多系统上的$PATH变量包含的路径可能更多，目录中的文件数量也可能会很多。于是，遍历这些目录去查询文件名的行为就可能比较耗时。于是bash提供了一种功能，就是建立一个bash表，在第一次找到一个命令的路径之后，对其命令名和对应的路径建立一个hash索引。这样下次再执行这个命令的时候，就不用去遍历所有的目录了，只要查询索引就可以更快的找到命令路径，以加快执行程序的速度。</p>
+<p>我们可以使用内建命令hash来查看当前已经建立缓存关系的命令和其命中次数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ hash</div><div class="line">hits    command</div><div class="line">   1    /usr/bin/flock</div><div class="line">   4    /usr/bin/chmod</div><div class="line">  20    /usr/bin/vim</div><div class="line">   4    /usr/bin/cat</div><div class="line">   1    /usr/bin/cp</div><div class="line">   1    /usr/bin/mkdir</div><div class="line">  16    /usr/bin/man</div><div class="line">  27    /usr/bin/ls</div></pre></td></tr></table></figure>
+<p>这个命令也可以对当前的hash表进行操作，-r参数用来清空当前hash表。手工创建一个hash：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -p /usr/sbin/passwd psw</div><div class="line">[root@zorrozou-pc0 bash]# psw</div><div class="line">Enter new UNIX password: </div><div class="line">Retype new UNIX password:</div></pre></td></tr></table></figure>
+<p>此时我们就可以通过执行psw来执行passwd命令了。查看更详细的hash对应关系：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -l</div><div class="line">builtin hash -p /usr/bin/netdata netdata</div><div class="line">builtin hash -p /usr/bin/df df</div><div class="line">builtin hash -p /usr/bin/chmod chmod</div><div class="line">builtin hash -p /usr/bin/vim vim</div><div class="line">builtin hash -p /usr/bin/ps ps</div><div class="line">builtin hash -p /usr/bin/man man</div><div class="line">builtin hash -p /usr/bin/pacman pacman</div><div class="line">builtin hash -p /usr/sbin/passwd psw</div><div class="line">builtin hash -p /usr/bin/ls ls</div><div class="line">builtin hash -p /usr/bin/ss ss</div><div class="line">builtin hash -p /usr/bin/ip ip</div></pre></td></tr></table></figure>
+<p>删除某一个hash对应：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -d psw</div><div class="line">[root@zorrozou-pc0 bash]# hash -l</div><div class="line">builtin hash -p /usr/bin/netdata netdata</div><div class="line">builtin hash -p /usr/bin/df df</div><div class="line">builtin hash -p /usr/bin/chmod chmod</div><div class="line">builtin hash -p /usr/bin/vim vim</div><div class="line">builtin hash -p /usr/bin/ps ps</div><div class="line">builtin hash -p /usr/bin/man man</div><div class="line">builtin hash -p /usr/bin/pacman pacman</div><div class="line">builtin hash -p /usr/bin/ls ls</div><div class="line">builtin hash -p /usr/bin/ss ss</div><div class="line">builtin hash -p /usr/bin/ip ip</div></pre></td></tr></table></figure>
+<p>显示某一个hash对应的路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@zorrozou-pc0 bash]# hash -t chmod</div><div class="line">/usr/bin/chmod</div></pre></td></tr></table></figure>
+<p>在交互式bash操作和bash编程中，hash功能总是打开的，我们可以用set +h关闭hash功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ cat hash.sh </div><div class="line">#!/bin/bash</div><div class="line"></div><div class="line">#set +h</div><div class="line"></div><div class="line">hash</div><div class="line"></div><div class="line">hash -p /usr/bin/useradd uad</div><div class="line"></div><div class="line">hash -t uad</div><div class="line"></div><div class="line">uad</div></pre></td></tr></table></figure>
+<p>默认打开hash的脚本输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./hash.sh </div><div class="line">hash: hash table empty</div><div class="line">/usr/bin/useradd</div><div class="line">Usage: uad [options] LOGIN</div><div class="line">       uad -D</div><div class="line">       uad -D [options]</div><div class="line"></div><div class="line">Options:</div><div class="line">  -b, --base-dir BASE_DIR       base directory for the home directory of the</div><div class="line">                            new account</div><div class="line">  -c, --comment COMMENT         GECOS field of the new account</div><div class="line">  -d, --home-dir HOME_DIR       home directory of the new account</div><div class="line">  -D, --defaults                print or change default useradd configuration</div><div class="line">  -e, --expiredate EXPIRE_DATE  expiration date of the new account</div><div class="line">  -f, --inactive INACTIVE       password inactivity period of the new account</div><div class="line">  -g, --gid GROUP               name or ID of the primary group of the new</div><div class="line">                            account</div><div class="line">  -G, --groups GROUPS           list of supplementary groups of the new</div><div class="line">                            account</div><div class="line">  -h, --help                    display this help message and exit</div><div class="line">  -k, --skel SKEL_DIR           use this alternative skeleton directory</div><div class="line">  -K, --key KEY=VALUE           override /etc/login.defs defaults</div><div class="line">  -l, --no-log-init             do not add the user to the lastlog and</div><div class="line">                            faillog databases</div><div class="line">  -m, --create-home             create the user&apos;s home directory</div><div class="line">  -M, --no-create-home          do not create the user&apos;s home directory</div><div class="line">  -N, --no-user-group           do not create a group with the same name as</div><div class="line">                            the user</div><div class="line">  -o, --non-unique              allow to create users with duplicate</div><div class="line">                            (non-unique) UID</div><div class="line">  -p, --password PASSWORD       encrypted password of the new account</div><div class="line">  -r, --system                  create a system account</div><div class="line">  -R, --root CHROOT_DIR         directory to chroot into</div><div class="line">  -s, --shell SHELL             login shell of the new account</div><div class="line">  -u, --uid UID                 user ID of the new account</div><div class="line">  -U, --user-group              create a group with the same name as the user</div></pre></td></tr></table></figure>
+<p>关闭hash之后的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ./hash.sh </div><div class="line">./hash.sh: line 5: hash: hashing disabled</div><div class="line">./hash.sh: line 7: hash: hashing disabled</div><div class="line">./hash.sh: line 9: hash: hashing disabled</div><div class="line">./hash.sh: line 11: uad: command not found</div></pre></td></tr></table></figure>
+<h3 id="外部命令：command"><a href="#外部命令：command" class="headerlink" title="外部命令：command"></a>外部命令：command</h3><p>除了以上说明之外的命令都会当作外部命令处理。执行外部命令的固定动作就是在$PATH路径下找命令，找到之后fork、exec、wait。如果没有这个可执行文件名，就报告命令不存在。这也是bash最后去判断的字符串类型。</p>
+<p>外建命令都是通过fork调用打开子进程执行的，所以bash单纯只用外建命令是不能实现部分功能的。比如大家都知道cd命令是用来修改当前进程的工作目录的，如果这个功能使用外部命令实现，那么进程将fork打开一个子进程，子进程通过chdir()进行当前工作目录的修改时，实际上只改变了子进程本身的当前工作目录，而父进程bash的工作目录没变。之后子进程退出，返回到父进程的交互操作环境之后，用户会发现，当前的bash的pwd还在原来的目录下。所以大家应该可以理解，虽然我们的原则是尽量将所有命令都外部实现，但是还是有一些功能不能以创建子进程的方式达到目的，那么这些功能就必须内部实现。这就是内建命令必须存在的原因。另外要注意：bash在正常调用内部命令的时候并不会像外部命令一样产生一个子进程。</p>
+<h2 id="脚本的退出"><a href="#脚本的退出" class="headerlink" title="脚本的退出"></a>脚本的退出</h2><p>一个bash脚本的退出一般有多种方式，比如使用exit退出或者所有脚本命令执行完之后退出。无论怎么样退出，脚本都会有个返回码，而且返回码可能不同。</p>
+<p>任何命令执行完之后都有返回码，主要用来判断这个命令是否执行成功。在交互中bash中，我们可以使用$?来查看上一个命令的返回码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ ls /123</div><div class="line">ls: cannot access &apos;/123&apos;: No such file or directory</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">2</div><div class="line">[zorro@zorrozou-pc0 bash]$ ls /</div><div class="line">bin  boot  cgroup  data  dev  etc  home  lib  lib64  lost+found  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">0</div></pre></td></tr></table></figure>
+<p>返回码逻辑上有两类，0为真，非零为假。就是说，返回为0表示命令执行成功，非零表示执行失败。返回码的取值范围为0-255。其中错误返回码为1-255。bash为我们提供了一个内建命令exit，通过中这个命令可以人为指定退出的返回码是多少。这个命令的使用是一般进行bash编程的运维人员所不太注意的。我们在上一篇的bash编程语法结构的讲解中说过，if、while语句的条件判断实际上就是判断命令的返回值，如果我们自己写的bash脚本不注意规范的使用脚本退出时的返回码的话，那么这样的bash脚本将可能不可以在别人编写脚本的时候，直接使用if将其作为条件判断，这可能会对程序的兼容性造成影响。因此，请大家注意自己写的bash程序的返回码状态。如果我们的bash程序没有显示的以一个exit指定返回码退出的话，那么其最后执行命令的返回码将成为整个bash脚本退出的返回码。</p>
+<p>当然，一个bash程序的退出还可能因为被中间打断而发生，这一般是因为进程接收到了一个需要程序退出的信号。比如我们日常使用的ctrl＋c操作，就是给进程发送了一个2号SIGINT信号。考虑到程序退出可能性的各种可能，系统将错误返回码设计成1-255，这其中还分成两类：</p>
+<ul>
+<li>程序退出的返回码：1-127。这部分返回码一般用来作为给程序员自行设定错误退出用的返回码，比如：如果一个文件不存在，ls将返回2。如果要执行的命令不存在，则bash统一返回127<br>。返回码125和126有特殊用处，一个是程序命令不存在的返回码，另一个是命令的文件在，但是不可执行的返回码。</li>
+<li>程序被信号打断的返回码：128-255。这部分系统习惯上是用来表示进程被信号打断的退出返回码的。一个进程如果被信号打断了，其退出返回码一般是128+信号编号的数字。</li>
+</ul>
+<p>比如说，如果一个进程被2号信号打断的话，其返回码一般是128+2=130。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ sleep 1000</div><div class="line">^C</div><div class="line">[zorro@zorrozou-pc0 bash]$ echo $?</div><div class="line">130</div></pre></td></tr></table></figure>
+<p>在执行sleep命令的过程中，我使用ctrl+c中断了进程的执行。此时返回值为130。可以用内建命令kill -l查看所有信号和其对应的编号：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[zorro@zorrozou-pc0 bash]$ kill -l</div><div class="line"> 1) SIGHUP   2) SIGINT   3) SIGQUIT  4) SIGILL   5) SIGTRAP</div><div class="line"> 6) SIGABRT  7) SIGBUS   8) SIGFPE   9) SIGKILL 10) SIGUSR1</div><div class="line">11) SIGSEGV 12) SIGUSR2 13) SIGPIPE 14) SIGALRM 15) SIGTERM</div><div class="line">16) SIGSTKFLT   17) SIGCHLD 18) SIGCONT 19) SIGSTOP 20) SIGTSTP</div><div class="line">21) SIGTTIN 22) SIGTTOU 23) SIGURG  24) SIGXCPU 25) SIGXFSZ</div><div class="line">26) SIGVTALRM   27) SIGPROF 28) SIGWINCH    29) SIGIO   30) SIGPWR</div><div class="line">31) SIGSYS  34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</div><div class="line">38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</div><div class="line">43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</div><div class="line">48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</div><div class="line">53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</div><div class="line">58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</div><div class="line">63) SIGRTMAX-1  64) SIGRTMAX</div></pre></td></tr></table></figure>
+<p>在我们编写bash脚本的时候，一般可以指定的返回码范围是1-124。建议大家养成编写返回码的编程习惯，但是系统并不对这做出限制，作为程序员你依然可以使用0-255的所有返回码。但是如果你滥用这些返回码，很可能会给未来程序的扩展造成不必要的麻烦。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>本文中我们描述了一个脚本的执行过程，从#!开始，到中间的解析过程，再到最后的退出返回码。希望这些对大家深入理解bash的执行过程和编写更高质量的脚本有帮助。通过本文我们明确了以下知识点：</p>
+<ul>
+<li>脚本开始的#!的作用原理。</li>
+<li>bash的字符串解析过程。</li>
+<li>什么是alias。</li>
+<li>什么是关键字。</li>
+<li>什么是function。</li>
+<li>什么是内建命令，hash和外建命令以及它们的执行方法。</li>
+<li>如何退出一个bash脚本以及返回码的含义。</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/shell/">shell</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/22/ansible/" title="初试ansible" itemprop="url">初试ansible</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-22T11:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="ansible使用"><a href="#ansible使用" class="headerlink" title="ansible使用"></a>ansible使用</h1><p>ansible可以作为自动化运维工具，一直以来都是知道有这东西，却没有尝试过，现在是时候把吹过的牛逼补回来了</p>
+<p>1、简介</p>
+<p>ansible是自动化运维工具，基于Python开发，集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点，实现了批量系统配置、批量程序部署、批量运行命令等功能。ansible是基于模块工作的，本身没有批量部署的能力。真正具有批量部署的是ansible所运行的模块，ansible只是提供一种框架。主要包括：</p>
+<ul>
+<li><p>连接插件connection plugins：负责和被监控端实现通信；</p>
+</li>
+<li><p>host inventory：指定操作的主机，是一个配置文件里面定义监控的主机；</p>
+</li>
+<li><p>各种模块核心模块、command模块、自定义模块；</p>
+</li>
+<li><p>借助于插件完成记录日志邮件等功能；</p>
+</li>
+<li><p>playbook：剧本执行多个任务时，非必需可以让节点一次性运行多个任务。</p>
+</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>略过了，使用pip，安装很简单</p>
+<h2 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h2><p><img src="http://githubforericwang.qiniudn.com/hexo/eric/wKiom1Rsxz3ToUCAAAGROYAM3EI989.jpg" alt=""></p>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><ul>
+<li><p>no agents：不需要在被管控主机上安装任何客户端；</p>
+</li>
+<li><p>no server：无服务器端，使用时直接运行命令即可；</p>
+</li>
+<li><p>modules in any languages：基于模块工作，可使用任意语言开发模块；</p>
+</li>
+<li><p>yaml，not code：使用yaml语言定制剧本playbook；</p>
+</li>
+<li><p>ssh by default：基于SSH工作；</p>
+</li>
+<li><p>strong multi-tier solution：可实现多级指挥。</p>
+</li>
+</ul>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>轻量级，无需在客户端安装agent，更新时，只需在操作机上进行一次更新即可；</li>
+<li>批量任务执行可以写成脚本，而且不用分发到远程就可以执行；</li>
+<li>使用python编写，维护更简单，ruby语法过于复杂；</li>
+<li>支持sudo。</li>
+</ul>
+<h2 id="任务执行流程"><a href="#任务执行流程" class="headerlink" title="任务执行流程"></a>任务执行流程</h2><p><img src="http://githubforericwang.qiniudn.com/hexo/eric/wKiom1Rsx2uQYJZ5AAJplY08vOQ976.jpg" alt=""></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="搭建多个可操作的host"><a href="#搭建多个可操作的host" class="headerlink" title="搭建多个可操作的host"></a>搭建多个可操作的host</h3><p>没有机器，暂时用docker替代了<br>一个简单的sshd的Dockerfile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">FROM ubuntu:14.04</div><div class="line">MAINTAINER ericwang 123048591@qq.com</div><div class="line">RUN apt-get update &amp;&amp; apt-get install -y openssh-server \</div><div class="line">   &amp;&amp; sed -i &apos;s/UsePAM yes/UsePAM no/g&apos; /etc/ssh/sshd_config  \</div><div class="line">   &amp;&amp; useradd ansible \</div><div class="line">   &amp;&amp; echo ansible:ansible |chpasswd \</div><div class="line">   &amp;&amp; echo &quot;admin   ALL=(ALL)       ALL&quot; &gt;&gt; /etc/sudoers  \</div><div class="line">   &amp;&amp; mkdir /var/run/sshd</div><div class="line">RUN ssh-keygen  -t rsa -f /root/.ssh/id_rsa -P &quot;&quot;</div><div class="line">EXPOSE 22</div><div class="line">CMD [&quot;/usr/sbin/sshd&quot;, &quot;-D&quot;]</div></pre></td></tr></table></figure>
+<p>build脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">docker build  --tag sshd-server ./</div></pre></td></tr></table></figure>
+<p>run脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">set -x</div><div class="line">container_id=$(docker run -itd -P sshd-server)</div><div class="line">cat ~/.ssh/id_rsa.pub | docker exec --user=root -i $container_id  sh -c &apos;cat &gt;&gt; /root/.ssh/authorized_keys&apos;</div><div class="line">docker exec $container_id chmod 600 /root/.ssh/authorized_keys</div></pre></td></tr></table></figure>
+<p>练习的时候才发现docker exec使用流的时候有些问题，google看到<a href="https://forums.docker.com/t/docker-exec-api-using-stdin-to-upload-a-file/748" target="_blank" rel="external">这篇文章</a>，直接使用exec command &gt;&gt; file这种形式是不行的，会把流输出到宿主系统，完全就是错误的。期待那位linux　大神继续更新shell相关的博文，更深入地理解linux</p>
+<p>./build.sh 创建image,然后,./run.sh　这就创建了一个容器,也就是用来测试的ansible host。多次run后，就有了多个host机器了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  ~ docker ps</div><div class="line"></div><div class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                      NAMES</div><div class="line">a57b8c69e513        sshd-server         &quot;/usr/sbin/sshd -D&quot;      35 seconds ago      Up 34 seconds       0.0.0.0:32784-&gt;22/tcp      serene_saha</div></pre></td></tr></table></figure>
+<p>每一次run后都会产生一个容器,将端口22映射到主机的一个端口上，可以通过ssh登陆到docker容器中<br>如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">➜  ~ ssh root@127.0.0.1 -p 32784</div><div class="line">The authenticity of host &apos;[127.0.0.1]:32784 ([127.0.0.1]:32784)&apos; can&apos;t be established.</div><div class="line">ECDSA key fingerprint is 6a:d1:27:e4:89:93:98:96:8f:02:f7:bf:6e:d7:eb:7b.</div><div class="line">Are you sure you want to continue connecting (yes/no)? yes</div><div class="line">Warning: Permanently added &apos;[127.0.0.1]:32784&apos; (ECDSA) to the list of known hosts.</div><div class="line">root@a57b8c69e513:~#</div></pre></td></tr></table></figure></p>
+<p>第一次登陆需要add到know hosts，以后就是免密码登陆了</p>
+<p>启动了２个docker容器后,接下来是配置ansible了<br>默认hosts是在/etc/ansible/hosts,添加一组远程主机地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  ~ cat /etc/ansible/hosts </div><div class="line">[docker]</div><div class="line">[docker]</div><div class="line">127.0.0.1:32787 ansible_connection=ssh        ansible_ssh_user=root</div></pre></td></tr></table></figure>
+<p>关于inventory的配置，这个<a href="http://sapser.github.io/ansible/2014/07/10/ansible-inventory/" target="_blank" rel="external">博客</a>写的很详尽</p>
+<p>接下来尝试写playbook，<a href="http://sapser.github.io/ansible/2014/07/21/ansible-playbook/" target="_blank" rel="external">这篇</a>介绍的也不错。<br>写了一个简单的目录传输的playbook，很简单，功能很简单(其实就是发布系统的目录推送部分，其他功能待完善)<br>ansible目录下的两个文件,push_code.yml,update_git_code.sh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">➜  ansible cat push_code.yml </div><div class="line">---</div><div class="line">- hosts: docker</div><div class="line">  remote_user: root</div><div class="line">  tasks:</div><div class="line">  - name: push data</div><div class="line">    copy: src=/data/git_code dest=/data/code/</div><div class="line">            owner=root group=root mode=0644</div></pre></td></tr></table></figure>
+<p>然后写一个简单的主机发送脚本吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">➜  ansible cat update_git_code.sh </div><div class="line">#!/bin/bash</div><div class="line">set -x</div><div class="line">cd dirname $0</div><div class="line">git_dir=/data/git_code/</div><div class="line">git --git-dir=$git_dir.git/ --work-tree=$git_dir pull --rebase origin master:master \</div><div class="line">&amp;&amp; ansible-playbook -check  push_code.yml</div></pre></td></tr></table></figure>
+<p>/data/git_code是预先建立好的git代码仓库。这样就实现了一个简单的发布系统。后面有时间结合下之前做的docker-laravel,搞一个自动化的吧</p>
+<p>ansible在github上也有关于lamp的例子<a href="https://github.com/ansible/ansible-examples" target="_blank" rel="external">ansible-examples</a></p>
+<p>就先这样吧　以后有机会再继续接触</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://sofar.blog.51cto.com/353572/1579894/" target="_blank" rel="external">自动化运维工具Ansible详细部署</a><br><a href="http://docs.ansible.com" target="_blank" rel="external">ansible 官方文档</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ansible/">ansible</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2016/05/18/shell/" title="shell 编程之语法基础" itemprop="url">shell 编程之语法基础</a>
   </h1>
   <p class="article-author">By
@@ -87,7 +594,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-18T01:35:00.000Z" itemprop="datePublished"> Published 2016-05-18</time>
+    <time datetime="2016-05-18T01:35:00.000Z" itemprop="datePublished"> 发表于 2016-05-18</time>
     
   </p>
 </header>
@@ -291,7 +798,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-11T06:13:00.000Z" itemprop="datePublished"> Published 2016-05-11</time>
+    <time datetime="2016-05-11T06:13:00.000Z" itemprop="datePublished"> 发表于 2016-05-11</time>
     
   </p>
 </header>
@@ -353,7 +860,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-09T12:32:00.000Z" itemprop="datePublished"> Published 2016-05-09</time>
+    <time datetime="2016-05-09T12:32:00.000Z" itemprop="datePublished"> 发表于 2016-05-09</time>
     
   </p>
 </header>
@@ -421,7 +928,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-04T02:48:37.000Z" itemprop="datePublished"> Published 2016-05-04</time>
+    <time datetime="2016-05-04T02:48:37.000Z" itemprop="datePublished"> 发表于 2016-05-04</time>
     
   </p>
 </header>
@@ -654,7 +1161,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-23T15:47:00.000Z" itemprop="datePublished"> Published 2016-04-23</time>
+    <time datetime="2016-04-23T15:47:00.000Z" itemprop="datePublished"> 发表于 2016-04-23</time>
     
   </p>
 </header>
@@ -711,7 +1218,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-23T15:43:10.000Z" itemprop="datePublished"> Published 2016-04-23</time>
+    <time datetime="2016-04-23T15:43:10.000Z" itemprop="datePublished"> 发表于 2016-04-23</time>
     
   </p>
 </header>
@@ -861,7 +1368,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-21T13:31:21.000Z" itemprop="datePublished"> Published 2016-04-21</time>
+    <time datetime="2016-04-21T13:31:21.000Z" itemprop="datePublished"> 发表于 2016-04-21</time>
     
   </p>
 </header>
@@ -898,363 +1405,34 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/20/git-hook/" title="git hook" itemprop="url">git hook</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-20T08:13:00.000Z" itemprop="datePublished"> Published 2016-04-20</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="hook"><a href="#hook" class="headerlink" title="hook"></a>hook</h2><p>使用了很久git了，但是hook用的很少，今天研究一下<br>git的hook放在GIT_DIR/.git/hooks目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">➜  hooks git:(master) ls -al</div><div class="line">总用量 48</div><div class="line">drwxrwxr-x 2 eric eric 4096  4月 20 16:18 .</div><div class="line">drwxrwxr-x 7 eric eric 4096  4月 20 16:18 ..</div><div class="line">-rwxrwxr-x 1 eric eric  452  4月 20 16:18 applypatch-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  896  4月 20 16:18 commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric  189  4月 20 16:18 post-update.sample</div><div class="line">-rwxrwxr-x 1 eric eric  398  4月 20 16:18 pre-applypatch.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1642  4月 20 16:18 pre-commit.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1239  4月 20 16:18 prepare-commit-msg.sample</div><div class="line">-rwxrwxr-x 1 eric eric 1352  4月 20 16:18 pre-push.sample</div><div class="line">-rwxrwxr-x 1 eric eric 4898  4月 20 16:18 pre-rebase.sample</div><div class="line">-rwxrwxr-x 1 eric eric 3611  4月 20 16:18 update.sample</div></pre></td></tr></table></figure></p>
-<p>可以看到该目录下有很多以sample结尾的文件<br>这里尝试几个简单的吧</p>
-<h2 id="客户端钩子"><a href="#客户端钩子" class="headerlink" title="客户端钩子"></a>客户端钩子</h2><h3 id="commit-msg"><a href="#commit-msg" class="headerlink" title="commit-msg"></a>commit-msg</h3><p>将commit-msg.sample 重命名commit-msg<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">mv commit-msg.sample commit-msg</div><div class="line">➜  hooks git:(master) cat commit-msg </div><div class="line">#!/bin/sh</div><div class="line">#</div><div class="line"># An example hook script to check the commit log message.</div><div class="line"># Called by &quot;git commit&quot; with one argument, the name of the file</div><div class="line"># that has the commit message.  The hook should exit with non-zero</div><div class="line"># status after issuing an appropriate message if it wants to stop the</div><div class="line"># commit.  The hook is allowed to edit the commit message file.</div><div class="line">#</div><div class="line"># To enable this hook, rename this file to &quot;commit-msg&quot;.</div><div class="line"></div><div class="line"># Uncomment the below to add a Signed-off-by line to the message.</div><div class="line"># Doing this in a hook is a bad idea in general, but the prepare-commit-msg</div><div class="line"># hook is more suited to it.</div><div class="line">#</div><div class="line"># SOB=$(git var GIT_AUTHOR_IDENT | sed -n &apos;s/^\(.*&gt;\).*$/Signed-off-by: \1/p&apos;)</div><div class="line"># grep -qs &quot;^$SOB&quot; &quot;$1&quot; || echo &quot;$SOB&quot; &gt;&gt; &quot;$1&quot;</div><div class="line"></div><div class="line"># This example catches duplicate Signed-off-by lines.</div><div class="line"></div><div class="line">test &quot;&quot; = &quot;$(grep &apos;^Signed-off-by: &apos; &quot;$1&quot; |</div><div class="line">	 sort | uniq -c | sed -e &apos;/^[ 	]*1[ 	]/d&apos;)&quot; || &#123;</div><div class="line">	echo &gt;&amp;2 Duplicate Signed-off-by lines.</div><div class="line">	exit 1</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>看介绍，应该是在git commit 命令时检查log message的脚本，有一个参数，存放commit message的文件名<br>在最后加上判断log message低于3个时不得提交的脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">words=$(cat $1 |wc -w)</div><div class="line">if test $words -lt 3</div><div class="line"> then  echo &quot;commit message should larger than 3 words&quot;</div><div class="line">       exit 1</div><div class="line">fi</div></pre></td></tr></table></figure></p>
-<p>然后添加一个文件,提交。无法提交，原因是message单词数没有超过3个，过于简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  git-hooks git:(master) ✗ echo 1111&gt;aaa</div><div class="line">➜  git-hooks git:(master) ✗ git add .</div><div class="line">➜  git-hooks git:(master) ✗ git commit -m &apos;add aaa&apos;</div><div class="line">commit message should larger than 3 words</div></pre></td></tr></table></figure></p>
-<h3 id="pre-commit"><a href="#pre-commit" class="headerlink" title="pre-commit"></a>pre-commit</h3><p>git commit 触发  先于commit-msg，不接收参数</p>
-<h3 id="prepare-commit-msg"><a href="#prepare-commit-msg" class="headerlink" title="prepare-commit-msg"></a>prepare-commit-msg</h3><p>效果与pre-commit类似，先于pre-commit执行</p>
-<h2 id="服务器钩子"><a href="#服务器钩子" class="headerlink" title="服务器钩子"></a>服务器钩子</h2><h3 id="pre-receive"><a href="#pre-receive" class="headerlink" title="pre-receive"></a>pre-receive</h3><p>在客户端推送时最先执行，可以用它来拒绝客户端的推送。<br>我能想到的，可以做语法检查，拼写等等</p>
-<h3 id="update"><a href="#update" class="headerlink" title="update"></a>update</h3><p>与 pre-receive 类似，但会在每个分支都执行一次。</p>
-<h3 id="post-receive"><a href="#post-receive" class="headerlink" title="post-receive"></a>post-receive</h3><p>在客户端推送完成后执行</p>
-<h2 id="使用gitlab的webhook"><a href="#使用gitlab的webhook" class="headerlink" title="使用gitlab的webhook"></a>使用gitlab的webhook</h2><p>现在很多版本控制都是使用git，gitlab来管理git项目仓库，其提供了方便的web管理，用户访问及权限，是搭建私人git仓库的推荐选择。<br>具体安装可以参考官方的wiki，因为gitlab比较吃内存，，所以我不想把它安装到机器上，所以就用docker来操作吧。<br>创建一个名为gitlab的容器，并将其80端口映射到苏主机的8088端口<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -itd -p 8088:80 --name gitlab gitlab/gitlab-ce</div></pre></td></tr></table></figure></p>
-<p>等待一段时间，就可以访问本机的8088端口，进入到gitlab的web管理界面了，初次使用要设置root的密码，然后就可以登录了，默认管理员帐号是root，密码是初次进入时设置的。<br>登录后点击 new project创建一个git项目,就叫做testHook把<br>接下来再启动一个docker 容器来作为git的客户端<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -it --link=gitlab ubuntu:14.04 /bin/bash</div></pre></td></tr></table></figure></p>
-<p>启动后安装git<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~# apt-get update &amp;&amp; apt-get install git</div></pre></td></tr></table></figure></p>
-<p>生成sshkey<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen</div></pre></td></tr></table></figure></p>
-<p>一直回车就可以了，在~/.ssh/下就生成了2个文件，私钥和公钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
-<p>把公钥设置到gitlab里，搜索框里搜索sshkey，把公钥复制到key中，title可以随意设置，gitlab也会自动生成<br>接下来把git项目clone到客户端中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~#git clone git@b9a4402e85aa:root/testhook.git</div></pre></td></tr></table></figure></p>
-<p>home目录下就会有一个空的git项目testHook，</p>
-<p>接下来设置webhook,可以为每个项目设置webhook，比如我创建的这个git项目，在<a href="http://localhost:8088/root/testhook/hooks" target="_blank" rel="external">http://localhost:8088/root/testhook/hooks</a> 中设置<br>这里我只添加push event，这个钩子作用应该类似post-receive，url是钩子触发时，需要向“谁”报告,这里我只在本机上启动了一个swoole-server,url请求swoole来看看gitlab钩子触发时具体发了些什么信息<br>swoole的代码就直接粘贴到这里了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">// Server</div><div class="line">class Server</div><div class="line">&#123;</div><div class="line">    private $serv;</div><div class="line"></div><div class="line">    public function __construct() &#123;</div><div class="line">        $this-&gt;serv = new swoole_server(&quot;0.0.0.0&quot;, 9501);</div><div class="line">        $this-&gt;serv-&gt;set(array(</div><div class="line">            &apos;worker_num&apos; =&gt; 8,</div><div class="line">            &apos;daemonize&apos; =&gt; false,</div><div class="line">            &apos;max_request&apos; =&gt; 10000,</div><div class="line">            &apos;dispatch_mode&apos; =&gt; 2,</div><div class="line">            &apos;debug_mode&apos;=&gt; 1</div><div class="line">        ));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;on(&apos;Start&apos;, array($this, &apos;onStart&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Connect&apos;, array($this, &apos;onConnect&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Receive&apos;, array($this, &apos;onReceive&apos;));</div><div class="line">        $this-&gt;serv-&gt;on(&apos;Close&apos;, array($this, &apos;onClose&apos;));</div><div class="line"></div><div class="line">        $this-&gt;serv-&gt;start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onStart( $serv ) &#123;</div><div class="line">        echo &quot;Start\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onConnect( $serv, $fd, $from_id ) &#123;</div><div class="line">        $serv-&gt;send( $fd, &quot;Hello &#123;$fd&#125;!,this is swoole server &quot; );</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onReceive( swoole_server $serv, $fd, $from_id, $data ) &#123;</div><div class="line">        echo &quot;Get Message From Client &#123;$fd&#125;:&#123;$data&#125;\n&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public function onClose( $serv, $fd, $from_id ) &#123;</div><div class="line">        echo &quot;Client &#123;$fd&#125; close connection\n&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">// 启动服务器</div><div class="line">$server = new Server();</div></pre></td></tr></table></figure></p>
-<p>启动swooleserver</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php swoole-server.php</div></pre></td></tr></table></figure>
-<p>然后来操作下客户端，需要设置git的user.name 和user.email不然不能commit<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# echo 1&gt;test</div><div class="line">root@ed6dd236d56b:~/testhook# git add test</div><div class="line">root@ed6dd236d56b:~/testhook# git commit -m &apos;add test&apos;</div><div class="line">[master 7923a94] add test</div><div class="line">1 file changed, 1 insertion(+)</div><div class="line">create mode 100644 test</div></pre></td></tr></table></figure></p>
-<p>接下来push，让gitlab产生一个触发<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">root@ed6dd236d56b:~/testhook# git push origin master</div><div class="line">Counting objects: 4, done.</div><div class="line">Delta compression using up to 4 threads.</div><div class="line">Compressing objects: 100% (2/2), done.</div><div class="line">Writing objects: 100% (3/3), 256 bytes | 0 bytes/s, done.</div><div class="line">Total 3 (delta 0), reused 0 (delta 0)</div><div class="line">To git@b9a4402e85aa:root/testhook.git</div><div class="line">79a7567..7923a94  master -&gt; master</div></pre></td></tr></table></figure></p>
-<p>可以看到swoole产生的日志<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  php swoole-server.php</div><div class="line">Start</div><div class="line">Get Message From Client 1:POST /swoole/swoole-client.php HTTP/1.1</div><div class="line">Content-Type: application/json</div><div class="line">X-Gitlab-Event: Push Hook</div><div class="line">Connection: close</div><div class="line">Host: 10.207.26.234:9501</div><div class="line">Content-Length: 1532</div><div class="line"></div><div class="line"></div><div class="line">Get Message From Client 1:&#123;&quot;object_kind&quot;:&quot;push&quot;,&quot;before&quot;:&quot;79a7567c469738a689d38510f9cfc6b5132eda02&quot;,&quot;after&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;ref&quot;:&quot;refs/heads/master&quot;,&quot;checkout_sha&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:null,&quot;user_id&quot;:1,&quot;user_name&quot;:&quot;Administrator&quot;,&quot;user_email&quot;:&quot;admin@example.com&quot;,&quot;user_avatar&quot;:&quot;http://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80\u0026d=identicon&quot;,&quot;project_id&quot;:1,&quot;project&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;description&quot;:&quot;&quot;,&quot;web_url&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;avatar_url&quot;:null,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;namespace&quot;:&quot;root&quot;,&quot;visibility_level&quot;:20,&quot;path_with_namespace&quot;:&quot;root/testhook&quot;,&quot;default_branch&quot;:&quot;master&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;&#125;,&quot;commits&quot;:[&#123;&quot;id&quot;:&quot;7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;message&quot;:&quot;add test\n&quot;,&quot;timestamp&quot;:&quot;2016-05-12T03:36:03+00:00&quot;,&quot;url&quot;:&quot;http://b9a4402e85aa/root/testhook/commit/7923a944b9c2451be90d8f219fba6f0732c958ba&quot;,&quot;author&quot;:&#123;&quot;name&quot;:&quot;ericwang&quot;,&quot;email&quot;:&quot;ericwang@leju.com&quot;&#125;,&quot;added&quot;:[&quot;test&quot;],&quot;modified&quot;:[],&quot;removed&quot;:[]&#125;],&quot;total_commits_count&quot;:1,&quot;repository&quot;:&#123;&quot;name&quot;:&quot;testhook&quot;,&quot;url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;description&quot;:&quot;&quot;,&quot;homepage&quot;:&quot;http://b9a4402e85aa/root/testhook&quot;,&quot;git_http_url&quot;:&quot;http://b9a4402e85aa/root/testhook.git&quot;,&quot;git_ssh_url&quot;:&quot;git@b9a4402e85aa:root/testhook.git&quot;,&quot;visibility_level&quot;:20&#125;&#125;</div></pre></td></tr></table></figure></p>
-<p>关于webhook具体的细节，在gitlab搜索框中搜索webhook也可以查阅</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>   [1] <a href="https://www.kernel.org/pub/software/scm/git/docs/githooks.html" target="_blank" rel="external">https://www.kernel.org/pub/software/scm/git/docs/githooks.html</a><br>   [2] <a href="https://www.atlassian.com/git/tutorials/git-hooks/local-hooks" target="_blank" rel="external">https://www.atlassian.com/git/tutorials/git-hooks/local-hooks</a><br>   [3] <a href="http://www.ituring.com.cn/article/206985" target="_blank" rel="external">http://www.ituring.com.cn/article/206985</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/git/">git</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/git/">git</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/04/20/rabbitmq-搭建/" title="rabbitmq 环境搭建" itemprop="url">rabbitmq 环境搭建</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-20T06:44:36.000Z" itemprop="datePublished"> Published 2016-04-20</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="erlang-安装"><a href="#erlang-安装" class="headerlink" title="erlang 安装"></a>erlang 安装</h2><p>关于erlang 的下载，可以到官网找最新版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">wget http://erlang.org/download/otp_src_18.3.tar.gz</div><div class="line">tar zxvf otp_src_18.3.tar.gz</div><div class="line">cd otp_src_18.3</div><div class="line">./configure</div><div class="line">sudo make</div><div class="line">sudo make install</div></pre></td></tr></table></figure></p>
-<p>erlang编译会依赖一些环境，这里就不一一列举了<br>缺省情况下需要libncurses5-dev  libssl-dev 以及java环境<br>因为本人用的zsh,在编译的时候提示/bin/sh javac not found，原因大概是javac并没有在/bin/sh的path的环境变量中，暴力了一点,直接在/usr/local/bin下做了javac,jar的软连接,解决了</p>
-<h2 id="rabbitmq"><a href="#rabbitmq" class="headerlink" title="rabbitmq"></a>rabbitmq</h2><p>下载地址:<a href="http://www.rabbitmq.com/download.html" target="_blank" rel="external">http://www.rabbitmq.com/download.html</a><br>选择binary安装包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget www.rabbitmq.com/releases/rabbitmq-server/v3.6.1/rabbitmq-server-generic-unix-3.6.1.tar.xz</div><div class="line">xz -d rabbitmq-server-generic-unix-3.6.1.tar.xz</div><div class="line">tar xvf rabbitmq-server-generic-unix-3.6.1.tar</div><div class="line">mv rabbitmq_server-3.6.1 /usr</div><div class="line">mv rabbitmq_server-3.6.1 /usr/local/rabbitmq</div></pre></td></tr></table></figure></p>
-<p>下载的是二进制包，所以可以直接使用<br>启动rabbitmq </p>
-<pre><code>/usr/local/rabbitmq/sbin/rabbitmq-server
-</code></pre>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/02/15/linux_11/" title="探索linux系统下proc文件系统内容" itemprop="url">探索linux系统下proc文件系统内容</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-15T06:46:00.000Z" itemprop="datePublished"> Published 2016-02-15</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>以下部分参考自<a href="http://www.cnblogs.com/cute/archive/2011/04/20/2022280.html" target="_blank" rel="external">深入理解linux系统下proc文件系统内容</a><br>Linux系统上的/proc目录是一种文件系统，即proc文件系统。与其它常见的文件系统不同的是，/proc是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状态。 </p>
-<p>基于/proc文件系统如上所述的特殊性，其内的文件也常被称作虚拟文件，并具有一些独特的特点。例如，其中有些文件虽然使用查看命令查看时会返回大量信息，但文件本身的大小却会显示为0字节。此外，这些特殊文件中大多数文件的时间及日期属性通常为当前系统时间和日期，这跟它们随时会被刷新（存储于RAM中）有关。 </p>
-<p>为了查看及使用上的方便，这些文件通常会按照相关性进行分类存储于不同的目录甚至子目录中，如/proc/scsi目录中存储的就是当前系统上所有SCSI设备的相关信息，/proc/N中存储的则是系统当前正在运行的进程的相关信息，其中N为正在运行的进程（可以想象得到，在某进程结束后其相关目录则会消失）。 </p>
-<p>大多数虚拟文件可以使用文件查看命令如cat、more或者less进行查看，有些文件信息表述的内容可以一目了然，但也有文件的信息却不怎么具有可读性。不过，这些可读性较差的文件在使用一些命令如apm、free、lspci或top查看时却可以有着不错的表现。 </p>
-<h3 id="进程目录中的常见文件介绍"><a href="#进程目录中的常见文件介绍" class="headerlink" title="进程目录中的常见文件介绍"></a>进程目录中的常见文件介绍</h3><p>/proc目录中包含许多以数字命名的子目录，这些数字表示系统当前正在运行进程的进程号，里面包含对应进程相关的多个信息文件。<br>以下实验都是在基于docker的nginx容器里进行的，部分内容可能会与真实系统有些区别（用docker的原因是进程比较少，可以直接使用<code>docker run -it nginx:1.7 /bin/bash</code>创建一个nginx的容器并进入容器内部)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@cdb3d33f6cb4:/# ls /bin/</div><div class="line">bash   cp    dir	    egrep    gunzip    ln     mknod	  mv		 pwd	   run-parts   ss     tar	uname	      zcat    zforce</div><div class="line">cat    dash  dmesg	    false    gzexe     login  mktemp	  nisdomainname  rbash	   sed	       stty   tempfile	uncompress    zcmp    zgrep</div><div class="line">chgrp  date  dnsdomainname  fgrep    gzip      ls     more	  pidof		 readlink  sh	       su     touch	vdir	      zdiff   zless</div><div class="line">chmod  dd    domainname     findmnt  hostname  lsblk  mount	  ping		 rm	   sh.distrib  sync   true	which	      zegrep  zmore</div><div class="line">chown  df    echo	    grep     ip        mkdir  mountpoint  ping6		 rmdir	   sleep       tailf  umount	ypdomainname  fgrep  znew</div></pre></td></tr></table></figure>
-<p>容器中可用的命令少之又少，都是些基本的命令，但是有这些命令，可以做很多事情了，虽然很多命令我也不懂。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/# cd proc/</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1	   bus	      consoles	diskstats    fb		  iomem     kcore      kpagecount  meminfo  mtrr	  scsi	    stat	   sysvipc	tty	     vmstat</div><div class="line">15	   cgroups    cpuinfo	dma	     filesystems  ioports   key-users  kpageflags  misc     net		  self	    swaps	   thread-self	uptime	     zoneinfo</div><div class="line">acpi	   cmdline    crypto	driver	     fs		  irq	    keys       loadavg	   modules  pagetypeinfo  slabinfo  sys		   timer_list	version</div><div class="line">buddyinfo  config.gz  devices	execdomains  interrupts   kallsyms  kmsg       locks	   mounts   partitions	  softirqs  sysrq-trigger  timer_stats	vmallocinfo</div></pre></td></tr></table></figure>
-<p>上面列出的是/proc目录中一些进程相关的目录，每个目录中是当程本身相关信息的文件。<br>下面我们来启动一个nginx，看看会发生什么</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# nginx</div><div class="line">root@c27f523688ea:/proc# ls</div><div class="line">1   acpi       cmdline	  crypto     driver	  fs	      irq	 keys	     loadavg  modules  pagetypeinfo  slabinfo  sys	      timer_list   version</div><div class="line">17  buddyinfo  config.gz  devices    execdomains  interrupts  kallsyms	 kmsg	     locks    mounts   partitions    softirqs  sysrq-trigger  timer_stats  vmallocinfo</div><div class="line">18  bus        consoles   diskstats  fb		  iomem       kcore	 kpagecount  meminfo  mtrr     scsi	     stat      sysvipc	      tty	   vmstat</div><div class="line">19  cgroups    cpuinfo	  dma	     filesystems  ioports     key-users  kpageflags  misc     net      self	     swaps     thread-self    uptime	   zoneinfo</div></pre></td></tr></table></figure>
-<p>嗯？ 多出来3个数字命名的目录，对就是pid 为17，18，19的进程。再次ls，发现19小时，没错19应该是运行ls产生的进程，运行完成就消失了，猜测17，18一个是nginx master，另一个应该是worker<br>查看以下pid为18的进程，属组和用户都是nginx，更加确定它就是nginx的worker</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 18</div><div class="line">ls: cannot read symbolic link 18/cwd: Permission denied</div><div class="line">ls: cannot read symbolic link 18/root: Permission denied</div><div class="line">ls: cannot read symbolic link 18/exe: Permission denied</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 nginx nginx 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root  root  0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 nginx nginx 0 Feb 15 02:17 attr</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 autogroup</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 auxv</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cgroup</div><div class="line">--w-------   1 nginx nginx 0 Feb 15 02:17 clear_refs</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cmdline</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 comm</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 coredump_filter</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 cpuset</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 cwd</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 environ</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 exe</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fd</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 fdinfo</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 gid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 limits</div><div class="line">dr-x------   2 nginx nginx 0 Feb 15 02:17 map_files</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 maps</div><div class="line">-rw-------   1 nginx nginx 0 Feb 15 02:17 mem</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mountinfo</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 mounts</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 mountstats</div><div class="line">dr-xr-xr-x   7 nginx nginx 0 Feb 15 02:17 net</div><div class="line">dr-x--x--x   2 nginx nginx 0 Feb 15 02:17 ns</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_adj</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 oom_score_adj</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 pagemap</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 personality</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 projid_map</div><div class="line">lrwxrwxrwx   1 nginx nginx 0 Feb 15 02:17 root</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 setgroups</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 smaps</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 stack</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 stat</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 statm</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 status</div><div class="line">-r--------   1 nginx nginx 0 Feb 15 02:17 syscall</div><div class="line">dr-xr-xr-x   3 nginx nginx 0 Feb 15 02:17 task</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 timers</div><div class="line">-rw-r--r--   1 nginx nginx 0 Feb 15 02:17 uid_map</div><div class="line">-r--r--r--   1 nginx nginx 0 Feb 15 02:17 wchar</div></pre></td></tr></table></figure>
-<p>有些文件没有权限，还是看nginx的master吧</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al 17/</div><div class="line">total 0</div><div class="line">dr-xr-xr-x   9 root root 0 Feb 15 02:13 .</div><div class="line">dr-xr-xr-x 134 root root 0 Feb 15 02:11 ..</div><div class="line">dr-xr-xr-x   2 root root 0 Feb 15 02:19 attr</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 autogroup</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 auxv</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cgroup</div><div class="line">--w-------   1 root root 0 Feb 15 02:19 clear_refs</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cmdline</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 comm</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 coredump_filter</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 cpuset</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 cwd -&gt; /proc</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 environ</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fd</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 fdinfo</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 gid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 limits</div><div class="line">dr-x------   2 root root 0 Feb 15 02:19 map_files</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 maps</div><div class="line">-rw-------   1 root root 0 Feb 15 02:19 mem</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mountinfo</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 mounts</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 mountstats</div><div class="line">dr-xr-xr-x   7 root root 0 Feb 15 02:19 net</div><div class="line">dr-x--x--x   2 root root 0 Feb 15 02:19 ns</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_adj</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 oom_score</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 oom_score_adj</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 pagemap</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 personality</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 projid_map</div><div class="line">lrwxrwxrwx   1 root root 0 Feb 15 02:19 root -&gt; /</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 setgroups</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 smaps</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 stack</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 stat</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 statm</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 status</div><div class="line">-r--------   1 root root 0 Feb 15 02:19 syscall</div><div class="line">dr-xr-xr-x   3 root root 0 Feb 15 02:19 task</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 timers</div><div class="line">-rw-r--r--   1 root root 0 Feb 15 02:19 uid_map</div><div class="line">-r--r--r--   1 root root 0 Feb 15 02:19 wchan</div></pre></td></tr></table></figure>
-<p>接下来看看各个文件都是干吗用的吧</p>
-<ul>
-<li>cmdline — 启动当前进程的完整命令，但僵尸进程目录中的此文件不包含任何信息;</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cd 17</div><div class="line">root@c27f523688ea:/proc/17# more cmdline</div><div class="line">nginx: master process nginx</div></pre></td></tr></table></figure>
-<ul>
-<li><p>cwd 指向当前进程运行目录的一个符号链接； </p>
-</li>
-<li><p>environ 当前进程的环境变量列表，彼此间用空字符（NULL）隔开；变量用大写字母表示，其值用小写字母表示；</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# more environ</div><div class="line"> master process nginx</div></pre></td></tr></table></figure>
-<ul>
-<li>exe 指向启动当前进程的可执行文件（完整路径）的符号链接，通过/proc/N/exe可以启动当前进程的一个拷贝； </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ls -al exe</div><div class="line">lrwxrwxrwx 1 root root 0 Feb 15 02:19 exe -&gt; /usr/sbin/nginx</div></pre></td></tr></table></figure>
-<p>实际的可执行文件就是/usr/sbin/nginx</p>
-<ul>
-<li><p>fd 这是个目录，包含当前进程打开的每一个文件的文件描述符（file descriptor），这些文件描述符是指向实际文件的一个符号链接;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# ls -al fd</div><div class="line">total 0</div><div class="line">dr-x------ 2 root root  0 Feb 15 02:19 .</div><div class="line">dr-xr-xr-x 9 root root  0 Feb 15 02:13 ..</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 0 -&gt; /dev/null</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 1 -&gt; /dev/null</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 2 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 3 -&gt; socket:[63800]</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 4 -&gt; /1</div><div class="line">l-wx------ 1 root root 64 Feb 15 02:35 5 -&gt; /1</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 6 -&gt; socket:[63798]</div><div class="line">lrwx------ 1 root root 64 Feb 15 02:35 7 -&gt; socket:[63801]</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<ul>
-<li><p>limits 当前进程所使用的每一个受限资源的软限制、硬限制和管理单元；此文件仅可由实际启动当前进程的UID用户读取</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat limits</div><div class="line">Limit                     Soft Limit           Hard Limit           Units</div><div class="line">Max cpu time              unlimited            unlimited            seconds</div><div class="line">Max file size             unlimited            unlimited            bytes</div><div class="line">Max data size             unlimited            unlimited            bytes</div><div class="line">Max stack size            8388608              unlimited            bytes</div><div class="line">Max core file size        0                    unlimited            bytes</div><div class="line">Max resident set          unlimited            unlimited            bytes</div><div class="line">Max processes             1048576              1048576              processes</div><div class="line">Max open files            1048576              1048576              files</div><div class="line">Max locked memory         65536                65536                bytes</div><div class="line">Max address space         unlimited            unlimited            bytes</div><div class="line">Max file locks            unlimited            unlimited            locks</div><div class="line">Max pending signals       3867                 3867                 signals</div><div class="line">Max msgqueue size         819200               819200               bytes</div><div class="line">Max nice priority         0                    0</div><div class="line">Max realtime priority     0                    0</div><div class="line">Max realtime timeout      unlimited            unlimited            us</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>再运行 ulimit ，因为用户都是root，所以 ulimit应该和这个limits表示的内容是相同的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc/17# ulimit -a</div><div class="line">core file size          (blocks, -c) 0</div><div class="line">data seg size           (kbytes, -d) unlimited</div><div class="line">scheduling priority             (-e) 0</div><div class="line">file size               (blocks, -f) unlimited</div><div class="line">pending signals                 (-i) 3867</div><div class="line">max locked memory       (kbytes, -l) 64</div><div class="line">max memory size         (kbytes, -m) unlimited</div><div class="line">open files                      (-n) 1048576</div><div class="line">pipe size            (512 bytes, -p) 8</div><div class="line">POSIX message queues     (bytes, -q) 819200</div><div class="line">real-time priority              (-r) 0</div><div class="line">stack size              (kbytes, -s) 8192</div><div class="line">cpu time               (seconds, -t) unlimited</div><div class="line">max user processes              (-u) 1048576</div><div class="line">virtual memory          (kbytes, -v) unlimited</div><div class="line">file locks                      (-x) unlimited</div></pre></td></tr></table></figure>
-<ul>
-<li>maps — 当前进程关联到的每个可执行文件和库文件在内存中的映射区域及其访问权限所组成的列表;<br>看不懂 先过了</li>
-</ul>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# cat maps</div><div class="line">00400000-004c1000 r-xp 00000000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c0000-006c1000 r--p 000c0000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006c1000-006d7000 rw-p 000c1000 00:20 92                                 /usr/sbin/nginx</div><div class="line">006d7000-006e6000 rw-p 00000000 00:00 0</div><div class="line">01c28000-01c85000 rw-p 00000000 00:00 0                                  [heap]</div><div class="line">7fb1c3d4f000-7fb1c3d5a000 r-xp 00000000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3d5a000-7fb1c3f59000 ---p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f59000-7fb1c3f5a000 r--p 0000a000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5a000-7fb1c3f5b000 rw-p 0000b000 00:20 47                         /lib/x86_64-linux-gnu/libnss_files-2.13.so</div><div class="line">7fb1c3f5b000-7fb1c3f65000 r-xp 00000000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c3f65000-7fb1c4164000 ---p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4164000-7fb1c4165000 r--p 00009000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4165000-7fb1c4166000 rw-p 0000a000 00:20 45                         /lib/x86_64-linux-gnu/libnss_nis-2.13.so</div><div class="line">7fb1c4166000-7fb1c417b000 r-xp 00000000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c417b000-7fb1c437a000 ---p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437a000-7fb1c437b000 r--p 00014000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437b000-7fb1c437c000 rw-p 00015000 00:20 43                         /lib/x86_64-linux-gnu/libnsl-2.13.so</div><div class="line">7fb1c437c000-7fb1c437e000 rw-p 00000000 00:00 0</div><div class="line">7fb1c437e000-7fb1c4385000 r-xp 00000000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4385000-7fb1c4584000 ---p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4584000-7fb1c4585000 r--p 00006000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4585000-7fb1c4586000 rw-p 00007000 00:20 41                         /lib/x86_64-linux-gnu/libnss_compat-2.13.so</div><div class="line">7fb1c4586000-7fb1c4588000 r-xp 00000000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4588000-7fb1c4788000 ---p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4788000-7fb1c4789000 r--p 00002000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c4789000-7fb1c478a000 rw-p 00003000 00:20 34                         /lib/x86_64-linux-gnu/libdl-2.13.so</div><div class="line">7fb1c478a000-7fb1c490b000 r-xp 00000000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c490b000-7fb1c4b0b000 ---p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0b000-7fb1c4b0f000 r--p 00181000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b0f000-7fb1c4b10000 rw-p 00185000 00:20 36                         /lib/x86_64-linux-gnu/libc-2.13.so</div><div class="line">7fb1c4b10000-7fb1c4b15000 rw-p 00000000 00:00 0</div><div class="line">7fb1c4b15000-7fb1c4b2b000 r-xp 00000000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4b2b000-7fb1c4d2a000 ---p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2a000-7fb1c4d2b000 r--p 00015000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2b000-7fb1c4d2c000 rw-p 00016000 00:20 519                        /lib/x86_64-linux-gnu/libz.so.1.2.7</div><div class="line">7fb1c4d2c000-7fb1c4ef6000 r-xp 00000000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c4ef6000-7fb1c50f6000 ---p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c50f6000-7fb1c5111000 r--p 001ca000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5111000-7fb1c5120000 rw-p 001e5000 00:20 517                        /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0</div><div class="line">7fb1c5120000-7fb1c5124000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5124000-7fb1c517a000 r-xp 00000000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c517a000-7fb1c537a000 ---p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537a000-7fb1c537d000 r--p 00056000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c537d000-7fb1c5384000 rw-p 00059000 00:20 516                        /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0</div><div class="line">7fb1c5384000-7fb1c53c0000 r-xp 00000000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c53c0000-7fb1c55c0000 ---p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c0000-7fb1c55c1000 rw-p 0003c000 00:20 514                        /lib/x86_64-linux-gnu/libpcre.so.3.13.1</div><div class="line">7fb1c55c1000-7fb1c55c9000 r-xp 00000000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c55c9000-7fb1c57c8000 ---p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c8000-7fb1c57c9000 r--p 00007000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57c9000-7fb1c57ca000 rw-p 00008000 00:20 512                        /lib/x86_64-linux-gnu/libcrypt-2.13.so</div><div class="line">7fb1c57ca000-7fb1c57f8000 rw-p 00000000 00:00 0</div><div class="line">7fb1c57f8000-7fb1c580f000 r-xp 00000000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c580f000-7fb1c5a0e000 ---p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0e000-7fb1c5a0f000 r--p 00016000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a0f000-7fb1c5a10000 rw-p 00017000 00:20 73                         /lib/x86_64-linux-gnu/libpthread-2.13.so</div><div class="line">7fb1c5a10000-7fb1c5a14000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5a14000-7fb1c5a34000 r-xp 00000000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c2a000-7fb1c5c2f000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c30000-7fb1c5c31000 rw-s 00000000 00:01 63799                      /dev/zero (deleted)</div><div class="line">7fb1c5c31000-7fb1c5c33000 rw-p 00000000 00:00 0</div><div class="line">7fb1c5c33000-7fb1c5c34000 r--p 0001f000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c34000-7fb1c5c35000 rw-p 00020000 00:20 29                         /lib/x86_64-linux-gnu/ld-2.13.so</div><div class="line">7fb1c5c35000-7fb1c5c36000 rw-p 00000000 00:00 0</div><div class="line">7ffe5a572000-7ffe5a593000 rw-p 00000000 00:00 0                          [stack]</div><div class="line">7ffe5a5e3000-7ffe5a5e5000 r--p 00000000 00:00 0                          [vvar]</div><div class="line">7ffe5a5e5000-7ffe5a5e7000 r-xp 00000000 00:00 0                          [vdso]</div><div class="line">ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]</div></pre></td></tr></table></figure>
-<ul>
-<li>mem 当前进程所占用的内存空间，由open、read和lseek等系统调用使用，不能被用户读取；</li>
-<li>root 指向当前进程运行根目录的符号链接；在Unix和Linux系统上，通常采用chroot命令使每个进程运行于独立的根目录；</li>
-<li><p>stat 当前进程的状态信息，包含一系统格式化后的数据列，可读性差，通常由ps命令使用； </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more stat</div><div class="line">17 (nginx) S 1 17 17 0 -1 4218944 49 0 0 0 0 0 0 0 20 0 1 0 5428469 31825920 195 18446744073709551615 4194304 4982492 140730414209264 140730414208128 140401482384618 0 0 1073745920</div><div class="line">402745863 0 0 0 17 0 0 0 0 0 0 7081352 7168288 29523968 140730414214953 140730414214959 140730414214959 140730414215144 0</div></pre></td></tr></table></figure>
-</li>
-<li><p>status 与stat所提供信息类似，但可读性较好，如下所示，每行表示一个属性信息；其详细介绍请参见 proc的man手册页;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc/17# more status</div><div class="line">Name:	nginx</div><div class="line">State:	S (sleeping)</div><div class="line">Tgid:	17</div><div class="line">Ngid:	0</div><div class="line">Pid:	17</div><div class="line">PPid:	1</div><div class="line">TracerPid:	0</div><div class="line">Uid:	0	0	0	0</div><div class="line">Gid:	0	0	0	0</div><div class="line">FDSize:	64</div><div class="line">Groups:</div><div class="line">NStgid:	17</div><div class="line">NSpid:	17</div><div class="line">NSpgid:	17</div><div class="line">NSsid:	17</div><div class="line">VmPeak:	   31080 kB</div><div class="line">VmSize:	   31080 kB</div><div class="line">VmLck:	       0 kB</div><div class="line">VmPin:	       0 kB</div><div class="line">VmHWM:	     780 kB</div><div class="line">VmRSS:	     780 kB</div><div class="line">VmData:	     724 kB</div><div class="line">VmStk:	     136 kB</div><div class="line">VmExe:	     772 kB</div><div class="line">VmLib:	    4500 kB</div><div class="line">VmPTE:	      76 kB</div><div class="line">VmPMD:	      12 kB</div><div class="line">VmSwap:	       0 kB</div><div class="line">Threads:	1</div><div class="line">SigQ:	0/3867</div><div class="line">SigPnd:	0000000000000000</div><div class="line">ShdPnd:	0000000000000000</div><div class="line">SigBlk:	0000000000000000</div><div class="line">SigIgn:	0000000040001000</div><div class="line">SigCgt:	0000000198016a07</div><div class="line">CapInh:	00000000a80425fb</div><div class="line">CapPrm:	00000000a80425fb</div><div class="line">CapEff:	00000000a80425fb</div><div class="line">CapBnd:	00000000a80425fb</div><div class="line">Seccomp:	0</div><div class="line">Cpus_allowed:	1</div><div class="line">Cpus_allowed_list:	0</div><div class="line">Mems_allowed:	1</div><div class="line">Mems_allowed_list:	0</div><div class="line">voluntary_ctxt_switches:	1</div><div class="line">--More--(0%)</div></pre></td></tr></table></figure>
-</li>
-<li><p>task 目录文件，包含由当前进程所运行的每一个线程的相关信息，每个线程的相关信息文件均保存在一个由线程号（tid）命名的目录中，这类似于其内容类似于每个进程目录中的内容</p>
-</li>
-</ul>
-<h3 id="proc目录下常见的文件介绍"><a href="#proc目录下常见的文件介绍" class="headerlink" title="/proc目录下常见的文件介绍"></a>/proc目录下常见的文件介绍</h3><ul>
-<li>/proc/apm 高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用(容器中没有)</li>
-<li>/proc/buddyinfo 用于诊断内存碎片问题的相关信息文件(容器中没有)</li>
-<li>/proc/cmdline 在启动时传递至内核的相关参数信息，这些信息通常由lilo或grub等启动管理工具进行传递</li>
-<li>/proc/cpuinfo 处理器的相关信息的文件</li>
-<li>/proc/crypto 系统上已安装的内核使用的密码算法及每个算法的详细信息列表</li>
-<li>/proc/devices 系统已经加载的所有块设备和字符设备的信息，包含主设备号和设备组（与主设备号对应的设备类型）名</li>
-<li>/proc/diskstats 每块磁盘设备的磁盘I/O统计信息列表</li>
-<li>/proc/dma 每个正在使用且注册的ISA DMA通道的信息列表</li>
-<li>/proc/execdomains 内核当前支持的执行域（每种操作系统独特“个性”）信息列表</li>
-<li>/proc/fb 帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息；</li>
-<li>/proc/filesystems 当前被内核支持的文件系统类型列表文件，被标示为nodev的文件系统表示不需要块设备的支持；通常mount一个设备时，如果没有指定文件系统类型将通过此文件来决定其所需文件系统的类型</li>
-<li>/proc/interrupts X86或X86_64体系架构系统上每个IRQ相关的中断号列表；多路处理器平台上每个CPU对于每个I/O设备均有自己的中断号</li>
-<li>/proc/iomem 每个物理设备上的记忆体（RAM或者ROM）在系统内存中的映射信息</li>
-<li>/proc/ioports 当前正在使用且已经注册过的与物理设备进行通讯的输入-输出端口范围信息列表；如下面所示，第一列表示注册的I/O端口范围，其后表示相关的设备</li>
-<li>/proc/kallsyms 模块管理工具用来动态链接或绑定可装载模块的符号定义，由内核输出;通常这个文件中的信息量相当大；</li>
-<li>/proc/kcore 系统使用的物理内存，以ELF核心文件（core file）格式存储，其文件大小为已使用的物理内存（RAM）加上4KB；这个文件用来检查内核数据结构的当前状态，因此，通常由GDB通常调试工具使用，但不能使用文件查看命令打开此文件</li>
-<li>/proc/kmsg 此文件用来保存由内核输出的信息，通常由/sbin/klogd或/bin/dmsg等程序使用，不要试图使用查看命令打开此文件</li>
-<li>/proc/locks 保存当前由内核锁定的文件的相关信息，包含内核内部的调试数据；每个锁定占据一行，且具有一个惟一的编号；如下输出信息中每行的第二列表示当前锁定使用的锁定类别，POSIX表示目前较新类型的文件锁，由lockf系统调用产生，FLOCK是传统的UNIX文件锁，由flock系统调用产生；第三列也通常由两种类型，ADVISORY表示不允许其他用户锁定此文件，但允许读取，MANDATORY表示此文件锁定期间不允许其他用户任何形式的访问；  </li>
-<li><p>/proc/meminfo 系统中关于当前内存的利用状况等的信息，常由free命令使用；可以使用文件查看命令直接读取此文件，其内容显示为两列，前者为统计属性，后者为对应的值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat meminfo</div><div class="line">MemTotal:        1020096 kB</div><div class="line">MemFree:          746572 kB</div><div class="line">MemAvailable:     802920 kB</div><div class="line">Buffers:           41512 kB</div><div class="line">Cached:           139888 kB</div><div class="line">SwapCached:            0 kB</div><div class="line">Active:           135888 kB</div><div class="line">Inactive:          92792 kB</div><div class="line">Active(anon):      83496 kB</div><div class="line">Inactive(anon):    90648 kB</div><div class="line">Active(file):      52392 kB</div><div class="line">Inactive(file):     2144 kB</div><div class="line">Unevictable:           0 kB</div><div class="line">Mlocked:               0 kB</div><div class="line">SwapTotal:       1182172 kB</div><div class="line">SwapFree:        1182172 kB</div><div class="line">Dirty:                 8 kB</div><div class="line">Writeback:             0 kB</div><div class="line">AnonPages:         47276 kB</div><div class="line">Mapped:            29256 kB</div><div class="line">Shmem:            126868 kB</div><div class="line">Slab:              28464 kB</div><div class="line">SReclaimable:      16392 kB</div><div class="line">SUnreclaim:        12072 kB</div><div class="line">KernelStack:        2432 kB</div><div class="line">PageTables:         1616 kB</div><div class="line">NFS_Unstable:          0 kB</div><div class="line">Bounce:                0 kB</div><div class="line">WritebackTmp:          0 kB</div><div class="line">CommitLimit:     1692220 kB</div><div class="line">Committed_AS:     371556 kB</div><div class="line">VmallocTotal:   34359738367 kB</div><div class="line">VmallocUsed:        8908 kB</div><div class="line">VmallocChunk:   34359699820 kB</div><div class="line">AnonHugePages:     32768 kB</div><div class="line">HugePages_Total:       0</div><div class="line">HugePages_Free:        0</div><div class="line">HugePages_Rsvd:        0</div><div class="line">HugePages_Surp:        0</div><div class="line">Hugepagesize:       2048 kB</div><div class="line">DirectMap4k:       47040 kB</div><div class="line">DirectMap2M:     1001472 kB</div></pre></td></tr></table></figure>
-</li>
-<li><p>/proc/mounts 在内核2.4.29版本以前，此文件的内容为系统当前挂载的所有文件系统，在2.4.19以后的内核中引进了每个进程使用独立挂载名称空间的方式，此文件则随之变成了指向/proc/self/mounts（每个进程自身挂载名称空间中的所有挂载点列表）文件的符号链接；/proc/self是一个独特的目录，后文中会对此目录进行介绍</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# ls -al mounts</div><div class="line">lrwxrwxrwx 1 root root 11 Feb 15 06:18 mounts -&gt; self/mounts</div></pre></td></tr></table></figure>
-<p>其中第一列表示挂载的设备，第二列表示在当前目录树中的挂载点，第三点表示当前文件系统的类型，第四列表示挂载属性（ro或者rw），第五列和第六列用来匹配/etc/mtab文件中的转储（dump）属性</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# more mounts</div><div class="line">none / aufs rw,relatime,si=6bfa28fca2bd64f1,dio,dirperm1 0 0</div><div class="line">proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /dev tmpfs rw,nosuid,mode=755 0 0</div><div class="line">devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0</div><div class="line">sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0</div><div class="line">tmpfs /sys/fs/cgroup tmpfs ro,nosuid,nodev,noexec,relatime,mode=755 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuset cgroup ro,nosuid,nodev,noexec,relatime,cpuset 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpu cgroup ro,nosuid,nodev,noexec,relatime,cpu 0 0</div><div class="line">cgroup /sys/fs/cgroup/cpuacct cgroup ro,nosuid,nodev,noexec,relatime,cpuacct 0 0</div><div class="line">cgroup /sys/fs/cgroup/blkio cgroup ro,nosuid,nodev,noexec,relatime,blkio 0 0</div><div class="line">cgroup /sys/fs/cgroup/memory cgroup ro,nosuid,nodev,noexec,relatime,memory 0 0</div><div class="line">cgroup /sys/fs/cgroup/devices cgroup ro,nosuid,nodev,noexec,relatime,devices 0 0</div><div class="line">cgroup /sys/fs/cgroup/freezer cgroup ro,nosuid,nodev,noexec,relatime,freezer 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_cls cgroup ro,nosuid,nodev,noexec,relatime,net_cls 0 0</div><div class="line">cgroup /sys/fs/cgroup/perf_event cgroup ro,nosuid,nodev,noexec,relatime,perf_event 0 0</div><div class="line">cgroup /sys/fs/cgroup/net_prio cgroup ro,nosuid,nodev,noexec,relatime,net_prio 0 0</div><div class="line">cgroup /sys/fs/cgroup/hugetlb cgroup ro,nosuid,nodev,noexec,relatime,hugetlb 0 0</div></pre></td></tr></table></figure>
-<p>可以看到/proc 使用的是proc文件系统,大多数的ubuntu镜像使用的是aufs文件系统，当然可以在启动镜像时的时候指定storage driver</p>
-<ul>
-<li><p>/proc/modules 当前装入内核的所有模块名称列表，可以由lsmod命令使用，也可以直接查看；如下所示，其中第一列表示模块名，第二列表示此模块占用内存空间大小，第三列表示此模块有多少实例被装入，第四列表示此模块依赖于其它哪些模块，第五列表示此模块的装载状态（Live：已经装入；Loading：正在装入；Unloading：正在卸载），第六列表示此模块在内核内存（kernel memory）中的偏移量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# cat modules</div><div class="line">veth 16384 0 - Live 0xffffffffa0173000</div><div class="line">xt_conntrack 16384 1 - Live 0xffffffffa0152000</div><div class="line">ipt_MASQUERADE 16384 1 - Live 0xffffffffa014d000</div><div class="line">nf_nat_masquerade_ipv4 16384 1 ipt_MASQUERADE, Live 0xffffffffa01a5000</div></pre></td></tr></table></figure>
-</li>
-<li><p>proc/partitions 块设备每个分区的主设备号（major）和次设备号（minor）等信息，同时包括每个分区所包含的块（block）数目（如下面输出中第三列所示)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"> root@c27f523688ea:/proc# more partitions</div><div class="line">major minor  #blocks  name</div><div class="line"></div><div class="line">   1        0      65535 ram0</div><div class="line">   1        1      65535 ram1</div><div class="line">   1        2      65535 ram2</div><div class="line">   1        3      65535 ram3</div><div class="line">   1        4      65535 ram4</div><div class="line">   1        5      65535 ram5</div><div class="line">   1        6      65535 ram6</div><div class="line">   1        7      65535 ram7</div><div class="line"> 250        0     194216 zram0</div><div class="line">  11        0      30720 sr0</div><div class="line">   8        0   20480000 sda</div><div class="line">   8        1   19486845 sda1</div><div class="line">   8        2     987966 sda2</div></pre></td></tr></table></figure>
-</li>
-<li><p>/proc/pci<br>内核初始化时发现的所有PCI设备及其配置信息列表，其配置信息多为某PCI设备相关IRQ信息，可读性不高，可以用“/sbin/lspci –vb”命令获得较易理解的相关信息；在2.6内核以后，此文件已为/proc/bus/pci目录及其下的文件代替</p>
-<ul>
-<li>/proc/slabinfo 在内核中频繁使用的对象（如inode、dentry等）都有自己的cache，即slab pool，而/proc/slabinfo文件列出了这些对象相关slap的信息；详情可以参见内核文档中slapinfo的手册页</li>
-<li><p>/proc/stat<br>实时追踪自系统上次启动以来的多种统计信息；如下所示，其中</p>
-<p>“cpu”行后的八个值分别表示以1/100（jiffies）秒为单位的统计值（包括系统运行于用户模式、低优先级用户模式，运系统模式、空闲模式、I/O等待模式的时间等）</p>
-<p>“intr”行给出中断的信息，第一个为自系统启动以来，发生的所有的中断的次数；然后每个数对应一个特定的中断自系统启动以来所发生的次数； </p>
-<p>“ctxt”给出了自系统启动以来CPU发生的上下文交换的次数。 </p>
-<p>“btime”给出了从系统启动到现在为止的时间，单位为秒； </p>
-<p>“processes (total_forks) 自系统启动以来所创建的任务的个数目； </p>
-<p>“procs_running”：当前运行队列的任务的数目； </p>
-<p>“procs_blocked”：当前被阻塞的任务的数目； </p>
-</li>
-<li>/proc/swaps 当前系统上的交换分区及其空间利用信息，如果有多个交换分区的话，则会每个交换分区的信息分别存储于/proc/swap目录中的单独文件中，而其优先级数字越低，被使用到的可能性越大 </li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat swaps</div><div class="line">Filename				Type		Size	Used	Priority</div><div class="line">/dev/zram0                              partition	194212	0	-1</div><div class="line">/dev/sda2                               partition	987960	0	-2</div></pre></td></tr></table></figure>
-<ul>
-<li>/proc/uptime 系统上次启动以来的运行时间,如下所示，其第一个数字表示系统运行时间，第二个数字表示系统空闲时间，单位是秒；</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">	root@c27f523688ea:/proc# cat uptime</div><div class="line">70344.11 70304.83</div></pre></td></tr></table></figure>
-<ul>
-<li>/proc/version<br>当前系统运行的内核版本号，还会显示系统安装的gcc版本，如下所示；</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">root@c27f523688ea:/proc# cat version</div><div class="line">Linux version 4.1.13-boot2docker (root@11aafb97cfeb) (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Fri Nov 20 19:05:50 UTC 2015</div></pre></td></tr></table></figure>
-<ul>
-<li>/proc/vmstat<br>当前系统虚拟内存的多种统计数据，信息量可能会比较大，这因系统而有所不同，可读性较好</li>
-<li>/proc/zoneinfo 内存区域（zone）的详细信息列表，信息量较大</li>
-</ul>
-<h3 id="proc-sys目录详解"><a href="#proc-sys目录详解" class="headerlink" title="/proc/sys目录详解"></a>/proc/sys目录详解</h3><p>与 /proc下其它文件的“只读”属性不同的是，管理员可对/proc/sys子目录中的许多文件内容进行修改以更改内核的运行特性，事先可以使用“ls -l”命令查看某文件是否“可写入”。写入操作通常使用类似于“echo  DATA &gt; /path/to/your/filename”的格式进行。需要注意的是，即使文件可写，其一般也不可以使用编辑器进行编辑。 </p>
-<ul>
-<li><p>/proc/sys/debug 子目录<br>此目录通常是一空目录； </p>
-</li>
-<li><p>/proc/sys/dev 子目录<br>为系统上特殊设备提供参数信息文件的目录，其不同设备的信息文件分别存储于不同的子目录中，如大多数系统上都会具有的/proc/sys/dev /cdrom和/proc/sys/dev/raid（如果内核编译时开启了支持raid的功能） 目录，其内存储的通常是系统上cdrom和raid的相关参数信息文件。</p>
-</li>
-</ul>
-<p>照着搬过来很多内容，了解了一些，一些还是不懂，写博客的好处，就是可以温故而知新</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/linux/">linux</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">Tag Cloud</p>
+    <p class="asidetitle">标签云</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 15.71px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 12.86px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/http/" style="font-size: 12.86px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 14.29px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.43px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.43px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.43px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 12.86px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 17.14px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+			<li><a href="/categories/C/" title="C">C<sup>5</sup></a></li>
 		  
 		
 		  
@@ -1282,11 +1460,9 @@
 		  
 		
 		  
-			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
-		  
 		
 		  
-			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+			<li><a href="/categories/linux/" title="linux">linux<sup>20</sup></a></li>
 		  
 		
 		  
@@ -1467,7 +1643,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

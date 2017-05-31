@@ -46,7 +46,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -62,7 +62,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -80,6 +80,238 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/11/13/mysql_03/" title="MYSQL大小写问题" itemprop="url">MYSQL大小写问题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-11-13T06:14:01.000Z" itemprop="datePublished"> 发表于 2015-11-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>这个问题坑了自己2次<br>第一次  搭建superdiamond的时候，给出的表名都是大写的，但是启动后报错，原因是没有找到表<br>第二次  比较惨，改了很久，数据库里存储的用户名是大写的，取出用户名后，使用的是小写符号做的加密，自己被坑的很惨，因为测试环境里并没有大写的名字</p>
+<p>今天比较空闲，学一下吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">insert into test values(&apos;A&apos;);  </div><div class="line">insert into test values(&apos;a&apos;);</div></pre></td></tr></table></figure>
+<p>如果对其做主键约束的话，是会报错的，Duplicate entry。</p>
+<p>MySQL在Linux下数据库名、表名、列名、别名大小写规则是这样的：</p>
+<p>1、数据库名与表名是严格区分大小写的；<br>2、表的别名是严格区分大小写的；<br>3、列名与列的别名在所有的情况下均是忽略大小写的；<br>4、变量名也是严格区分大小写的；</p>
+<p><strong>MySQL在查询字符串时是大小写不敏感的，在编绎MySQL时一般以ISO-8859字符集作为默认的字符集，这个字符集对大小写不敏感,因此在比较过程中中文编码字符大小写转换造成了这种现象。</strong></p>
+<p>第1条就可以解释superdiamond为什么启动时会找不到表名，因为建表语句是大写的，而到了代码层，则是常规写法。</p>
+<p>而如果想在插入时区分大小写，可以强制字段值需要设置BINARY属性</p>
+<p>一些参考：<br><a href="http://www.iteye.com/topic/766135" target="_blank" rel="external">http://www.iteye.com/topic/766135</a><br><a href="http://stackoverflow.com/questions/3936967/mysql-case-insensitive-select" target="_blank" rel="external">http://stackoverflow.com/questions/3936967/mysql-case-insensitive-select</a><br><a href="http://dev.mysql.com/doc/refman/5.0/en/case-sensitivity.html" target="_blank" rel="external">http://dev.mysql.com/doc/refman/5.0/en/case-sensitivity.html</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/mysql/">mysql</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/10/08/other_01/" title="大型网站之分布式会话管理" itemprop="url">大型网站之分布式会话管理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-07T17:10:43.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>ifeve上的文章越来越快餐化了，这篇不错还是转了吧,免密码登陆时常用的方法。个人倾向使用memcache，redis这类nosql来做session集中管理，当然内部系统，有时候也用cookie，简单。<br>原文地址: <a href="http://ifeve.com/dis-session-manager/" target="_blank" rel="external">大型网站之分布式会话管理</a><br>随着网站的功能和用户越来越多，单机器服务部署的Web应用已经不能再支持了。这时候就需要优化或调整目前的架构，具体怎么优化，或先优化哪部分，这取决于网站的具体情况， 并非总是一个套路。</p>
+<p>如根据使用情况得知，数据库压力大，则就可以先设施读写分离，分库分表，是垂直划分(可以简单的理解为按业务功能划分)， 还是水平划分(如用户表数据量很多，就可以按一定的规则分表设计,表结构仍然是相同的)。如Web应用服务器压力大,可以增加一台服务部署应用， 即从单台服务变为集群。变为集群后，用户访问网站，到底是选择哪一台服务器呢？这就需要在应用服务器前增加负载均衡设备来解决。还有点就是会话session 管理的问题，接下来会详细说明这问题。</p>
+<p>具体的问题</p>
+<p>当一个带有会话表示的Http请求到Web服务器后，需求在请求中的处理过程中找到session数据。而问题就在于，session是保存在单机上的。 假设我们有应用A和应用B，现在一位用户第一次访问网站，session数据保存在应用A中。如果我们不做处理，怎么保障接下来的请求每次都请求到应用A呢? 如请求到了应用B中，就会发现没有这位用户的session数据，这绝对是不能容忍的。</p>
+<p>解决方案</p>
+<p>解决方案有Session Stick，Session复制，Session集中管理，基于Cookie管理，下面一一说明。</p>
+<p>Session Stick<br>在单机情况，session保存在单机上，请求也是到这台单机上，不会有问题。变成多台后，如果能保障每次请求都到同一台服务，那就和单机一样了。 这需要在负载均衡设备上修改。这就是Session Stick，这种方式也会有问题：</p>
+<p>如果某一台服务器宕机或重启，那么这台服务器上的session数据就丢失了。如果session数据中还有登录状态信息，那么用户需要重现登录。<br>负载均衡要处理具体的session到服务器的映射。<br>Session复制<br>Session复制顾名思义，就是每台应用服务，都保存会话session数据，一般的应用容器都支持。与Session Stick相比，sessioon复制对负载均衡 没有太多的要求。不过这个方案还是有缺点：</p>
+<p>同步session数据带来都网络开销。只要session数据变化，就需要同步到所有机器上，机器越多，网络开销越大。<br>由于每台服务器都保存session数据，如果集群的session数据很多，比如90万人在访问网站，每台机器用于保存session数据的内容占用很严重。<br>这就是Session复制，这个方案是靠应用容器来完成，并不依赖应用，如果应用服务数量并不是很多，可以考虑。</p>
+<p>Session集中管理<br>这个也很好理解，再加一台服务，专门来管理session数据，每台应用服务都从专门的session管理服务中取会话session数据。可以使用数据库，NOSQL数据库等。 和Session复制相比，减少了每台应用服务的内存使用，同步session带来的网络开销问题。但还是有缺点：</p>
+<p>读写session引入了网络操作，相对于本机读写session，带来了延时和不稳定性。<br>如Session集中服务有问题，会影响应用。<br>基于Cookie管理<br>最后一个是基于Cookie管理，我们把session数据存放在cookie中，然后请求过来后，从cookie中获取session数据。与集中管理相比，这个方案并不依赖外部 的存储系统，读写session数据带来的网络操作延时和不稳定性。但依然有缺点：</p>
+<p>Cookie有长度限制，这会影响session数据的长度。<br>安全性。session数据本来存储在服务端的，而这个方案是让session数据转到外部网络或客户端中，所以会有安全性问题。不过可以对写入Cookie的session 数据做加密。<br>带宽消耗。由于加了session数据，带宽当然也会增加一点。<br>性能消耗。每次Http请求和响应都带有Session数据，对于Web服务器来说，在同样的处理情况下，响应的结果输出越少，支持的并发请求越多。<br>总结</p>
+<p>这4种方案都是可用的方案，我比较倾向于使用Session集中管理，不过这4种方案都各有优劣，需要根据具体的实际场景做出合适的选择。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/10/05/json/" title="JSON数据乱码问题" itemprop="url">JSON数据乱码问题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-05T06:17:00.000Z" itemprop="datePublished"> 发表于 2015-10-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>文章转自<a href="http://ifeve.com/json-code-problem/" target="_blank" rel="external">JSON数据乱码问题</a></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>程序员一提到编码应该都不陌生，像gbk、utf-8、ascii等这些编码更是经常在用，但时不时也会出个乱码问题，解决这个问题的方法大部分都是先google和baidu一下，最后可能在某个犄角旮旯里找到一点信息，然后就机械的按部就班的模仿下来,结果问题可能真就迎刃而解了,然后就草草了事,下回遇到相似的问题,可能又是重复上面的过程。很少有人有耐心去花精力弄明白这写问题的根本原因，以及解决这些问题的原理是什么。这篇文章就是通过一个实际案例,试着去讲清楚什么是编码,乱码又是怎么产生的,以及如何解决。该案例是从lua_cjson.c这个库开始的,对这个库不熟悉也没关系,也不需要熟悉它,我们只是借用它来说明乱码问题,只需要跟着文章的思路走就可以。</p>
+<p>前段时间同事在作一个新项目的时候用到了lua_cjson.c这个库(以下简称cjson)，将json串转换成LUA本地的数据结构,但是在使用的过程中出现了中文乱码问题，奇怪的是只有那么几个字是乱码，这其中就包括”朶”字，其他字一切正常。经了解json串用的是GBK编码，那问题就来了，为什么用gbk编码会出现这个问题，原因是什么？又应该怎么解决这个问题？</p>
+<p>要解释清楚这个问题，首先我们来看看json串都有哪些要求。</p>
+<h2 id="JSON规范"><a href="#JSON规范" class="headerlink" title="JSON规范"></a>JSON规范</h2><hr>
+<p>json全称JavaScript Object Notion是结构化数据序列化的一个文本，可以描述四种基本类型(strings,numbers,booleans and null)和两种结构类型(objects and arrays)。</p>
+<p>RFC4627中有这样一段话</p>
+<p>A string is a sequence of zero or more Unicode characters.<br>字符串有零个或多个unicode字符序列组成.</p>
+<p>在这里稍微解释下什么是unicode字符。我们都知道ascii字符有字母、数字等,但是他收录的字只有一百多个。比如汉字就不是ascii字符，但是unicode收录了汉字,所以汉字可以是unicode字符。这里要说明的是unicode字符其实就是一些符号。</p>
+<p>现在另一个问题出来了，在json文本中应该怎么表示这些字符。<br>在规范的Encoding片段是这样说的</p>
+<p>JSON text SHALL be encoded in Unicode. The default encoding is UTF-8。<br>JSON文本SHALL把unicode字符编码。默认使用utf-8编码。</p>
+<p>我们看到在这里用到了SHALL[RFC2119]这个关键字，也就是说字符必须被编码后才能作为JSON串使用。而且默认使用utf-8编码。<br>如何判断使用的是那种unicode编码呢?</p>
+<p>Since the first two characters of a JSON text will always be ASCII characters[RFC0020],<br>it is possible to determine whether an octet stream is UTF-8、UTF-16(BE or LE), or<br>UTF-32(BE or LE)by looking at the pattern of nulls in the first four octets.</p>
+<p>由于json文本的前两个字符(注意这里说的是字符,不是字节)一定是ASCII字符,因此可以从一个字节<br>流的前四个字节(注意是字节)中判断出该字节流是UTF-8、UTF-16(BE or LE)、or UTF-32(BE or LE)编码。</p>
+<p>00 00 00 xx UTF-32BE  (u32编码大端)<br>xx 00 00 00 UTF-32LE  (u32编码小端)<br>00 xx 00 xx UTF-16BE  (u16编码大端)<br>xx 00 xx 00 UTF-16LE  (u16编码小端)<br>xx xx xx xx UTF-8   (utf-8编码)<br>ps:<br>u32用32位的4字节整数表示一个字符；</p>
+<p>u16用16位的2字节整数表示一个字符,如果2字节表示不了,就用连续两个16位的2字节整<br>数表示，所以就会出现u16编码中有4个字节表示一个字符的情况，和u32的四字节不一<br>样的是,该字符在u16中的前两个字节和后两个字节之间不会有字序的问题。</p>
+<p>utf-8用多个8位的1字节序列来表示一个字符,所以没有字序的问题.</p>
+<p>截止到现在我们没有看到任何关于可以使用GBK编码的信息,难道json文本就不能用gbk编码吗,如果真的不能用的话，那为什么cjson不是把所有的gbk编码解释称乱码,而是只有某几个字是乱码.<br>在规范中对json解析器有这样一段描述:</p>
+<p>A JSON parser transforms a JSON text into another representation.<br>A JSON parser MUST accept all texts that conform to the JSON grammar.<br>A JSON parser MAY accept non-JSON forms or extensions.</p>
+<p>json解析器可以将一个json文本转换成其他表示方式。<br>json解析器MUST接受所有符合json语法的文本.<br>json解析器MAY接受非json形式或扩展的文本.</p>
+<p>乱码的原因<br>从规范对对解析器的描述可以看到,规范并没有要求解析器必须对文本的编码方式做校验,而且解析器也可以有选择的去接受非json形式的文本。</p>
+<p>现在我们再来看看cjson解析器是如何做的，在cjson开头的注释中说了这么一句话:</p>
+<p>Invalid UTF-8 characters are not detected and will be passed untouched。<br>If required, UTF-8 error checking should be done outside this library。<br>发现无效的UTF-8编码会直接放过,如果有必要对UTF-8编码的检查应该在该库的之外。</p>
+<p>说的很清楚,对非utf8编码直接放过，不做任何检查,所以用gbk编码不符合规范,但又可以被解析的答案就出来了。那”朶”等这些字的乱码问题又是怎么回事? 我们现在看看cjson对规范中的另外两个编码utf16、utf32是如何做的，然后再说乱码问题.</p>
+<p>在cjson解析方法的开始处是这么做的:</p>
+<p>/<em> Detect Unicode other than UTF-8(see RFC 4627, Sec 3)
+</em></p>
+<ul>
+<li>CJSON can support any simple data type, hence only the first</li>
+<li>character is guaranteed to be ASCII (at worst:’”‘). This is</li>
+<li>still enough to detect whether the wrong encoding is in use.<br>*/<br>if (json_len &gt;=2 &amp;&amp; (!json.data[0] || !json.data[1]))<br>luaL_error(1,”JSON parser does not support UTF-16 or UTF-32”);</li>
+</ul>
+<p>前面我们说过一个json串的前两个字符一定是ascii字符,也就是说一个json串至少也的有两个字节.所以这段代码首先判断json串的长度是不是大于等2,然后根据串的前两个字节的值,是否有零来判断该文本是否是非utf-8编码。结果已经看到了，人家不支持规范上说的u16和u32编码.</p>
+<p>现在我们就来看看”朶”这个子是如何变成乱码的，经过对cjson源码的分析得知,cjson在处理字节流的时候当遇见’\’反斜杠时会猜测后一个字节应该是要被转义的字符,比如\b、\r之类的字符,如果是就放行,如果不是,cjson就认为这不是一个正确的json格式,就会把这个字节给干掉,所以本来用两个字节表示的汉子就硬生生的给掰弯了。<br>那”朶”字跟’\’反斜杠又有什么关系? 查询这两字符在编码中的表示得出:<br>“朶” 0x965C<br>“\” 0x5C<br>这样我们就看到”朶”字的低位字节和”\”字符相同,都是0x5C,如果这时候”朶”字后边不是b、r之类的可以被转移ascii字符,cjson就会把这个字节和紧跟其后的一个字节抹掉,所以乱码就产生了。</p>
+<p>那我们应该怎么解决这个问题,让cjson可以顺利的支持gbk编码呢,首先我们看看gbk编码是怎么回事,为什么会出现低位字节和ascii冲突的问题.</p>
+<h2 id="GB-编码系列"><a href="#GB-编码系列" class="headerlink" title="GB_编码系列"></a>GB_编码系列</h2><hr>
+<p>先来了解一下GB系列的编码范围问题:<br>GB2312(1980)共收录7445个字符，6763个汉字和682个其他字符。<br>每个汉字及符号用两个字节表示,为了跟ascii兼容,处理程序使用EUC存储方法。<br>汉字的编码范围<br>高字节: 0xB0 – 0xF7,<br>低字节: 0xA1 – 0xFE,<br>占用72*94=6768,0xD7FA – 0xD7FE未使用。</p>
+<p>GBK共收录21886个字符,采用一字节和双字节编码。<br>单字节表示范围<br>8位: 0x0 – 0x7F<br>双字节表示范围<br>高字节: 0x81 – 0xFE<br>低字节: 0x40 – 0x7E、0x80 – 0xFE</p>
+<p>GB18030收录70244个汉字,采用1、2、4字节编码。<br>单字节范围<br>8位: 0x0 – 0x7F<br>双字节范围<br>高字节: 0x81 – 0xFE<br>低字节: 0x40 – 0xFE<br>四字节范围<br>第一字节:0x81 – 0xFE<br>第二字节:0x30 – 0x39<br>第三字节:0x81 – 0xFE<br>第四字节:0x30 – 0x39</p>
+<p>由于GB类的编码都是向下兼容的，这里就有一个问题，因为GB2312的两个字节的高位都是1,符合这个条件的码位只有128*128=16384个。GBK和GB18030都大于这个数,所以为了兼容,我们从上面的编码范围看到,这两个编码都用到了低位字节的最高位可以为0的情况。</p>
+<p>最终得出的结论就是,在GBK编码中只要该字符是两个字节表示,并且低位字节是0x5C的字符都会被cjson弄成乱码.</p>
+<p>解决方案:<br>1) 不要使用gbk编码,将你的字符串转换成utf-8编码.<br>2) 对cjson源码稍微做个改动,就是在每个字节到来之前先判断该字节是否大于127,如果大于则将该字节个随后的一个字节放过,否则交给cjson去处理。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/other/">other</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/08/30/linux_06/" title="Linux 技巧：让进程在后台可靠运行的几种方法" itemprop="url">Linux 技巧：让进程在后台可靠运行的几种方法</a>
   </h1>
   <p class="article-author">By
@@ -87,7 +319,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-29T16:26:00.000Z" itemprop="datePublished"> Published 2015-08-30</time>
+    <time datetime="2015-08-29T16:26:00.000Z" itemprop="datePublished"> 发表于 2015-08-30</time>
     
   </p>
 </header>
@@ -182,7 +414,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-28T12:03:00.000Z" itemprop="datePublished"> Published 2015-08-28</time>
+    <time datetime="2015-08-28T12:03:00.000Z" itemprop="datePublished"> 发表于 2015-08-28</time>
     
   </p>
 </header>
@@ -245,7 +477,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-23T12:46:00.000Z" itemprop="datePublished"> Published 2015-08-23</time>
+    <time datetime="2015-08-23T12:46:00.000Z" itemprop="datePublished"> 发表于 2015-08-23</time>
     
   </p>
 </header>
@@ -306,7 +538,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-20T08:13:22.000Z" itemprop="datePublished"> Published 2015-08-20</time>
+    <time datetime="2015-08-20T08:13:22.000Z" itemprop="datePublished"> 发表于 2015-08-20</time>
     
   </p>
 </header>
@@ -375,7 +607,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T09:54:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T09:54:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -455,7 +687,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T09:47:01.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T09:47:01.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -517,7 +749,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T09:41:53.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T09:41:53.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -569,253 +801,34 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/10/php_01/" title="生成N个不重复的随机数" itemprop="url">生成N个不重复的随机数</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-10T09:38:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>##生成N个不重复的随机数<br>转自<a href="http://www.nowamagic.net/librarys/veda/detail/2508" target="_blank" rel="external">Veda 原型</a>  </p>
-<p>有25幅作品拿去投票，一次投票需要选16幅，单个作品一次投票只能选择一次。前面有个程序员捅了漏子，忘了把投票入库，有200个用户产生的投票序列为空。那么你会如何填补这个漏子？   </p>
-<p>当然向上级反映情况。但是我们这里讨论的是技术，就是需要生成1-25之间的16个不重复的随机数，去填补。具体怎么设计函数呢？将随机数存入数组，再在数组中去除重复的值，即可生成一定数量的不重复随机数。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/*</div><div class="line">* array unique_rand( int $min, int $max, int $num )</div><div class="line">* 生成一定数量的不重复随机数</div><div class="line">* $min 和 $max: 指定随机数的范围</div><div class="line">* $num: 指定生成数量</div><div class="line">*/</div><div class="line">function unique_rand($min, $max, $num) &#123;</div><div class="line">    $count = 0;</div><div class="line">    $return = array();</div><div class="line">    while ($count &lt; $num) &#123;</div><div class="line">        $return[] = mt_rand($min, $max);</div><div class="line">        $return = array_flip(array_flip($return));</div><div class="line">        $count = count($return);</div><div class="line">    &#125;</div><div class="line">    shuffle($return);</div><div class="line">    return $return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$arr = unique_rand(1, 25, 16);</div><div class="line">sort($arr);</div><div class="line"></div><div class="line">$result = &apos;&apos;;</div><div class="line">$result = &apos;&apos;;</div><div class="line">for($i=0; $i &lt; count($arr);$i++)</div><div class="line">&#123;</div><div class="line">	$result .= $arr[$i].&apos;,&apos;;</div><div class="line">&#125;</div><div class="line">$result = substr($result, 0, -1);</div><div class="line">echo $result;</div><div class="line">?&gt;</div></pre></td></tr></table></figure>
-<p>补充几点说明：  </p>
-<ul>
-<li>生成随机数时用了 mt_rand() 函数。这个函数生成随机数的平均速度要比 rand() 快四倍。<br>去除数组中的重复值时用了“翻翻法”，就是用 array_flip() 把数组的 key 和 value 交换两次。这种做法比用 array_unique() 快得多。</li>
-<li>返回数组前，先使用 shuffle() 为数组赋予新的键名，保证键名是 0-n 连续的数字。如果不进行此步骤，可能在删除重复值时造成键名不连续，给遍历带来麻烦。</li>
-</ul>
-<p>##一些优化<br>为了尊重作者，我还是不在原文里对内容进行修改了   </p>
-<ul>
-<li>for循环在使用时切记不要使用count(array)方式，php不像java会对这样的代码进行优化，这样的代码造成的结果是数组有多少个元素，就会执行多少次count(array)。  </li>
-<li>把数组拼接成字符串可以使用implode函数</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">string implode ( string $glue , array $pieces )</div></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/php/">php</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/php/">php</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/10/php_opcache/" title="read-phps-opcode" itemprop="url">read-phps-opcode</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-10T09:32:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="Vulcan-Logic-Disassembler"><a href="#Vulcan-Logic-Disassembler" class="headerlink" title="Vulcan Logic Disassembler"></a>Vulcan Logic Disassembler</h2><p>本文翻译自<a href="http://rancoud.com/read-phps-opcode/" target="_blank" rel="external">http://rancoud.com/read-phps-opcode/</a><br>VLD(Vulcan Logic Disassembler)是一个向你解释zend引擎如何将你的脚本转化成opcode的扩展.<br><a href="http://pecl.php.net/package/vld" target="_blank" rel="external">扩展下载地址</a><br>我将解释如何安装，使用并阅读opcode</p>
-<p>首先，你要安装PEAR<br><code>aptitude install php-pear</code><br>然后就可以添加vld<br><code>pecl install &quot;channel://pecl.php.net/vld-0.12.0&quot;</code><br>编辑php.ini文件使扩展生效<br>注意，这个文件是cli模式的,跟php.ini不同<br><code>nano /etc/php5/cli/php.ini</code><br>将下面这行加到静态扩展区域<br><code>extension=vld.so</code></p>
-<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php -dvld.dump_paths=1 -dvld.verbosity=0 -dvld.save_paths=1 -dvld.active=1 yourscript.php</div></pre></td></tr></table></figure>
-<p>以下列出参数列表及默认值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"># Activate extension: boolean </div><div class="line">vld.active	 0</div><div class="line"># The caracter used for writing columns: carater</div><div class="line">vld.col_sep	 &quot;\t&quot;</div><div class="line"># Dumps branch and paths: boolean</div><div class="line">vld.dump_paths	 1</div><div class="line"># Execute code in the same time: boolean</div><div class="line">vld.execute	 1</div><div class="line"># Format output analyze: boolean</div><div class="line">vld.format	 0</div><div class="line"># Where to save the file for graphviz .dot file: string</div><div class="line">vld.save_dir	    /tmp</div><div class="line"># dump path information has a graphviz .dot file: boolean</div><div class="line">vld.save_paths	 0</div><div class="line"># suppresses output and loading of auto_append_file respectively if vld.active=1 and vld.execute=0: boolean</div><div class="line">vld.skip_append	 0</div><div class="line"># suppresses output and loading of auto_prepend_file respectively if vld.active=1 and vld.execute=0: boolean</div><div class="line">vld.skip_prepend 0</div><div class="line"># Verbosities&apos; level (0:none, 1, 2, 3): integer</div><div class="line">vld.verbosity	 1</div></pre></td></tr></table></figure>
-<p>现在我门可以看这个网站的结果<br>(<a href="http://blog.pascal-martin.fr/post/php-obtenir-dump-opcodes" target="_blank" rel="external">http://blog.pascal-martin.fr/post/php-obtenir-dump-opcodes</a>)<br>php代码  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">for ($i=0 ; $i&gt;10 ; $i++) &#123; </div><div class="line">    if ($i % 2 === 0) &#123;</div><div class="line">        echo &quot;Pair : &quot;;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        echo &quot;Impair : &quot;;</div><div class="line">    &#125;</div><div class="line">    echo $i, &quot;\n&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>VLD 输出  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">$ ~/bin/php-5.3/bin/php -dextension=vld.so -dvld.active=1 -dvld.verbosity=0 -dvld.execute=0 exemples/003-control.php </div><div class="line">filename:       /.../exemples/003-control.php</div><div class="line">function name:  (null)</div><div class="line">number of ops:  16</div><div class="line">compiled vars:  !0 = $i</div><div class="line">line     # *  op                           fetch          ext  return  operands</div><div class="line">---------------------------------------------------------------------------------</div><div class="line">   2     0  &gt;   ASSIGN                                                   !0, 0</div><div class="line">         1  &gt;   IS_SMALLER                                       ~1      !0, 10</div><div class="line">         2    &gt; JMPZNZ                                        6          ~1, -&gt;15</div><div class="line">         3  &gt;   POST_INC                                         ~2      !0</div><div class="line">         4      FREE                                                     ~2</div><div class="line">         5    &gt; JMP                                                      -&gt;1</div><div class="line">   3     6  &gt;   MOD                                              ~3      !0, 2</div><div class="line">         7      IS_IDENTICAL                                     ~4      ~3, 0</div><div class="line">         8    &gt; JMPZ                                                     ~4, -&gt;11</div><div class="line">   4     9  &gt;   ECHO                                                     &apos;Pair+%3A+&apos;</div><div class="line">   5    10    &gt; JMP                                                      -&gt;12</div><div class="line">   7    11  &gt;   ECHO                                                     &apos;Impair+%3A+&apos;</div><div class="line">   9    12  &gt;   ECHO                                                     !0</div><div class="line">        13      ECHO                                                     &apos;%0A&apos;</div><div class="line">  10    14    &gt; JMP                                                      -&gt;3</div><div class="line">  11    15  &gt; &gt; RETURN                                                   1</div><div class="line"> </div><div class="line">branch: #  0; line:     2-    2; sop:     0; eop:     0; out1:   1</div><div class="line">branch: #  1; line:     2-    2; sop:     1; eop:     2; out1:  15; out2:   6</div><div class="line">branch: #  3; line:     2-    2; sop:     3; eop:     5; out1:   1</div><div class="line">branch: #  6; line:     3-    3; sop:     6; eop:     8; out1:   9; out2:  11</div><div class="line">branch: #  9; line:     4-    5; sop:     9; eop:    10; out1:  12</div><div class="line">branch: # 11; line:     7-    9; sop:    11; eop:    11; out1:  12</div><div class="line">branch: # 12; line:     9-   10; sop:    12; eop:    14; out1:   3</div><div class="line">branch: # 15; line:    11-   11; sop:    15; eop:    15</div><div class="line">path #1: 0, 1, 15, </div><div class="line">path #2: 0, 1, 6, 9, 12, 3, 1, 15, </div><div class="line">path #3: 0, 1, 6, 11, 12, 3, 1, 15,</div></pre></td></tr></table></figure>
-<h2 id="如何阅读"><a href="#如何阅读" class="headerlink" title="如何阅读"></a>如何阅读</h2><p>在表格上面有两行   </p>
-<ul>
-<li>操作执行的数量:有多少opcode操作将会被执行，这里是16  </li>
-<li>编译的变量:php变量和它的opcode version，这里$i被表示成!0</li>
-</ul>
-<h2 id="其他方式"><a href="#其他方式" class="headerlink" title="其他方式"></a>其他方式</h2><p>只翻译了部分，其他的不翻译了，因为我喜欢编译安装，所以vld也是编译安装<br>根据<a href="http://pecl.php.net/package/vld" target="_blank" rel="external">下载地址</a>中的version，安装适合自己php的vld版本<br>可以使用<code>php -v</code>查看自己php的版本号<br>下载好后</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$tar zxvf vld-0.12.0.tgz #解压</div><div class="line">$cd vld-0.12.0/</div><div class="line">$/usr/local/php/bin/phpize  #根据自己的phpize实际位置使用</div><div class="line">$./configure --with-php-config=/usr/local/php/bin/php-config --enable-vld</div><div class="line">$sudo make </div><div class="line">$sudo make install</div></pre></td></tr></table></figure>
-<p>这样就安装完成了，然后在php.ini中添加<br><code>extension=vld.so</code><br>一般编译安装的php.ini 放在php目录下的lib目录中<br>可以使用<code>php -i |grep vld</code>查看是否安装成功</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/php/">php</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/php/">php</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/10/linux_03/" title="jdk linux环境" itemprop="url">jdk linux环境</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-10T08:07:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p>虽然Ubuntu提供了openjdk的使用,但是有时候apt-get的安装软件的配置信息并不熟悉,所以个人还是习惯自主安装<br>jdk7 的<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html" target="_blank" rel="external">下载地址</a><br>必须accept才能下载</p>
-<hr>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>我是在远程机器上安装的,所以还使用了scp等工具，这里就忽略了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ sudo mkdir /usr/local/java</div><div class="line">$ sudo tar zxvf jdk-7u21-linux-i586.tar.gz -C /usr/local/java</div><div class="line">$ cd /usr/local/java</div><div class="line">$ sudo mv jdk1.7.0_67 jdk</div></pre></td></tr></table></figure></p>
-<p>-C表示解压到指定文件夹,zxvf不说了<br>这样就在 /usr/local/java目录下生成了jdk目录</p>
-<hr>
-<h2 id="添加环境变量"><a href="#添加环境变量" class="headerlink" title="添加环境变量"></a>添加环境变量</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ sudo vi /etc/bash.bashrc</div></pre></td></tr></table></figure>
-<p>在最后一行添加如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">export JAVA_HOME=/usr/local/java/jdk</div><div class="line">export JRE_HOME=$&#123;JAVA_HOME&#125;/jre  </div><div class="line">export CLASSPATH=.:$&#123;JAVA_HOME&#125;/lib:$&#123;JRE_HOME&#125;/lib  </div><div class="line">export PATH=$&#123;JAVA_HOME&#125;/bin:$PATH</div></pre></td></tr></table></figure></p>
-<p>使修改生效<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ source /etc/bash.bashrc</div></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>最后 在终端中输入java -version<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ java -version</div><div class="line">java version &quot;1.7.0_67&quot;</div><div class="line">Java(TM) SE Runtime Environment (build 1.7.0_67-b01)</div><div class="line">Java HotSpot(TM) 64-Bit Server VM (build 24.65-b04, mixed mode)</div></pre></td></tr></table></figure></p>
-<p>安装成功</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/linux/">linux</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/linux/">linux</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/5/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/7/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/7/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">Tag Cloud</p>
+    <p class="asidetitle">标签云</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 15.71px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 12.86px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/http/" style="font-size: 12.86px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 14.29px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.43px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.43px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.43px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 12.86px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 17.14px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+			<li><a href="/categories/C/" title="C">C<sup>5</sup></a></li>
 		  
 		
 		  
@@ -843,11 +856,9 @@
 		  
 		
 		  
-			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
-		  
 		
 		  
-			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+			<li><a href="/categories/linux/" title="linux">linux<sup>20</sup></a></li>
 		  
 		
 		  
@@ -1028,7 +1039,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

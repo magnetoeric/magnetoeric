@@ -19,7 +19,7 @@
 <meta property="og:url" content="http://magnetoeric.github.io/2017/04/02/php_config/index.html">
 <meta property="og:site_name" content="艾瑞克">
 <meta property="og:description" content="几种方式.iniparse_ini_file() 载入一个由 filename 指定的 ini 文件，并将其中的设置作为一个联合数组返回。 ini 文件的结构和 php.ini 的相似。一下是一个名为 db.ini的配置文件 12345[db]host=0.0.0.0port=1234username=usernamepassword=pass 那么使用parse_ini_file读取也很简单 1">
-<meta property="og:updated_time" content="2017-05-22T09:23:47.000Z">
+<meta property="og:updated_time" content="2017-05-31T13:04:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读取config的几种方式">
 <meta name="twitter:description" content="几种方式.iniparse_ini_file() 载入一个由 filename 指定的 ini 文件，并将其中的设置作为一个联合数组返回。 ini 文件的结构和 php.ini 的相似。一下是一个名为 db.ini的配置文件 12345[db]host=0.0.0.0port=1234username=usernamepassword=pass 那么使用parse_ini_file读取也很简单 1">
@@ -48,7 +48,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -64,7 +64,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -87,14 +87,14 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2017-04-02T14:15:00.000Z" itemprop="datePublished"> Published 2017-04-02</time>
+    <time datetime="2017-04-02T14:15:00.000Z" itemprop="datePublished"> 发表于 2017-04-02</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">Contents</strong>
+			<strong class="toc-title">文章目录</strong>
 		
 			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#几种方式"><span class="toc-number">1.</span> <span class="toc-text">几种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ini"><span class="toc-number">1.1.</span> <span class="toc-text">.ini</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#env"><span class="toc-number">1.2.</span> <span class="toc-text">.env</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yaml"><span class="toc-number">1.3.</span> <span class="toc-text">yaml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xml"><span class="toc-number">1.4.</span> <span class="toc-text">xml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#array-amp-json"><span class="toc-number">1.5.</span> <span class="toc-text">array & json</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yaconf"><span class="toc-number">2.</span> <span class="toc-text">yaconf</span></a></li></ol>
 		
@@ -104,7 +104,7 @@
 <p>ini 文件的结构和 php.ini 的相似。<br>一下是一个名为 db.ini的配置文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[db]</div><div class="line">host=0.0.0.0</div><div class="line">port=1234</div><div class="line">username=username</div><div class="line">password=pass</div></pre></td></tr></table></figure>
 <p>那么使用parse_ini_file读取也很简单</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$config = parse_ini_file(&apos;db&apos;,true);</div><div class="line">print_r($config);exit;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$config = parse_ini_file(&apos;db.ini&apos;,true);</div><div class="line">print_r($config);exit;</div></pre></td></tr></table></figure>
 <p>会返回一个key为db的二维数组</p>
 <h3 id="env"><a href="#env" class="headerlink" title=".env"></a>.env</h3><p>利用php的环境变量 $_ENV</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">通过环境方式传递给当前脚本的变量的数组。</div><div class="line"></div><div class="line">这些变量被从 PHP 解析器的运行环境导入到 PHP 的全局命名空间。很多是由支持 PHP 运行的 Shell 提供的，并且不同的系统很可能运行着不同种类的 Shell，所以不可能有一份确定的列表。请查看你的 Shell 文档来获取定义的环境变量列表。</div><div class="line"></div><div class="line">其他环境变量包含了 CGI 变量，而不管 PHP 是以服务器模块还是 CGI 处理器的方式运行。</div><div class="line"></div><div class="line">$HTTP_ENV_VARS 包含相同的信息，但它不是一个超全局变量。 (注意 $HTTP_ENV_VARS 和 $_ENV 是不同的变量，PHP 处理它们的方式不同)</div></pre></td></tr></table></figure>
@@ -170,35 +170,35 @@
 	
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">Contents</strong>
+  <strong class="toc-title">文章目录</strong>
  
  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#几种方式"><span class="toc-number">1.</span> <span class="toc-text">几种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ini"><span class="toc-number">1.1.</span> <span class="toc-text">.ini</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#env"><span class="toc-number">1.2.</span> <span class="toc-text">.env</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yaml"><span class="toc-number">1.3.</span> <span class="toc-text">yaml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xml"><span class="toc-number">1.4.</span> <span class="toc-text">xml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#array-amp-json"><span class="toc-number">1.5.</span> <span class="toc-text">array & json</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yaconf"><span class="toc-number">2.</span> <span class="toc-text">yaconf</span></a></li></ol>
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">Tag Cloud</p>
+    <p class="asidetitle">标签云</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 15.71px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 12.86px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/http/" style="font-size: 12.86px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 14.29px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.43px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.43px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.43px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 12.86px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 17.14px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+			<li><a href="/categories/C/" title="C">C<sup>5</sup></a></li>
 		  
 		
 		  
@@ -226,11 +226,9 @@
 		  
 		
 		  
-			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
-		  
 		
 		  
-			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+			<li><a href="/categories/linux/" title="linux">linux<sup>20</sup></a></li>
 		  
 		
 		  
@@ -488,7 +486,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 

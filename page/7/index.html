@@ -46,7 +46,7 @@
 				<h1 class="site-name"><a href="/" title="艾瑞克">艾瑞克</a></h1>
 				<h2 class="blog-motto">艾瑞克的小站</h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -62,7 +62,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
 						<input type="hidden" name="q" value="site:magnetoeric.github.io">
 					</form>
 					
@@ -80,6 +80,225 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/08/10/php_01/" title="生成N个不重复的随机数" itemprop="url">生成N个不重复的随机数</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T09:38:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>##生成N个不重复的随机数<br>转自<a href="http://www.nowamagic.net/librarys/veda/detail/2508" target="_blank" rel="external">Veda 原型</a>  </p>
+<p>有25幅作品拿去投票，一次投票需要选16幅，单个作品一次投票只能选择一次。前面有个程序员捅了漏子，忘了把投票入库，有200个用户产生的投票序列为空。那么你会如何填补这个漏子？   </p>
+<p>当然向上级反映情况。但是我们这里讨论的是技术，就是需要生成1-25之间的16个不重复的随机数，去填补。具体怎么设计函数呢？将随机数存入数组，再在数组中去除重复的值，即可生成一定数量的不重复随机数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">/*</div><div class="line">* array unique_rand( int $min, int $max, int $num )</div><div class="line">* 生成一定数量的不重复随机数</div><div class="line">* $min 和 $max: 指定随机数的范围</div><div class="line">* $num: 指定生成数量</div><div class="line">*/</div><div class="line">function unique_rand($min, $max, $num) &#123;</div><div class="line">    $count = 0;</div><div class="line">    $return = array();</div><div class="line">    while ($count &lt; $num) &#123;</div><div class="line">        $return[] = mt_rand($min, $max);</div><div class="line">        $return = array_flip(array_flip($return));</div><div class="line">        $count = count($return);</div><div class="line">    &#125;</div><div class="line">    shuffle($return);</div><div class="line">    return $return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$arr = unique_rand(1, 25, 16);</div><div class="line">sort($arr);</div><div class="line"></div><div class="line">$result = &apos;&apos;;</div><div class="line">$result = &apos;&apos;;</div><div class="line">for($i=0; $i &lt; count($arr);$i++)</div><div class="line">&#123;</div><div class="line">	$result .= $arr[$i].&apos;,&apos;;</div><div class="line">&#125;</div><div class="line">$result = substr($result, 0, -1);</div><div class="line">echo $result;</div><div class="line">?&gt;</div></pre></td></tr></table></figure>
+<p>补充几点说明：  </p>
+<ul>
+<li>生成随机数时用了 mt_rand() 函数。这个函数生成随机数的平均速度要比 rand() 快四倍。<br>去除数组中的重复值时用了“翻翻法”，就是用 array_flip() 把数组的 key 和 value 交换两次。这种做法比用 array_unique() 快得多。</li>
+<li>返回数组前，先使用 shuffle() 为数组赋予新的键名，保证键名是 0-n 连续的数字。如果不进行此步骤，可能在删除重复值时造成键名不连续，给遍历带来麻烦。</li>
+</ul>
+<p>##一些优化<br>为了尊重作者，我还是不在原文里对内容进行修改了   </p>
+<ul>
+<li>for循环在使用时切记不要使用count(array)方式，php不像java会对这样的代码进行优化，这样的代码造成的结果是数组有多少个元素，就会执行多少次count(array)。  </li>
+<li>把数组拼接成字符串可以使用implode函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">string implode ( string $glue , array $pieces )</div></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/10/php_opcache/" title="read-phps-opcode" itemprop="url">read-phps-opcode</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T09:32:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="Vulcan-Logic-Disassembler"><a href="#Vulcan-Logic-Disassembler" class="headerlink" title="Vulcan Logic Disassembler"></a>Vulcan Logic Disassembler</h2><p>本文翻译自<a href="http://rancoud.com/read-phps-opcode/" target="_blank" rel="external">http://rancoud.com/read-phps-opcode/</a><br>VLD(Vulcan Logic Disassembler)是一个向你解释zend引擎如何将你的脚本转化成opcode的扩展.<br><a href="http://pecl.php.net/package/vld" target="_blank" rel="external">扩展下载地址</a><br>我将解释如何安装，使用并阅读opcode</p>
+<p>首先，你要安装PEAR<br><code>aptitude install php-pear</code><br>然后就可以添加vld<br><code>pecl install &quot;channel://pecl.php.net/vld-0.12.0&quot;</code><br>编辑php.ini文件使扩展生效<br>注意，这个文件是cli模式的,跟php.ini不同<br><code>nano /etc/php5/cli/php.ini</code><br>将下面这行加到静态扩展区域<br><code>extension=vld.so</code></p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php -dvld.dump_paths=1 -dvld.verbosity=0 -dvld.save_paths=1 -dvld.active=1 yourscript.php</div></pre></td></tr></table></figure>
+<p>以下列出参数列表及默认值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"># Activate extension: boolean </div><div class="line">vld.active	 0</div><div class="line"># The caracter used for writing columns: carater</div><div class="line">vld.col_sep	 &quot;\t&quot;</div><div class="line"># Dumps branch and paths: boolean</div><div class="line">vld.dump_paths	 1</div><div class="line"># Execute code in the same time: boolean</div><div class="line">vld.execute	 1</div><div class="line"># Format output analyze: boolean</div><div class="line">vld.format	 0</div><div class="line"># Where to save the file for graphviz .dot file: string</div><div class="line">vld.save_dir	    /tmp</div><div class="line"># dump path information has a graphviz .dot file: boolean</div><div class="line">vld.save_paths	 0</div><div class="line"># suppresses output and loading of auto_append_file respectively if vld.active=1 and vld.execute=0: boolean</div><div class="line">vld.skip_append	 0</div><div class="line"># suppresses output and loading of auto_prepend_file respectively if vld.active=1 and vld.execute=0: boolean</div><div class="line">vld.skip_prepend 0</div><div class="line"># Verbosities&apos; level (0:none, 1, 2, 3): integer</div><div class="line">vld.verbosity	 1</div></pre></td></tr></table></figure>
+<p>现在我门可以看这个网站的结果<br>(<a href="http://blog.pascal-martin.fr/post/php-obtenir-dump-opcodes" target="_blank" rel="external">http://blog.pascal-martin.fr/post/php-obtenir-dump-opcodes</a>)<br>php代码  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">for ($i=0 ; $i&gt;10 ; $i++) &#123; </div><div class="line">    if ($i % 2 === 0) &#123;</div><div class="line">        echo &quot;Pair : &quot;;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        echo &quot;Impair : &quot;;</div><div class="line">    &#125;</div><div class="line">    echo $i, &quot;\n&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>VLD 输出  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">$ ~/bin/php-5.3/bin/php -dextension=vld.so -dvld.active=1 -dvld.verbosity=0 -dvld.execute=0 exemples/003-control.php </div><div class="line">filename:       /.../exemples/003-control.php</div><div class="line">function name:  (null)</div><div class="line">number of ops:  16</div><div class="line">compiled vars:  !0 = $i</div><div class="line">line     # *  op                           fetch          ext  return  operands</div><div class="line">---------------------------------------------------------------------------------</div><div class="line">   2     0  &gt;   ASSIGN                                                   !0, 0</div><div class="line">         1  &gt;   IS_SMALLER                                       ~1      !0, 10</div><div class="line">         2    &gt; JMPZNZ                                        6          ~1, -&gt;15</div><div class="line">         3  &gt;   POST_INC                                         ~2      !0</div><div class="line">         4      FREE                                                     ~2</div><div class="line">         5    &gt; JMP                                                      -&gt;1</div><div class="line">   3     6  &gt;   MOD                                              ~3      !0, 2</div><div class="line">         7      IS_IDENTICAL                                     ~4      ~3, 0</div><div class="line">         8    &gt; JMPZ                                                     ~4, -&gt;11</div><div class="line">   4     9  &gt;   ECHO                                                     &apos;Pair+%3A+&apos;</div><div class="line">   5    10    &gt; JMP                                                      -&gt;12</div><div class="line">   7    11  &gt;   ECHO                                                     &apos;Impair+%3A+&apos;</div><div class="line">   9    12  &gt;   ECHO                                                     !0</div><div class="line">        13      ECHO                                                     &apos;%0A&apos;</div><div class="line">  10    14    &gt; JMP                                                      -&gt;3</div><div class="line">  11    15  &gt; &gt; RETURN                                                   1</div><div class="line"> </div><div class="line">branch: #  0; line:     2-    2; sop:     0; eop:     0; out1:   1</div><div class="line">branch: #  1; line:     2-    2; sop:     1; eop:     2; out1:  15; out2:   6</div><div class="line">branch: #  3; line:     2-    2; sop:     3; eop:     5; out1:   1</div><div class="line">branch: #  6; line:     3-    3; sop:     6; eop:     8; out1:   9; out2:  11</div><div class="line">branch: #  9; line:     4-    5; sop:     9; eop:    10; out1:  12</div><div class="line">branch: # 11; line:     7-    9; sop:    11; eop:    11; out1:  12</div><div class="line">branch: # 12; line:     9-   10; sop:    12; eop:    14; out1:   3</div><div class="line">branch: # 15; line:    11-   11; sop:    15; eop:    15</div><div class="line">path #1: 0, 1, 15, </div><div class="line">path #2: 0, 1, 6, 9, 12, 3, 1, 15, </div><div class="line">path #3: 0, 1, 6, 11, 12, 3, 1, 15,</div></pre></td></tr></table></figure>
+<h2 id="如何阅读"><a href="#如何阅读" class="headerlink" title="如何阅读"></a>如何阅读</h2><p>在表格上面有两行   </p>
+<ul>
+<li>操作执行的数量:有多少opcode操作将会被执行，这里是16  </li>
+<li>编译的变量:php变量和它的opcode version，这里$i被表示成!0</li>
+</ul>
+<h2 id="其他方式"><a href="#其他方式" class="headerlink" title="其他方式"></a>其他方式</h2><p>只翻译了部分，其他的不翻译了，因为我喜欢编译安装，所以vld也是编译安装<br>根据<a href="http://pecl.php.net/package/vld" target="_blank" rel="external">下载地址</a>中的version，安装适合自己php的vld版本<br>可以使用<code>php -v</code>查看自己php的版本号<br>下载好后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$tar zxvf vld-0.12.0.tgz #解压</div><div class="line">$cd vld-0.12.0/</div><div class="line">$/usr/local/php/bin/phpize  #根据自己的phpize实际位置使用</div><div class="line">$./configure --with-php-config=/usr/local/php/bin/php-config --enable-vld</div><div class="line">$sudo make </div><div class="line">$sudo make install</div></pre></td></tr></table></figure>
+<p>这样就安装完成了，然后在php.ini中添加<br><code>extension=vld.so</code><br>一般编译安装的php.ini 放在php目录下的lib目录中<br>可以使用<code>php -i |grep vld</code>查看是否安装成功</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/php/">php</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/10/linux_03/" title="jdk linux环境" itemprop="url">jdk linux环境</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T08:07:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p>虽然Ubuntu提供了openjdk的使用,但是有时候apt-get的安装软件的配置信息并不熟悉,所以个人还是习惯自主安装<br>jdk7 的<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html" target="_blank" rel="external">下载地址</a><br>必须accept才能下载</p>
+<hr>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>我是在远程机器上安装的,所以还使用了scp等工具，这里就忽略了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ sudo mkdir /usr/local/java</div><div class="line">$ sudo tar zxvf jdk-7u21-linux-i586.tar.gz -C /usr/local/java</div><div class="line">$ cd /usr/local/java</div><div class="line">$ sudo mv jdk1.7.0_67 jdk</div></pre></td></tr></table></figure></p>
+<p>-C表示解压到指定文件夹,zxvf不说了<br>这样就在 /usr/local/java目录下生成了jdk目录</p>
+<hr>
+<h2 id="添加环境变量"><a href="#添加环境变量" class="headerlink" title="添加环境变量"></a>添加环境变量</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ sudo vi /etc/bash.bashrc</div></pre></td></tr></table></figure>
+<p>在最后一行添加如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">export JAVA_HOME=/usr/local/java/jdk</div><div class="line">export JRE_HOME=$&#123;JAVA_HOME&#125;/jre  </div><div class="line">export CLASSPATH=.:$&#123;JAVA_HOME&#125;/lib:$&#123;JRE_HOME&#125;/lib  </div><div class="line">export PATH=$&#123;JAVA_HOME&#125;/bin:$PATH</div></pre></td></tr></table></figure></p>
+<p>使修改生效<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ source /etc/bash.bashrc</div></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>最后 在终端中输入java -version<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ java -version</div><div class="line">java version &quot;1.7.0_67&quot;</div><div class="line">Java(TM) SE Runtime Environment (build 1.7.0_67-b01)</div><div class="line">Java HotSpot(TM) 64-Bit Server VM (build 24.65-b04, mixed mode)</div></pre></td></tr></table></figure></p>
+<p>安装成功</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/08/10/php_03/" title="按照权重随机" itemprop="url">按照权重随机</a>
   </h1>
   <p class="article-author">By
@@ -87,7 +306,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T08:07:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T08:07:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -147,7 +366,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T08:05:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T08:05:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -228,7 +447,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -320,70 +539,6 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/08/10/redis_01/" title="记一次redis迁移" itemprop="url">记一次redis迁移</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>##事件<br>最近由于运维部门回收机器，没有通知就关闭了一个redis服务，redis中主要是同步的小区，导致搜索页猜词逻辑没有获得小区名称，继而导致分词服务请求量下降，产生报警，500页面数量升高也产生报警。</p>
-<h2 id="迁移"><a href="#迁移" class="headerlink" title="迁移"></a>迁移</h2><p>既然要回收了，就要对redis进行迁移，最开始打算在脚本同步时写2份redis（脚本是每天都跑的），然后更改读的配置，但是这样要在每一处写入的地方去再写一次，非常笨拙。于是回想到最近读的redis相关书籍，redis做主从同步，然后把代码中的配置切到从reids不就可以了。</p>
-<h2 id="相关命令"><a href="#相关命令" class="headerlink" title="相关命令"></a>相关命令</h2><p>redis主从命令很简单  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SLAVEOF IP port  //主从</div><div class="line">SLAVEOF NO ONE //停止主从</div></pre></td></tr></table></figure>
-<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>在同步rdb过程中，产生了溢出，原因应该是没有使用缓存剔除，导致out of memory。还是马神比较在行，修改从数据库配置，使用lru替换规则，保证同步过程顺利进行，然后在配置中修改了reids的ip和端口，顺利进行了迁移</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/nosql/">nosql</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/redis/">redis</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
       <a href="/2015/08/10/nginx_01/" title="nginx安装" itemprop="url">nginx安装</a>
   </h1>
   <p class="article-author">By
@@ -391,7 +546,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -476,6 +631,70 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2015/08/10/redis_01/" title="记一次redis迁移" itemprop="url">记一次redis迁移</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-10T07:44:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>##事件<br>最近由于运维部门回收机器，没有通知就关闭了一个redis服务，redis中主要是同步的小区，导致搜索页猜词逻辑没有获得小区名称，继而导致分词服务请求量下降，产生报警，500页面数量升高也产生报警。</p>
+<h2 id="迁移"><a href="#迁移" class="headerlink" title="迁移"></a>迁移</h2><p>既然要回收了，就要对redis进行迁移，最开始打算在脚本同步时写2份redis（脚本是每天都跑的），然后更改读的配置，但是这样要在每一处写入的地方去再写一次，非常笨拙。于是回想到最近读的redis相关书籍，redis做主从同步，然后把代码中的配置切到从reids不就可以了。</p>
+<h2 id="相关命令"><a href="#相关命令" class="headerlink" title="相关命令"></a>相关命令</h2><p>redis主从命令很简单  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">SLAVEOF IP port  //主从</div><div class="line">SLAVEOF NO ONE //停止主从</div></pre></td></tr></table></figure>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>在同步rdb过程中，产生了溢出，原因应该是没有使用缓存剔除，导致out of memory。还是马神比较在行，修改从数据库配置，使用lru替换规则，保证同步过程顺利进行，然后在配置中修改了reids的ip和端口，顺利进行了迁移</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/nosql/">nosql</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/redis/">redis</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2015/08/10/linux_01/" title="ssh免密码登录" itemprop="url">ssh免密码登录</a>
   </h1>
   <p class="article-author">By
@@ -483,7 +702,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T07:28:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T07:28:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -549,7 +768,7 @@
 		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-10T02:28:00.000Z" itemprop="datePublished"> Published 2015-08-10</time>
+    <time datetime="2015-08-10T02:28:00.000Z" itemprop="datePublished"> 发表于 2015-08-10</time>
     
   </p>
 </header>
@@ -610,234 +829,34 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/07/31/php-urlencode/" title="php urlencode" itemprop="url">php urlencode</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-07-31T10:49:12.000Z" itemprop="datePublished"> Published 2015-07-31</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>公司里使用dubbo做rpc，启动时dubbo的service会向zookeeper注册其自身，包含一些参数，如版本号，服务地址等等信息，但是zookeeper里的信息是urldecode的，非常不友好，又不想总去找个网站做urldecode，这时候脚本语言的优势就显现出来了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;?php</div><div class="line">echo urldecode($argv[1]);</div></pre></td></tr></table></figure>
-<p>非常简单的命令，执行时直接把zookeeper里的内容复制下来<br>php xxx.php $url　　就可以在cli里看到实际内容了</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/php/">php</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/php/">php</a><a href="/tags/urlencode/">urlencode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/07/20/books_01/" title="读书" itemprop="url">读书</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-07-20T02:36:00.000Z" itemprop="datePublished"> Published 2015-07-20</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="高性能PHP应用开发"><a href="#高性能PHP应用开发" class="headerlink" title="高性能PHP应用开发"></a>高性能PHP应用开发</h1><h2 id="读后感"><a href="#读后感" class="headerlink" title="读后感"></a>读后感</h2><p>几天时间，看完了这本书，书很薄，内容比较快餐，优化不应该是这么泛泛笼统的谈吧。<br>整本书介绍了很多工具，用工具做了一些分析，没什么实际经验分享。对于扩展视野还是有帮助，<br>比如：</p>
-<ul>
-<li>使用apache benchmark测试网站性能</li>
-<li>使用vld分析opcode</li>
-<li>ngnix,apache等应用服务其的一些介绍</li>
-<li>使用yui压缩资源文件<br>等等.</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/books/">books</a>
-</div>
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/07/20/docker_01/" title="初识docker" itemprop="url">初识docker</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="ericwang" target="_blank" itemprop="author">ericwang</a>
-		
-  <p class="article-time">
-    <time datetime="2015-07-20T02:35:00.000Z" itemprop="datePublished"> Published 2015-07-20</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="什么是docker"><a href="#什么是docker" class="headerlink" title="什么是docker"></a>什么是docker</h2><p>docker是一个开源项目,其目的是实现轻量级的操作系统虚拟化解决方案.<br>Docker 的基础是linux的容器(LXC)等技术</p>
-<hr>
-<h2 id="docker和vagrant的区别"><a href="#docker和vagrant的区别" class="headerlink" title="docker和vagrant的区别"></a>docker和vagrant的区别</h2><p>stackoverflow上的一个<a href="http://stackoverflow.com/questions/16647069/should-i-use-vagrant-or-docker-io-for-creating-an-isolated-environment" target="_blank" rel="external">问题</a>，二楼是vagrant的作者，三楼是docker的作者</p>
-<hr>
-<h2 id="Docker的三个概念"><a href="#Docker的三个概念" class="headerlink" title="Docker的三个概念"></a>Docker的三个概念</h2><ul>
-<li>镜像(Image)</li>
-<li>容器(Container)</li>
-<li>仓库(Repository)<br>理解这三个概念,就理解了Docker的整个生命周期</li>
-</ul>
-<h3 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h3><p>Docker镜像就是一个只读的模板。例如一个镜像可以包含一个完整的Ubuntu镜像,里面仅安装了某些你需要的应用程序,比如Apache+Mysql+php等等<br>镜像可以用来创建Docker容器<br>Docker提供了一个简单的方式来创建镜像或是更新现有镜像DockerHub(有点像github),你可以直接从官方或是其他人那里获得镜像直接使用</p>
-<h3 id="Docker-容器"><a href="#Docker-容器" class="headerlink" title="Docker 容器"></a>Docker 容器</h3><p>Docker 利用容器来运行应用。<br>容器是镜像创建的运行实例,每个容器可以是隔离的,保证安全的平台。<br>镜像是只读的,容器在启动的时候创建一层可写层作为最上层。</p>
-<h3 id="Docker仓库"><a href="#Docker仓库" class="headerlink" title="Docker仓库"></a>Docker仓库</h3><p>仓库是集中存放镜像文件的场所,有公有仓库和私有仓库<br>公有仓库就是我们前面说的DockerHub，用户可以在本地网络中创建一个私有仓库<br>用户可以创建自己的镜像并push到共有或私有仓库,方便下次或另外机器上使用<br>和github类似,不多说了</p>
-<hr>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>Ubuntu系统安装(我的是13.10系统 这种安装方式不是最新的Docker)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ sudo apt-get update</div><div class="line">$ sudo apt-get install docker.io</div><div class="line">$ sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker</div><div class="line">$ sudo sed -i &apos;$acomplete -F _docker docker&apos; /etc/bash_completion.d/docker.io</div></pre></td></tr></table></figure></p>
-<hr>
-<h2 id="运行一个Docker实例"><a href="#运行一个Docker实例" class="headerlink" title="运行一个Docker实例"></a>运行一个Docker实例</h2><p>首先要注册一个Docker账户<a href="https://hub.docker.com/account/signup/" target="_blank" rel="external">这里</a>，邮箱确认后就可以登录了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ sudo docker login</div></pre></td></tr></table></figure></p>
-<p>登录后,可以输入<code>$ docker run</code>来查看可用指令<br>接下来 试一试<code>$ sudo docker run ubuntu:14.04 /bin/echo &#39;Hello world&#39;</code><br><code>sudo docker run ubuntu:14.04</code>告诉 Docker加载 ubuntu 14.04。<br>Docker在运行时会判断当前运行的镜像是否加载到Docker主机上,如果没有,会到Docker下载指定的镜像<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Hello world</div></pre></td></tr></table></figure></p>
-<p>以上 就安装并运行了一个简单的Docker实例</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/docker/">docker</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/docker/">docker</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/6/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/8/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/8/">Next<span></span></a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
 
   
   <div class="tagcloudlist">
-    <p class="asidetitle">Tag Cloud</p>
+    <p class="asidetitle">标签云</p>
     <div class="tagcloudlist clearfix">
-       <a href="/tags/C/" style="font-size: 13.33px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.67px;">git</a> <a href="/tags/http/" style="font-size: 13.33px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.67px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.67px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.67px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 16.67px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
+       <a href="/tags/C/" style="font-size: 15.71px;">C</a> <a href="/tags/ansible/" style="font-size: 10px;">ansible</a> <a href="/tags/arch/" style="font-size: 10px;">arch</a> <a href="/tags/bower/" style="font-size: 10px;">bower</a> <a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/docker/" style="font-size: 12.86px;">docker</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/http/" style="font-size: 12.86px;">http</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mysql/" style="font-size: 14.29px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nodejs/" style="font-size: 11.43px;">nodejs</a> <a href="/tags/patterns/" style="font-size: 11.43px;">patterns</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 11.43px;">rabbitmq</a> <a href="/tags/redis/" style="font-size: 12.86px;">redis</a> <a href="/tags/rpc/" style="font-size: 10px;">rpc</a> <a href="/tags/shell/" style="font-size: 17.14px;">shell</a> <a href="/tags/singleton/" style="font-size: 10px;">singleton</a> <a href="/tags/solr/" style="font-size: 10px;">solr</a> <a href="/tags/urlencode/" style="font-size: 10px;">urlencode</a> <a href="/tags/varnish/" style="font-size: 10px;">varnish</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a>
     </div>
   </div>
 
 
   
 <div class="categorieslist">
-	<p class="asidetitle">Categories</p>
+	<p class="asidetitle">分类</p>
 		<ul>
 		
 		  
-			<li><a href="/categories/C/" title="C">C<sup>2</sup></a></li>
+			<li><a href="/categories/C/" title="C">C<sup>5</sup></a></li>
 		  
 		
 		  
@@ -865,11 +884,9 @@
 		  
 		
 		  
-			<li><a href="/categories/limux/" title="limux">limux<sup>1</sup></a></li>
-		  
 		
 		  
-			<li><a href="/categories/linux/" title="linux">linux<sup>19</sup></a></li>
+			<li><a href="/categories/linux/" title="linux">linux<sup>20</sup></a></li>
 		  
 		
 		  
@@ -1050,7 +1067,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
